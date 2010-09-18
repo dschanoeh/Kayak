@@ -1,21 +1,23 @@
+package de.vwag.kayak.can;
 import java.util.Date;
 
 
-public class CANFrame {
+public class Frame {
 	byte[] data;
 	int identifier;
+	
 	Date timestamp;
 	
-	public CANFrame() {
+	public Frame() {
 		
 	}
 	
-	public CANFrame(int identifier, byte[] data) {
+	public Frame(int identifier, byte[] data) {
 		this.identifier = identifier;
 		this.data = data;
 	}
 	
-	public CANFrame(int identifier, byte[] data, Date timestamp) {
+	public Frame(int identifier, byte[] data, Date timestamp) {
 		this.identifier = identifier;
 		this.data = data;
 		this.timestamp = timestamp;
@@ -23,6 +25,10 @@ public class CANFrame {
 	
 	public Date getTimestamp() {
 		return timestamp;
+	}
+	
+	public int getIdentifier() {
+		return identifier;
 	}
 	
 	public int getLength() {

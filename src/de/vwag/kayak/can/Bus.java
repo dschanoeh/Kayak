@@ -1,11 +1,15 @@
+package de.vwag.kayak.can;
+
 import java.util.ArrayList;
 
 
-public abstract class CANBus {
+public abstract class Bus {
 	ArrayList<FrameReceiver> receivers;
+	BusStatistics statistics;
 	
-	public CANBus() {
+	public Bus() {
 		receivers = new ArrayList<FrameReceiver>();
+		statistics = null;
 	}
 	
 	public void registerReceiver(FrameReceiver receiver) {
@@ -18,9 +22,21 @@ public abstract class CANBus {
 		receivers.remove(receiver);
 	}
 	
-	private void sendFrame(CANFrame frame) {
+	public void enableStatistics() {
+		statistics = new BusStatistics();
+	}
+	
+	public void disableStatistics() {
+		statistics = null;
+	}
+	
+	public void receiveFrame(Frame frame) {
 		for(FrameReceiver r : receivers) {
 			r.newFrame(frame);
+		}
+		
+		if(statistics!=null) {
+			statistics.frameReceived(frame.getIdentifier(), frame.getLength());
 		}
 	}
 	
