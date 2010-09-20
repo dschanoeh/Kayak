@@ -8,7 +8,7 @@ import java.nio.ByteOrder;
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  *
  */
-public class ParsingInformation {
+public class SignalInformation {
 	public enum DataType {
 		INT,
 		FLOAT
@@ -18,10 +18,38 @@ public class ParsingInformation {
 	private float factor;
 	private float offset;
 	private int startPosition;
-	private int endPosition;
+	private int size;
 	private ByteOrder byteOrder;
+	private String name;
+	private boolean signed;
+	private float minimum;
+	private float maximum;
 	
 	
+	public float getMinimum() {
+		return minimum;
+	}
+	public void setMinimum(float minimum) {
+		this.minimum = minimum;
+	}
+	public float getMaximum() {
+		return maximum;
+	}
+	public void setMaximum(float maximum) {
+		this.maximum = maximum;
+	}
+	public boolean isSigned() {
+		return signed;
+	}
+	public void setSigned(boolean signed) {
+		this.signed = signed;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public ByteOrder getByteOrder() {
 		return byteOrder;
 	}
@@ -52,11 +80,11 @@ public class ParsingInformation {
 	public void setStartPosition(int startPosition) {
 		this.startPosition = startPosition;
 	}
-	public int getEndPosition() {
-		return endPosition;
+	public int getSize() {
+		return size;
 	}
-	public void setEndPosition(int endPosition) {
-		this.endPosition = endPosition;
+	public void setSize(int size) {
+		this.size = size;
 	}
 	
 	
