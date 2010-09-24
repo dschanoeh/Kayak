@@ -5,8 +5,20 @@ import java.util.Date;
 public class Frame {
 	byte[] data;
 	int identifier;
+	String busName;
+	long timestamp;
 	
-	Date timestamp;
+	public String getBusName() {
+		return busName;
+	}
+
+	public void setBusName(String busName) {
+		this.busName = busName;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
 	
 	public Frame() {
 		
@@ -17,13 +29,13 @@ public class Frame {
 		this.data = data;
 	}
 	
-	public Frame(int identifier, byte[] data, Date timestamp) {
+	public Frame(int identifier, byte[] data, long timestamp) {
 		this.identifier = identifier;
 		this.data = data;
 		this.timestamp = timestamp;
 	}
 	
-	public Date getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 	

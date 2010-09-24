@@ -24,8 +24,10 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 	ArrayList<String> busNames;
 	Bus[] busses;
 	Thread myThread;
+	File file;
 	
 	public ReplayFrameSource(File file) throws FileNotFoundException, IOException {
+		this.file = file;
 		reOpenFile(file);
 		
 		busNames = new ArrayList<String>();
@@ -81,37 +83,46 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 	@Override
 	public void run() {
 		try {
-			Date startTime = new Date();
+			Date startTime;
 			
-			while(reader.ready() && !stop) {
-				String line = reader.readLine();
-				String[] rows = line.split("\\s");
+			for(;;) {
+				startTime = new Date();
 				
-				/* check if we have a bus connected for this recorded bus */
-				int busNumber = busNames.indexOf(rows[1]);
-				if(busNumber < 0 || busses[busNumber] == null)
-					continue;
+				while(reader.ready() && !stop) {
+					String line = reader.readLine();
+					String[] rows = line.split("\\s");
+					
+					/* check if we have a bus connected for this recorded bus */
+					int busNumber = busNames.indexOf(rows[1]);
+					if(busNumber < 0 || busses[busNumber] == null)
+						continue;
+					
+					long msecs = (long)(Double.parseDouble((rows[0].substring(1, rows[0].length()-1))) * 1000);
+					String[] data = rows[2].split("#");
+					int identifier = Integer.parseInt(data[0]);
+					byte[] message = Util.hexStringToByteArray(data[1]);
+					
+					Frame frame = new Frame(identifier, message);
+					
+					long timeToWait = msecs - ((new Date()).getTime() - startTime.getTime());
+					
+					/* if timeToWait is <0 we are to late. if it is >0 we have to wait. This only makes sense if
+					 * it is more than a few ms.
+					 */
+					if(timeToWait >= 10) {
+						Thread.sleep(timeToWait);
+					} 
+					
+					busses[busNumber].receiveFrame(frame);
+				}
 				
-				long msecs = (long)(Double.parseDouble((rows[0].substring(1, rows[0].length()))) * 1000);
-				String[] data = rows[2].split("#");
-				int identifier = Integer.parseInt(data[0]);
-				byte[] message = hexStringToByteArray(data[1]);
+				if(stop)
+					break;
 				
-				Frame frame = new Frame(identifier, message);
+				reader.close();
+				reOpenFile(file);
 				
-				long timeToWait = msecs - ((new Date()).getTime() - startTime.getTime());
-				
-				/* if timeToWait is <0 we are to late. if it is >0 we have to wait. This only makes sense if
-				 * it is more than a few ms.
-				 */
-				if(timeToWait >= 10) {
-					Thread.sleep(timeToWait);
-				} 
-				
-				busses[busNumber].receiveFrame(frame);
 			}
-			
-			reader.close();
 			
 			
 		} catch (IOException e) {
@@ -125,15 +136,7 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 		
 	}
 	
-	private byte[] hexStringToByteArray(String s) {
-	    int len = s.length();
-	    byte[] data = new byte[len / 2];
-	    for (int i = 0; i < len; i += 2) {
-	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-	                             + Character.digit(s.charAt(i+1), 16));
-	    }
-	    return data;
-	}
+	
 	
 	
 }
