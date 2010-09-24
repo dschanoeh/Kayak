@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -18,7 +17,6 @@ import java.util.zip.GZIPInputStream;
  *
  */
 public class ReplayFrameSource implements FrameSource, Runnable{
-	private File logFile;
 	private Boolean stop=false;
 	BufferedReader reader;
 	ArrayList<String> busNames;
@@ -83,10 +81,9 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 	@Override
 	public void run() {
 		try {
-			Date startTime;
 			
 			for(;;) {
-				startTime = new Date();
+				long startTime = System.currentTimeMillis();
 				
 				while(reader.ready() && !stop) {
 					String line = reader.readLine();
@@ -104,7 +101,7 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 					
 					Frame frame = new Frame(identifier, message);
 					
-					long timeToWait = msecs - ((new Date()).getTime() - startTime.getTime());
+					long timeToWait = msecs - (System.currentTimeMillis() - startTime);
 					
 					/* if timeToWait is <0 we are to late. if it is >0 we have to wait. This only makes sense if
 					 * it is more than a few ms.

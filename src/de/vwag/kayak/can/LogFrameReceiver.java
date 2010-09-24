@@ -1,13 +1,33 @@
 package de.vwag.kayak.can;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.zip.GZIPOutputStream;
 
 public class LogFrameReceiver implements FrameReceiver {
-	FileWriter writer;
+	Boolean gzipped;
+	BufferedWriter writer;
+	
+	public Boolean getGzipped() {
+		return gzipped;
+	}
+	
+	
 	public LogFrameReceiver(File file) throws IOException {
-		writer = new FileWriter(file);
+		FileOutputStream fileStream = new FileOutputStream(file);
+		
+		if(file.getName().endsWith(".gz")) {
+			GZIPOutputStream zipStream = new GZIPOutputStream(fileStream);
+			OutputStreamWriter outputWriter = new OutputStreamWriter(zipStream);
+			writer = new BufferedWriter(outputWriter);
+		} else {
+			OutputStreamWriter outputWriter = new OutputStreamWriter(fileStream);
+			writer = new BufferedWriter(outputWriter);
+		}
 	}
 	
 	public void close() throws IOException {
