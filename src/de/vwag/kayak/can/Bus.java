@@ -14,14 +14,18 @@ public class Bus {
 	ArrayList<FrameReceiver> receivers;
 	BusStatistics statistics;
 	String name;
-	Date startTime;
+	TimeSource timeSource;
 	
 	public String getName() {
 		return name;
 	}
-	
-	public void open() {
-		startTime = new Date();
+
+	public TimeSource getTimeSource() {
+		return timeSource;
+	}
+
+	public void setTimeSource(TimeSource timeSource) {
+		this.timeSource = timeSource;
 	}
 
 	public void setName(String name) {
@@ -55,12 +59,8 @@ public class Bus {
 		if(name!=null)
 			frame.setBusName(name);
 		
-		/* TODO it needs to be checked if this is the fastest way to set the timestamp.
-		 * probably a separate thread could handle this more elegant...
-		 */
-		if(startTime!=null) {
-			frame.setTimestamp(new Date().getTime() - startTime.getTime());
-		}
+		if(timeSource != null)
+			frame.setTimestamp(timeSource.getTime());
 		
 		for(FrameReceiver r : receivers) {
 			r.newFrame(frame);
