@@ -8,6 +8,9 @@ public class MessageInformation {
 	private boolean multiplexed;
 	private int ID;
 	private ArrayList<SignalInformation> signals;
+	private String name;
+	private String sender;
+	private int length;
 	
 	public MessageInformation() {
 		signals = new ArrayList<SignalInformation>();
@@ -52,10 +55,6 @@ public class MessageInformation {
 	public void setLength(int length) {
 		this.length = length;
 	}
-
-	private String name;
-	private String sender;
-	private int length;
 	
 	public boolean isMultiplexed() {
 		return multiplexed;
@@ -63,10 +62,5 @@ public class MessageInformation {
 	
 	public void setMultiplexed(Boolean multiplexed) {
 		this.multiplexed = multiplexed;
-	}
-	
-	public Data[] generateData(Frame frame) {
-		return null;
-		
 	}
 }

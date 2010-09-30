@@ -1,7 +1,6 @@
 package de.vwag.kayak.can;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * A Bus is the virtual representation of a CAN bus. It connects different
@@ -11,10 +10,10 @@ import java.util.Date;
  *
  */
 public class Bus {
-	ArrayList<FrameReceiver> receivers;
-	BusStatistics statistics;
-	String name;
-	TimeSource timeSource;
+	private ArrayList<FrameReceiver> receivers;
+	private BusStatistics statistics;
+	private String name;
+	private TimeSource timeSource;
 	
 	public String getName() {
 		return name;

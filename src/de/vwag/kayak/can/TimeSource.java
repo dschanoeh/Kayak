@@ -8,7 +8,7 @@ package de.vwag.kayak.can;
  *
  */
 public class TimeSource {
-	long reference;
+	private long reference;
 	
 	public TimeSource() {
 		reference = System.currentTimeMillis();

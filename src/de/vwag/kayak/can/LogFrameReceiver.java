@@ -3,14 +3,13 @@ package de.vwag.kayak.can;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.zip.GZIPOutputStream;
 
 public class LogFrameReceiver implements FrameReceiver {
-	Boolean gzipped;
-	BufferedWriter writer;
+	private Boolean gzipped;
+	private BufferedWriter writer;
 	
 	public Boolean getGzipped() {
 		return gzipped;

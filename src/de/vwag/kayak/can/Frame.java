@@ -1,12 +1,10 @@
 package de.vwag.kayak.can;
-import java.util.Date;
-
 
 public class Frame {
-	byte[] data;
-	int identifier;
-	String busName;
-	long timestamp;
+	private byte[] data;
+	private int identifier;
+	private String busName;
+	private long timestamp;
 	
 	public String getBusName() {
 		return busName;

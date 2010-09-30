@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -18,11 +17,11 @@ import java.util.zip.GZIPInputStream;
  */
 public class ReplayFrameSource implements FrameSource, Runnable{
 	private Boolean stop=false;
-	BufferedReader reader;
-	ArrayList<String> busNames;
-	Bus[] busses;
-	Thread myThread;
-	File file;
+	private BufferedReader reader;
+	private ArrayList<String> busNames;
+	private Bus[] busses;
+	private Thread myThread;
+	private File file;
 	
 	public ReplayFrameSource(File file) throws FileNotFoundException, IOException {
 		this.file = file;
