@@ -3,7 +3,7 @@ package de.vwag.kayak.canData;
 public class Signal {
 	private String name;
 	private String unit;
-	private int valueInt;
+	private long valueLong;
 	private double valueDouble;
 	
 	public Signal(SignalInformation information) {
@@ -11,12 +11,12 @@ public class Signal {
 		this.unit = information.getUnit();
 	}
 
-	public int getValueInt() {
-		return valueInt;
+	public long getValueLong() {
+		return valueLong;
 	}
 
-	public void setValueInt(int valueInt) {
-		this.valueInt = valueInt;
+	public void setValueLong(long valueLong) {
+		this.valueLong = valueLong;
 	}
 
 	public double getValueDouble() {
