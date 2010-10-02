@@ -55,6 +55,13 @@ public class BusMessageParser implements FrameReceiver {
 			if(signalInformation.getByteOrder() == ByteOrder.LITTLE_ENDIAN) {
 				/* TODO implement little endian */
 			}
+			
+			/* If the data should be interpreted as signed we have to calculate the 
+			 * two's complement
+			 */
+			if(signalInformation.isSigned())
+				rawData = unsignedToSigned(rawData, signalInformation.getSize());
+			
 			double factor = signalInformation.getFactor();
 			double offset = signalInformation.getOffset();
 			
@@ -73,6 +80,17 @@ public class BusMessageParser implements FrameReceiver {
 		message.setSignals(signals);
 		
 		return message;
+	}
+	
+	private long unsignedToSigned(long number, int size) {
+		/* check if the MSB is set. If this is the case the number is negative. The msb
+		 * then has a negative value and can be subtracted after masking out the old. */
+		long msb = 1 << (size-1);
+		if((number & msb) != 0) {
+			number = (number & ~msb) - msb;
+		}
+			
+		return number; 
 	}
 	
 	/**
