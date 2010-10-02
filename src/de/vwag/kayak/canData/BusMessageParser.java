@@ -49,7 +49,6 @@ public class BusMessageParser implements FrameReceiver {
 			
 			long rawData = extractBits(frame.getData(), signalInformation.getStartPosition(), signalInformation.getSize());
 			
-			
 			/* If the byte order is little endian we have to do some work to switch the bytes.
 			 * if it is big endian the order is already correct.
 			 */
@@ -76,26 +75,27 @@ public class BusMessageParser implements FrameReceiver {
 		return message;
 	}
 	
-	
+	/**
+	 * This function extracts a given number of bits out of a byte array starting at a
+	 * given position. The result is returned as a long.
+	 * There are two issues with this approach. First we can not handle values that are
+	 * wider than 2^63bit (because long is signed). This is possibly rarely used but
+	 * nevertheless should be somehow fixed. Second the performance could be poor
+	 * because calculation is done bitwise.
+	 * @param data The byte array to work with
+	 * @param startBit The first bit to be extracted
+	 * @param size The number of bits that have to be extracted
+	 * @return Long representation of the extracted bits
+	 */
 	private long extractBits(byte[] data, int startBit, int size) {
-		/* TODO needs to be implemented correct :) */
-		/*long val = 0;
+		long val = 0;
 		
-		for(int i=startBit/8;i<=(startBit+size-1)/8;i++) {
-			int shiftVal = i*8-startBit;
-			if(shiftVal > 0) {
-				long a = data[i]<<shiftVal;
-				val |= a;
-			} else { 
-				long a = data[i]>>-shiftVal;
-				val |= a;
-			}
-
-		}
+	     for(int i = 0; i< size;i++){
+	         int bitNr = i + startBit;
+	         val |= ((data[bitNr >> 3] >> (bitNr & 0x07)) & 1) << i;
+	     }
 		
-		val &= ~(0xFFFFFFFFFFFFFFFFL << size);*/
-		
-		return 0;
+		return val;
 	}
 	
 	
