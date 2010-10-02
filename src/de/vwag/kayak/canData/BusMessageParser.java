@@ -27,7 +27,7 @@ public class BusMessageParser implements FrameReceiver {
 			return;
 		
 		/* TODO possibly we could check here if there is someone listening for
-		 * this messages. If no we won't have to parse it at all.
+		 * this messages. If not we won't have to parse it at all.
 		 */
 		
 		parse(frame, information);
@@ -46,21 +46,22 @@ public class BusMessageParser implements FrameReceiver {
 			/* get the bits and build a value. We have to take care
 			 * if this is big or little endian.
 			 */
+			int size = signalInformation.getSize();
 			
-			long rawData = extractBits(frame.getData(), signalInformation.getStartPosition(), signalInformation.getSize());
+			long rawData = extractBits(frame.getData(), signalInformation.getStartPosition(), size);
 			
 			/* If the byte order is little endian we have to do some work to switch the bytes.
-			 * if it is big endian the order is already correct.
+			 * if it is big endian the order is already correct. 
 			 */
-			if(signalInformation.getByteOrder() == ByteOrder.LITTLE_ENDIAN) {
-				/* TODO implement little endian */
-			}
+			if(signalInformation.getByteOrder() == ByteOrder.LITTLE_ENDIAN) 
+				rawData = bigToLittleEndian(rawData, size);
+			
 			
 			/* If the data should be interpreted as signed we have to calculate the 
 			 * two's complement
 			 */
 			if(signalInformation.isSigned())
-				rawData = unsignedToSigned(rawData, signalInformation.getSize());
+				rawData = unsignedToSigned(rawData, size);
 			
 			double factor = signalInformation.getFactor();
 			double offset = signalInformation.getOffset();
@@ -80,6 +81,21 @@ public class BusMessageParser implements FrameReceiver {
 		message.setSignals(signals);
 		
 		return message;
+	}
+	
+	/* TODO it has to checked if this is the the correct behaviour */
+	private long bigToLittleEndian(long rawData, int size) {
+		long newData = 0;
+		int numOfBytes = size / 8;
+		if((size % 8) > 0)
+			numOfBytes++;
+		
+		for(int x=0;x < numOfBytes;x++) {
+			long currentByte = ((0x000000ffL << (x*8)) & rawData) >> (x*8); 
+			newData |=  currentByte << (((numOfBytes-1)*8) - (x*8));
+		}
+		
+		return newData;
 	}
 	
 	private long unsignedToSigned(long number, int size) {
