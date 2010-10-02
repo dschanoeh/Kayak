@@ -42,7 +42,7 @@ public class Bus {
 		}
 	}
 	
-	public void deregisterReceiver(FrameReceiver receiver) {
+	public void unregisterReceiver(FrameReceiver receiver) {
 		receivers.remove(receiver);
 	}
 	
