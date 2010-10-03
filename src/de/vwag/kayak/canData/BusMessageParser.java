@@ -57,8 +57,8 @@ public class BusMessageParser implements FrameReceiver {
 				rawData = bigToLittleEndian(rawData, size);
 			
 			
-			/* If the data should be interpreted as signed we have to calculate the 
-			 * two's complement
+			/* If the data should be interpreted as signed we have to it was encoded with
+			 * the two's complement
 			 */
 			if(signalInformation.isSigned())
 				rawData = unsignedToSigned(rawData, size);
@@ -98,8 +98,14 @@ public class BusMessageParser implements FrameReceiver {
 		return newData;
 	}
 	
+	/**
+	 * Interpret the signed long number as if it was a signed number with the given size
+	 * @param number The number to be converted
+	 * @param size Size of the number in bit
+	 * @return returns a number with the correct value
+	 */
 	private long unsignedToSigned(long number, int size) {
-		/* check if the MSB is set. If this is the case the number is negative. The msb
+		/* check if the MSB is set. If this is the case the number is negative. The MSB
 		 * then has a negative value and can be subtracted after masking out the old. */
 		long msb = 1 << (size-1);
 		if((number & msb) != 0) {
