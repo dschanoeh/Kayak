@@ -54,6 +54,9 @@ public class BusMessageParser implements FrameReceiver {
 			 * if this is big or little endian.
 			 */
 			int size = signalInformation.getSize();
+			if(size>63) {
+				logger.log(Level.WARNING, "Size of signal" + signalInformation.getName() + " is too large for the current implementation. This won't work.");
+			}
 			
 			long rawData = extractBits(frame.getData(), signalInformation.getStartPosition(), size);
 			
@@ -76,9 +79,11 @@ public class BusMessageParser implements FrameReceiver {
 			long longValue = rawData * (long) factor + (long) offset;
 			double doubleValue = (double) rawData * factor + offset;
 			
-			/* TODO handle maximum and minimum or at least print warnings if the value exceeds
-			 * maximum and minimum
-			 */
+			if(doubleValue < signalInformation.getMinimum()) {
+				logger.log(Level.WARNING, "Value of " + signalInformation.getName() + " is smaller than the specified minimum.");
+			} else if(doubleValue > signalInformation.getMaximum()) {
+				logger.log(Level.WARNING, "Value of " + signalInformation.getName() + " is greater than the specified maximum.");
+			}
 			
 			signals[i].setValueDouble(doubleValue);
 			signals[i].setValueLong(longValue);
