@@ -34,5 +34,9 @@ public class Signal {
 	public String getUnit() {
 		return unit;
 	}
+	
+	public String toString() {
+		return name + ": " + String.valueOf(valueDouble) +  " (" + String.valueOf(valueLong) + ") " + unit;
+	}
 
 }
