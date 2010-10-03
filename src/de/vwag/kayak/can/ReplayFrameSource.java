@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -22,6 +24,7 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 	private Bus[] busses;
 	private Thread myThread;
 	private File file;
+	private Logger logger = Logger.getLogger("de.vwag.kayak.can");
 	
 	public ReplayFrameSource(File file) throws FileNotFoundException, IOException {
 		this.file = file;
@@ -123,17 +126,16 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 				
 				reader.close();
 				reOpenFile(file);
+				logger.log(Level.INFO, "Restarting replay of logfile.");
 				
 			}
 			
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "IO error while reading logfile.", e);
 			return;
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.WARNING, "Logfile replay thread was interruped.", e);
 		}
 		
 	}
