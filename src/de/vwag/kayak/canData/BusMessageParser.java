@@ -3,12 +3,19 @@ package de.vwag.kayak.canData;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.vwag.kayak.can.*;
 
 public class BusMessageParser implements FrameReceiver {
+	private static Logger logger = Logger.getLogger("de.vwag.kayak.canData");
 	
 	Hashtable<Integer, MessageInformation> messageInformation;
+	
+	public BusMessageParser() {
+		messageInformation = new Hashtable<Integer, MessageInformation>();
+	}
 	
 	public void setMessageInformation(ArrayList<MessageInformation> information) {
 		for(MessageInformation info : information) {
