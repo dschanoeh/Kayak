@@ -31,10 +31,16 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 		
 		while(reader.ready()) {
 			String line = reader.readLine();
-			String bus = line.split("\\s")[1];
 			
-			if(!busNames.contains(bus)) {
-				busNames.add(bus);
+			String bus="";
+			
+			/* Ignore empty lines */
+			if(line != "") {
+				bus = line.split("\\s")[1];
+			
+				if(!busNames.contains(bus)) {
+					busNames.add(bus);
+				}
 			}
 		}
 		busses = new Bus[busNames.size()];
