@@ -1,0 +1,84 @@
+<class-diagram version="0.9.86" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true">  
+  <class corner="BOTTOM_RIGHT" language="java" name="de.vwag.kayak.canData.BusMessageParser" project="Kayak" 
+    file="/Kayak/src/de/vwag/kayak/canData/BusMessageParser.java" binary="false">    
+    <position x="464" y="532" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class corner="BOTTOM_RIGHT" language="java" name="de.vwag.kayak.canData.DBCParser" project="Kayak" 
+    file="/Kayak/src/de/vwag/kayak/canData/DBCParser.java" binary="false">    
+    <position x="287" y="70" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class corner="BOTTOM_RIGHT" language="java" name="de.vwag.kayak.canData.MessageInformation" project="Kayak" 
+    file="/Kayak/src/de/vwag/kayak/canData/MessageInformation.java" binary="false">    
+    <position x="581" y="228" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <enumeration corner="BOTTOM_RIGHT" language="java" name="de.vwag.kayak.canData.SignalInformation.DataType" 
+    project="Kayak" file="/Kayak/src/de/vwag/kayak/canData/SignalInformation.java" binary="false">    
+    <position x="831" y="531" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </enumeration>  
+  <class corner="BOTTOM_RIGHT" language="java" name="de.vwag.kayak.canData.SignalInformation" project="Kayak" 
+    file="/Kayak/src/de/vwag/kayak/canData/SignalInformation.java" binary="false">    
+    <position x="856" y="218" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <association>    
+    <source project="Kayak" name="de.vwag.kayak.canData.BusMessageParser" 
+      file="/Kayak/src/de/vwag/kayak/canData/BusMessageParser.java" binary="false" navigable="false">      
+      <attribute name="messageInformation"/>      
+      <multiplicity minimum="0" maximum="2147483647"/>    
+    </source>    
+    <target project="Kayak" name="de.vwag.kayak.canData.MessageInformation" 
+      file="/Kayak/src/de/vwag/kayak/canData/MessageInformation.java" binary="false" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association>    
+    <source project="Kayak" name="de.vwag.kayak.canData.DBCParser" 
+      file="/Kayak/src/de/vwag/kayak/canData/DBCParser.java" binary="false" navigable="false">      
+      <attribute name="identifiers"/>      
+      <multiplicity minimum="0" maximum="2147483647"/>    
+    </source>    
+    <target project="Kayak" name="de.vwag.kayak.canData.MessageInformation" 
+      file="/Kayak/src/de/vwag/kayak/canData/MessageInformation.java" binary="false" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting>    
+    <source project="Kayak" name="de.vwag.kayak.canData.SignalInformation" 
+      file="/Kayak/src/de/vwag/kayak/canData/SignalInformation.java" binary="false"/>    
+    <target project="Kayak" name="de.vwag.kayak.canData.SignalInformation.DataType" 
+      file="/Kayak/src/de/vwag/kayak/canData/SignalInformation.java" binary="false"/>  
+  </nesting>  
+  <association>    
+    <source project="Kayak" name="de.vwag.kayak.canData.MessageInformation" 
+      file="/Kayak/src/de/vwag/kayak/canData/MessageInformation.java" binary="false" navigable="false">      
+      <attribute name="signals"/>      
+      <multiplicity minimum="0" maximum="2147483647"/>    
+    </source>    
+    <target project="Kayak" name="de.vwag.kayak.canData.SignalInformation" 
+      file="/Kayak/src/de/vwag/kayak/canData/SignalInformation.java" binary="false" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <classifier-display autosize="true" package="true" initial-value="false" signature="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="false"/>    
+    <operations public="true" package="true" protected="true" private="false"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

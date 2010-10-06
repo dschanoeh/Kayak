@@ -32,7 +32,7 @@ public class LogFrameReceiver implements FrameReceiver {
 	public void close() throws IOException {
 		writer.close();
 	}
-	@Override
+
 	public void newFrame(Frame frame) {
 		/* TODO The timestamp number formatting is dirty... */
 		long timestamp = frame.getTimestamp();

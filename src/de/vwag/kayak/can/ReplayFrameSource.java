@@ -64,29 +64,23 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 		}
 	}
 	
-	
-	@Override
 	public void close() {
 		stop = true;
 	}
 
-	@Override
 	public void open() {
 		myThread = new Thread(this);
 		myThread.start();
 	}
 
-	@Override
 	public void connectBus(Bus bus, int number) {
 		busses[number] = bus;
 	}
 
-	@Override
 	public int getNumberOfBusses() {
 		return busNames.size();
 	}
 
-	@Override
 	public void run() {
 		try {
 			

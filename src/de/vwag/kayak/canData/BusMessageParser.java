@@ -23,7 +23,6 @@ public class BusMessageParser implements FrameReceiver {
 		}
 	}
 	
-	@Override
 	public void newFrame(Frame frame) {
 		MessageInformation information = messageInformation.get(frame.getIdentifier());
 		
