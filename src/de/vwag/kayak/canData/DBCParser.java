@@ -89,8 +89,15 @@ public class DBCParser {
 						
 						signal.setUnit(endSplit[1].substring(1, endSplit[1].length()-1));
 						
-						if(!endSplit[2].equals("Vector__XXX")) {
-							/* TODO add receivers. This is not done yet because it seems useless... */
+						if(!endSplit[endSplit.length-1].equals("Vector__XXX")) {
+							if(endSplit[2].contains(",")) {
+								String[] receiverSplit = endSplit[endSplit.length-1].split(",");
+								signal.setReceivers(receiverSplit);
+							} else {
+								signal.setReceivers(new String[] { endSplit[endSplit.length-1] });
+							}
+							
+							
 						}
 						
 						identifier.addSignal(signal);

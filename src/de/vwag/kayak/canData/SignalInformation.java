@@ -24,8 +24,15 @@ public class SignalInformation {
 	private boolean signed;
 	private float minimum;
 	private float maximum;
+	private String[] receivers;
 	
 	
+	public String[] getReceivers() {
+		return receivers;
+	}
+	public void setReceivers(String[] receivers) {
+		this.receivers = receivers;
+	}
 	public float getMinimum() {
 		return minimum;
 	}
