@@ -2,8 +2,6 @@ package de.vwag.kayak.canData;
 
 import java.util.ArrayList;
 
-import de.vwag.kayak.can.*;
-
 public class MessageInformation {
 	private boolean multiplexed;
 	private int ID;
