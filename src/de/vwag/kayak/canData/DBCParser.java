@@ -2,10 +2,13 @@ package de.vwag.kayak.canData;
 import java.io.*;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class DBCParser {
 	ArrayList<MessageInformation> identifiers;
+	private static Logger logger = Logger.getLogger("de.vwag.kayak.canData");
 	
 	public ArrayList<MessageInformation> getIdentifiers() {
 		return identifiers;
@@ -18,8 +21,7 @@ public class DBCParser {
 		if(!file.canRead())
 			return;
 		
-		try {
-			
+		try {			
 			FileReader fileReader = new FileReader(file);
 			BufferedReader reader = new BufferedReader(fileReader);
 			
@@ -28,7 +30,7 @@ public class DBCParser {
 			while(reader.ready()) {
 				
 				if(line.startsWith("BS_")) {
-					/* parse baudrate */
+					/* TODO parse baudrate */
 					line=null;
 				} else if(line.startsWith("BO_")) {
 					MessageInformation identifier = new MessageInformation();
@@ -109,11 +111,9 @@ public class DBCParser {
 			
 			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "Could not open logfile.", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "IO error while reading logfile.", e);
 		}
 	}
 }
