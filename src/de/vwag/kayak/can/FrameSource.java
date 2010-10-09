@@ -8,11 +8,10 @@ package de.vwag.kayak.can;
  *
  */
 public interface FrameSource {
-	
 	public void connectBus(Bus bus, int number);
 	public void open();
 	public void close();
 	public int getNumberOfBusses();
-	
-
+	public String getDescription();
+	public String getNameOfBus(int number);
 }

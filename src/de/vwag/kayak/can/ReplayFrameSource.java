@@ -11,6 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+
+
 /**
  * A ReplayFrameSource is an implementation of a unidirectional FrameSource.
  * It is used to replay a saved logfile.
@@ -24,6 +26,8 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 	private Bus[] busses;
 	private Thread myThread;
 	private File file;
+	private String description;
+	private String platform;
 	private Logger logger = Logger.getLogger("de.vwag.kayak.can");
 	
 	public ReplayFrameSource(File file) throws FileNotFoundException, IOException {
@@ -39,10 +43,18 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 			
 			/* Ignore empty lines */
 			if(line != "") {
-				bus = line.split("\\s")[1];
-			
-				if(!busNames.contains(bus)) {
-					busNames.add(bus);
+				if(line.startsWith("DEVICE_ALIAS")) {
+					/* TODO to be implemented */
+				} else if(line.startsWith("PLATFORM")) {
+					platform = line.split("\\s")[1];
+				} else if(line.startsWith("DESCRIPTION")) {
+					description = line.substring(line.indexOf("\"")+1, line.lastIndexOf("\"")-1);
+				} else {
+					bus = line.split("\\s")[1];
+					
+					if(!busNames.contains(bus)) {
+						busNames.add(bus);
+					}
 				}
 			}
 		}
@@ -50,6 +62,17 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 		
 		reOpenFile(file);
 		
+	}
+	
+	public String getDescription() {
+		if(platform==null)
+			return description;
+		else
+			return description + " (" + platform + ")";
+	}
+	
+	public String getNameOfBus(int number) {
+		return busNames.get(number);
 	}
 	
 	private void reOpenFile(File file) throws FileNotFoundException, IOException {
@@ -89,6 +112,9 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 				
 				while(reader.ready() && !stop) {
 					String line = reader.readLine();
+					if(!line.startsWith("("))
+						continue;
+					
 					String[] rows = line.split("\\s");
 					
 					/* check if we have a bus connected for this recorded bus */
@@ -98,7 +124,8 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 					
 					long msecs = (long)(Double.parseDouble((rows[0].substring(1, rows[0].length()-1))) * 1000);
 					String[] data = rows[2].split("#");
-					int identifier = Integer.parseInt(data[0]);
+					
+					int identifier = Integer.parseInt(data[0], 16);
 					byte[] message = Util.hexStringToByteArray(data[1]);
 					
 					Frame frame = new Frame(identifier, message);
