@@ -28,6 +28,7 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 	private File file;
 	private String description;
 	private String platform;
+	private long timeOffset;
 	private Logger logger = Logger.getLogger("de.vwag.kayak.can");
 	
 	public ReplayFrameSource(File file) throws FileNotFoundException, IOException {
@@ -35,6 +36,7 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 		reOpenFile(file);
 		
 		busNames = new ArrayList<String>();
+		Boolean firstLine = true;
 		
 		while(reader.ready()) {
 			String line = reader.readLine();
@@ -49,11 +51,17 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 					platform = line.split("\\s")[1];
 				} else if(line.startsWith("DESCRIPTION")) {
 					description = line.substring(line.indexOf("\"")+1, line.lastIndexOf("\"")-1);
-				} else {
+				} else if(line.startsWith("(")){
 					bus = line.split("\\s")[1];
 					
 					if(!busNames.contains(bus)) {
 						busNames.add(bus);
+					}
+					
+					if(firstLine) {
+						String[] cols = line.split("\\s");
+						timeOffset = (long)(Double.parseDouble((cols[0].substring(1, cols[0].length()-1))) * 1000);
+						firstLine = false;
 					}
 				}
 			}
@@ -115,15 +123,15 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 					if(!line.startsWith("("))
 						continue;
 					
-					String[] rows = line.split("\\s");
+					String[] cols = line.split("\\s");
 					
 					/* check if we have a bus connected for this recorded bus */
-					int busNumber = busNames.indexOf(rows[1]);
+					int busNumber = busNames.indexOf(cols[1]);
 					if(busNumber < 0 || busses[busNumber] == null)
 						continue;
 					
-					long msecs = (long)(Double.parseDouble((rows[0].substring(1, rows[0].length()-1))) * 1000);
-					String[] data = rows[2].split("#");
+					long msecs = (long)(Double.parseDouble((cols[0].substring(1, cols[0].length()-1))) * 1000) - timeOffset;
+					String[] data = cols[2].split("#");
 					
 					int identifier = Integer.parseInt(data[0], 16);
 					byte[] message = Util.hexStringToByteArray(data[1]);
