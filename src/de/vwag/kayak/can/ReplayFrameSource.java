@@ -11,13 +11,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-
-
 /**
  * A ReplayFrameSource is an implementation of a unidirectional FrameSource.
  * It is used to replay a saved logfile.
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
- *
  */
 public class ReplayFrameSource implements FrameSource, Runnable{
 	private Boolean stop=false;
@@ -68,8 +65,7 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 		}
 		busses = new Bus[busNames.size()];
 		
-		reOpenFile(file);
-		
+		reOpenFile(file);	
 	}
 	
 	public String getDescription() {
@@ -113,8 +109,7 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 	}
 
 	public void run() {
-		try {
-			
+		try {		
 			for(;;) {
 				long startTime = System.currentTimeMillis();
 				
@@ -156,20 +151,12 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 				reader.close();
 				reOpenFile(file);
 				logger.log(Level.INFO, "Restarting replay of logfile.");
-				
-			}
-			
-			
+			}	
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "IO error while reading logfile.", e);
 			return;
 		} catch (InterruptedException e) {
 			logger.log(Level.WARNING, "Logfile replay thread was interruped.", e);
-		}
-		
+		}	
 	}
-	
-	
-	
-	
 }
