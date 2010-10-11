@@ -21,7 +21,16 @@ seconds. For each offered socket there must be one beacon with the following inf
 * Device type the service is running on
   * socketCAN - general socketCAN service on a linux machine
   * embedded - embedded linux with access to a bus over socketCAN
-  * adapter - e.g. microcontroller driven CAN to ethernet adapter 
+  * adapter - e.g. microcontroller driven CAN to ethernet adapter
+
+Connection establishment
+========================
+When a Kayak instance has found an existing bus via the service discovery it can to connect to the
+device over TCP to configure it and to register for frame reception.
+The configuration connection may be used to set a baudrate or apply filters for specific CAN IDs.
+When the configuration was successful the client can start the frame transmission and may close the
+TCP connection. The frame transfer happens via UDP and is initiated by the service after the client
+has registered his UDP port and started the transmission.
 
 Frame format
 ============
@@ -30,7 +39,7 @@ be transmitted. Every transmitted frame begins with a 3 bit type of frame (data,
 information, alive). The following bits have a different meaning which is defined in the following
 subsections for each frame type.
 The formats are designed to always have a length that is divisible by 8 bit. Data is mostly aligned
-to byte borders to allow easy handling without shifting especially for mikrocontroller applications.  
+to byte borders to allow easy handling without shifting especially for microcontroller applications.  
 
 Frame types
 ============
