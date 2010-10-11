@@ -17,7 +17,11 @@ bus ports were bound. The interval for these discovery beacons shall not be long
 seconds. For each offered socket there must be one beacon with the following information:
 * Description of the service
 * Name of the bus (this should be the same as the device name)
-* URL with port and IP address     
+* URL with port and IP address
+* Device type the service is running on
+  * socketCAN - general socketCAN service on a linux machine
+  * embedded - embedded linux with access to a bus over socketCAN
+  * adapter - e.g. microcontroller driven CAN to ethernet adapter 
 
 Frame format
 ============
