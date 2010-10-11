@@ -15,13 +15,17 @@ A server will bind to a new and random port for each bus he provides access to. 
 service discovery is necessary. The server sends a broadcast to port 42000 on the subnet where the
 bus ports were bound. The interval for these discovery beacons shall not be longer than three
 seconds. For each offered socket there must be one beacon with the following information:
+
 * Description of the service
 * Name of the bus (this should be the same as the device name)
 * URL with port and IP address
 * Device type the service is running on
-  * socketCAN - general socketCAN service on a linux machine
-  * embedded - embedded linux with access to a bus over socketCAN
-  * adapter - e.g. microcontroller driven CAN to ethernet adapter
+
+### Device types
+
+* socketCAN - general socketCAN service on a linux machine
+* embedded - embedded linux with access to a bus over socketCAN
+* adapter - e.g. microcontroller driven CAN to ethernet adapter
 
 Connection establishment
 ========================
