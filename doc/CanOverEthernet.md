@@ -9,6 +9,16 @@ not be sure that the data was received by the correct receiver.
 Because UDP is not connection based it can be used even if the ethernet connection is very bad
 (via WLAN) or cables are disconnected and connected again during in-car configuration.
 
+Service discovery
+=================
+A server will bind to a new and random port for each bus he provides access to. Because of that
+service discovery is necessary. The server sends a broadcast to port 42000 on the subnet where the
+bus ports were bound. The interval for these discovery beacons shall not be longer than three
+seconds. For each offered socket there must be one beacon with the following information:
+* Description of the service
+* Name of the bus (this should be the same as the device name)
+* URL with port and IP address     
+
 Frame format
 ============
 The information is encoded bitwise and there are many pieces of information with different sizes to
