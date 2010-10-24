@@ -7,6 +7,7 @@ The BCM server provides a network interface to the Socket CAN broadcast manager 
     < interface command ival_s ival_us can_id can_dlc [data]* >
 
 ### Commands for transmission ###
+There are a few commands that control the transmission of CAN frames. Most of them are intervall based and the Socket CAN broadcast manager guarantees that the frames are sent cyclic with the given intervalls. To be able to control these transmission jobs they are automatically removed when the BCM server socket is closed.
 
 ##### Add a new frame for transmission #####
 This command adds a new frame to the BCM queue. An intervall can be configured to have the frame sent cyclic.
@@ -41,6 +42,45 @@ This command is used to send a single CAN frame only once.
 Example:
 Send a single CAN frame without cyclic transmission
     < can0 S 0 0 123 0 >
+
+### Commands for reception ###
+The commands for reception are 'R'eceive setup, 'F'ilter ID Setup and 'X' for delete.
+
+##### Content filtering #####
+This command is used to configure the broadcast manager for reception of frames with a given CAN ID. Frames are only sent when they match the pattern that is provided.
+
+Examples: 
+Receive CAN ID 0x123 from vcan1 and check for changes in the first byte
+    < vcan1 R 0 0 123 1 FF >
+
+Receive CAN ID 0x123 from vcan1 and check for changes in given mask
+    < vcan1 R 0 0 123 8 FF 00 F8 00 00 00 00 00 >
+
+As above but throttle receive update rate down to 1.5 seconds
+    < vcan1 R 1 500000 123 8 FF 00 F8 00 00 00 00 00 >
+
+##### Filter for CAN ID #####
+Adds a filter for a CAN ID. The frames are sent regardless of their content.
+
+Example:
+Filter for CAN ID 0x123 from vcan1 without content filtering
+    < vcan1 F 0 0 123 0 >
+
+##### Delete a filter #####
+This deletes all 'R' or 'F' filters for a specific CAN ID.
+
+Example:
+Delete receive filter ('R' or 'F') for CAN ID 0x123
+    < vcan1 X 0 0 123 0 >
+
+
+### Frame transmission ###
+CAN messages received by the given filters are send in the format:
+    < interface can_id can_dlc [data]* >
+
+Example:
+when receiving a CAN message from vcan1 with CAN ID 0x123 , data length 4 and data 0x11, 0x22, 0x33 and 0x44
+    < vcan1 123 4 11 22 33 44 >
 
 Extensions
 ----------
