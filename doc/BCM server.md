@@ -87,10 +87,16 @@ Extensions
 
 If the BCM server is supposed to be a fundament for Kayak it needs to provide a few more features:
 
-### Service discovery ###
-Because configuration shall be as easy as possible and the virtual CAN bus and the Kayak instance are not neccessarily on the same machine a machanism for service discovery is neccessary.
+### General ###
 
-The server sends a broadcast beacon to port 42000 on the subnet where the server port was bound. The interval for these discovery beacons shall not be longer than three seconds. Because the BCM server handles all communication (even for multiple busses) over a single TCP connection the broadcast must provide information about all busses that are accessible through the BCM server.
+* It shall be possible to subscribe to all frames that are on the bus. This is necessary if Kayak has no information about the messages on the bus and we simply want to display all frames that drop in
+* Error frames shall be reported in line with the normal frames. It is essential that Kayak is informed about error frames
+* The BCM server must provide service discovery, bus configuration and bus statistics. These features are described in the following sections
+
+### Service discovery ###
+Because configuration shall be as easy as possible and the virtual CAN bus and the Kayak instance are not necessarily on the same machine a machanism for service discovery is necessary.
+
+The server sends a UDP broadcast beacon to port 42000 on the subnet where the server port was bound. The interval for these discovery beacons shall not be longer than three seconds. Because the BCM server handles all communication (even for multiple busses) over a single TCP connection the broadcast must provide information about all busses that are accessible through the BCM server.
 
 ##### Content #####
 
@@ -117,5 +123,9 @@ For simple parsing and a human readable schema XML is used to structure the info
         <Bus name="vcan0"/>
         <Bus name="vcan1"/>
     </CANBeacon>
+
+### Configuration ###
+
+### Statistics ###
 
 
