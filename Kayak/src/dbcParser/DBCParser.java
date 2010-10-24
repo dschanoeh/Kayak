@@ -1,9 +1,12 @@
-package de.vwag.kayak.canData;
+package dbcParser;
 import java.io.*;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import de.vwag.kayak.canData.MessageInformation;
+import de.vwag.kayak.canData.SignalInformation;
 
 
 public class DBCParser {
