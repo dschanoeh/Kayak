@@ -1,7 +1,0 @@
-#!/bin/bash
-
-APPLICATION="Kayak.application"
-
-baseDir=`dirname $0`
-
-java -cp $baseDir/startup.jar org.eclipse.core.launcher.Main -application $APPLICATION -os linux -ws gtk -arch x86 -nl de_DE -consoleLog $*

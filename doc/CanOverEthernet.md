@@ -20,7 +20,6 @@ seconds. For each offered socket there must be one beacon with the following inf
 * Name of the bus (this should be the same as the device name)
 * URL with port and IP address
 * Device type the service is running on
-* Version string (either socketCAN version or version of the adapter software)
 
 ### Device types
 
@@ -36,21 +35,6 @@ The configuration connection may be used to set a baudrate or apply filters for 
 When the configuration was successful the client can start the frame transmission and may close the
 TCP connection. The frame transfer happens via UDP and is initiated by the service after the client
 has registered his UDP port and started the transmission.
-
-Configuration
-=============
-
-### Set bitrate
-
-### Set timings (tq, prop, seg1, seg2, sjw)
-
-### Reset statistics
-
-### Initiate connection to udp://ip_addr:port
-
-### Get statistics
-
-###
 
 Frame format
 ============
