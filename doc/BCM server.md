@@ -1,10 +1,17 @@
 BCM server
 ==========
 
-The BCM server provides a network interface to the Socket CAN broadcast manager of the host. It can be controlled over a single TCP socket and supports transmission and reception of CAN frames. The used protocol is ASCII based and commands have the following structure:
+The BCM server provides a network interface to the Socket CAN broadcast manager of the host. It can be controlled over a single TCP socket and supports transmission and reception of CAN frames. The used protocol is ASCII based and data transmissions have the following structure:
 
-### Command structure ###
-    < interface command ival_s ival_us can_id can_dlc [data]* >
+### Data structure ###
+    < interface data_type ival_s ival_us can_id can_dlc [data]* >
+
+### Data types ###
+The field data_type must be present in every transmitted piece of data. This makes it easy to separate relevant from irellevant data. If the receiver does not understand a specific command or data transmission he can simply ignore it.
+Two types of data are transmitted:
+
+* Commands have a data_type with a single uppercase letter (e.g. A, U, D, ...)
+* Normal data transfer has a data_type with a sigle lowercase letter, which denotes the type of data (e.g. f, e, s, ...)
 
 ### Commands for transmission ###
 There are a few commands that control the transmission of CAN frames. Most of them are intervall based and the Socket CAN broadcast manager guarantees that the frames are sent cyclic with the given intervalls. To be able to control these transmission jobs they are automatically removed when the BCM server socket is closed.
@@ -76,11 +83,11 @@ Delete receive filter ('R' or 'F') for CAN ID 0x123
 
 ### Frame transmission ###
 CAN messages received by the given filters are send in the format:
-    < interface can_id can_dlc [data]* >
+    < interface f can_id can_dlc [data]* >
 
 Example:
 when receiving a CAN message from vcan1 with CAN ID 0x123 , data length 4 and data 0x11, 0x22, 0x33 and 0x44
-    < vcan1 123 4 11 22 33 44 >
+    < vcan1 f 123 4 11 22 33 44 >
 
 Extensions
 ----------
@@ -126,6 +133,10 @@ For simple parsing and a human readable schema XML is used to structure the info
         <Bus name="vcan0"/>
         <Bus name="vcan1"/>
     </CANBeacon>
+
+### Error frame transmission ###
+Error frames are sent similar to normal frames only distinguished by the data_type 'e'. An error frame always has the length of 8 data bytes. Because of this only the fields can_id and data are necessary (see socketcan/can/error.h for further information):
+    < interface e can_id data >
 
 ### Configuration ###
 
