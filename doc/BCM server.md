@@ -110,10 +110,14 @@ The server sends a UDP broadcast beacon to port 42000 on the subnet where the se
 
 ##### Content #####
 
-* Description of the service
+Required:
+* Name of the device that provides access to the busses. On linux machines this could be the hostname
 * Name of the busses (in case of socketCAN and embedded this should be the same as the device name)
-* URL with port and IP address
+* URL with port and IP address. If the server is listening on multiple sockets all of them should be included in the beacon
 * Device type the service is running on
+
+Optional:
+* Description of the service in a human readable form
 
 ##### Device types ######
 
@@ -127,8 +131,7 @@ For simple parsing and a human readable schema XML is used to structure the info
 
 ##### Example #####
 
-    <CANBeacon>
-        <Device name="HeartOfGold" type="SocketCAN"/>
+    <CANBeacon name="HeartOfGold" type="SocketCAN" description="A human readable description"/>
         <URL>can://127.0.0.1:28600</URL>
         <Bus name="vcan0"/>
         <Bus name="vcan1"/>
