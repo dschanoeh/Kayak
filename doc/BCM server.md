@@ -143,6 +143,22 @@ Error frames are sent similar to normal frames only distinguished by the data_ty
 
 ### Configuration ###
 
+##### Configure the bittiming #####
+The protocol enables the client to change the bittiming of a given bus as provided by set link. Automatic bitrate configuration by the kernel is not supported because it is not guaranteed that the corresponding option was enabled during compile time (e.g. in Ubuntu 10.10 it isn't). This way it it also easyer to implement the function in a microcontroller based adapter.
+    < can0 B bitrate sample_point tq prop_seg phase_seg1 phase_seg2 sjw brp >
+
+##### Set the controlmode #####
+The control mode controls if the bus is set to listen only, if sent packages are looped back and if the controller is configured to take three samples. The following command provides access to these settings. Each field must be set to '0' or '1' to disable or enable the setting.
+
+    < can0 C listen_only loopback three_samples >
+
+##### Enable or disable statistic transmission #####
+THis command requests the transmission of statistic information in line with the normal information. An intervall must be set to specify how often the transmission should occur. A flag of '1' enables the transmission and a flag of '0' disables it.
+
+    < vcan0 E flag ival_ms >
+
+
+
 ### Statistics ###
 
 
