@@ -17,6 +17,7 @@ public class NetworkFrameSource implements FrameSource, Runnable {
 	private PrintWriter output;
 	private Thread thread;
 	private boolean stopRequest = false;
+	public static int ID_ALL = 0;
 	
 	public NetworkFrameSource(String host, int port) {
 		this.host = host;
@@ -30,6 +31,30 @@ public class NetworkFrameSource implements FrameSource, Runnable {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void subscribeID(String bus, int id) {
+		if(id == ID_ALL) {
+			for(int i=0;i<2048;i++) {
+				output.write(String.format("< %s F 0 0 %3X 0 >", bus, i));
+			}
+		} else {
+			output.write(String.format("< %s F 0 0 %3X 0 >", bus, id));
+		}
+		
+		output.flush();
+	}
+	
+	public void unsubscribeID(String bus, int id) {
+		if(id == ID_ALL) {
+			for(int i=0;i<2048;i++) {
+				output.write(String.format("< %s X 0 0 %3X 0 >", bus, i));
+			}
+		} else {
+			output.write(String.format("< %s X 0 0 %3X 0 >", bus, id));
+		}
+		
+		output.flush();
+	}
 
 	@Override
 	public void open() {
@@ -42,9 +67,6 @@ public class NetworkFrameSource implements FrameSource, Runnable {
 			input = new Scanner(socket.getInputStream());
 			output = new PrintWriter(socket.getOutputStream(),true);
 			
-			/* TODO: Test subscription */
-			output.write("< vcan0 F 0 0 5D1 0 >");
-			output.flush();	
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "IOException while creating the socket.",e);
 		}
@@ -107,8 +129,6 @@ public class NetworkFrameSource implements FrameSource, Runnable {
 			} catch (NoSuchElementException ex) {
 				continue;
 			}
-			
-			
 		}
 	}
 }
