@@ -20,15 +20,16 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 	private Boolean stop=false;
 	private BufferedReader reader;
 	private ArrayList<String> busNames;
-	private Bus[] busses;
 	private Thread myThread;
 	private File file;
 	private String description;
 	private String platform;
 	private long timeOffset;
+	private BusNameContainer container;
 	private Logger logger = Logger.getLogger("de.vwag.kayak.can");
 	
 	public ReplayFrameSource(File file) throws FileNotFoundException, IOException {
+		container = new BusNameContainer();
 		this.file = file;
 		reOpenFile(file);
 		
@@ -63,7 +64,6 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 				}
 			}
 		}
-		busses = new Bus[busNames.size()];
 		
 		reOpenFile(file);	
 	}
@@ -73,10 +73,6 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 			return description;
 		else
 			return description + " (" + platform + ")";
-	}
-	
-	public String getNameOfBus(int number) {
-		return busNames.get(number);
 	}
 	
 	private void reOpenFile(File file) throws FileNotFoundException, IOException {
@@ -100,14 +96,6 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 		myThread.start();
 	}
 
-	public void connectBus(Bus bus, int number) {
-		busses[number] = bus;
-	}
-
-	public int getNumberOfBusses() {
-		return busNames.size();
-	}
-
 	public void run() {
 		try {		
 			for(;;) {
@@ -121,8 +109,8 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 					String[] cols = line.split("\\s");
 					
 					/* check if we have a bus connected for this recorded bus */
-					int busNumber = busNames.indexOf(cols[1]);
-					if(busNumber < 0 || busses[busNumber] == null)
+					Bus bus = container.getBus(cols[1]);
+					if(bus == null)
 						continue;
 					
 					long msecs = (long)(Double.parseDouble((cols[0].substring(1, cols[0].length()-1))) * 1000) - timeOffset;
@@ -142,7 +130,7 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 						Thread.sleep(timeToWait);
 					} 
 					
-					busses[busNumber].receiveFrame(frame);
+					bus.receiveFrame(frame);
 				}
 				
 				if(stop)
@@ -158,5 +146,15 @@ public class ReplayFrameSource implements FrameSource, Runnable{
 		} catch (InterruptedException e) {
 			logger.log(Level.WARNING, "Logfile replay thread was interruped.", e);
 		}	
+	}
+
+	@Override
+	public void connectBus(Bus bus, String name) {
+		container.addPair(bus, name);
+	}
+
+	@Override
+	public String[] getBusNames() {
+		return busNames.toArray(new String[] { });
 	}
 }

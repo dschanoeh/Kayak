@@ -17,6 +17,7 @@ public class NetworkFrameSource implements FrameSource, Runnable {
 	private PrintWriter output;
 	private Thread thread;
 	private boolean stopRequest = false;
+	private BusNameContainer container;
 	public static int ID_ALL = 0;
 	
 	public NetworkFrameSource(String host, int port) {
@@ -24,12 +25,7 @@ public class NetworkFrameSource implements FrameSource, Runnable {
 		this.port = port;
 				
 		socket = new Socket();
-	}
-
-	@Override
-	public void connectBus(Bus bus, int number) {
-		// TODO Auto-generated method stub
-		
+		container = new BusNameContainer();
 	}
 	
 	public void subscribeID(String bus, int id) {
@@ -87,19 +83,7 @@ public class NetworkFrameSource implements FrameSource, Runnable {
 	}
 
 	@Override
-	public int getNumberOfBusses() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getNameOfBus(int number) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -119,9 +103,15 @@ public class NetworkFrameSource implements FrameSource, Runnable {
 				String[] fields = frame.split("\\s");
 				
 				/* We received a frame */
-				if(fields[1].equals("f")) {
+				if(fields[2].equals("f")) {
 					try {
-						Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(fields[3]));
+						Bus bus = container.getBus(fields[1]);
+						if(bus  != null) {
+							Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(fields[3]));
+							bus.receiveFrame(f);
+						}
+						
+						
 					} catch(Exception ex) {
 						logger.log(Level.WARNING, "Could not properly parse CAN frame", ex);
 					}
@@ -130,5 +120,16 @@ public class NetworkFrameSource implements FrameSource, Runnable {
 				continue;
 			}
 		}
+	}
+
+	@Override
+	public void connectBus(Bus bus, String name) {
+		container.addPair(bus, name);
+	}
+
+	@Override
+	public String[] getBusNames() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
