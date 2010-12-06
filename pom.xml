@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <!-- The Basics -->
+    <groupId>com.github.kayak</groupId>
+    <artifactId>kayak</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <!-- <dependencies></dependencies> -->
+    <!-- <parent></parent> -->
+    <!-- <dependencyManagement></dependencyManagement> -->
+    <!-- <modules></modules> -->
+    <!-- <properties></properties> -->
+    
+    <!-- Build settings -->
+    <build></build>
+    <reporting></reporting>
+    
+    <!-- More project info -->
+    <name>Kayak</name>
+    <description>
+    	Kayak aims to be a Java framework and GUI for CAN data handling. It will 
+    	include an abstract data model for different CAN hard- and software 
+    	solutions. SocketCAN and IP will be used as an abstraction layer above 
+    	the hardware. Platform independence is a goal and therefore all logic 
+    	will be implemented in Java. To run the framework on a Windows client 
+    	a socketCAN over ethernet protocol will be implemented.
+    </description>
+    <url>https://github.com/dschanoeh/Kayak/</url>
+    <inceptionYear>2010</inceptionYear>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License, version 3</name>
+            <url>http://www.gnu.org/licenses/lgpl.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization></organization>
+    <developers>
+		<developer>
+			<id>dschanoe</id>
+	      	<name></name>
+	      	<email>dschanoe@googlemail.com</email>
+	      	<roles>
+	        	<role>architect</role>
+	        	<role>developer</role>
+	      	</roles>
+	      	<timezone>+1</timezone>
+	      	<properties>
+	        	<picUrl></picUrl>
+	      	</properties>
+	    </developer>
+	</developers>
+	<contributors>
+    	<contributor>
+    		<name>julietkilo</name>
+      		<email></email>
+      		<roles>
+        		<role>developer, tester</role>
+      		</roles>
+      		<timezone>-1</timezone>
+      		<properties>
+      		</properties>
+      	</contributor>
+  	</contributors>
+    
+    <!-- Environment settings -->
+    <issueManagement></issueManagement>
+    <ciManagement></ciManagement>
+    <mailingLists></mailingLists>
+    <scm>
+        <connection>scm:git:git://github.com/dschanoeh/Kayak.git</connection>
+        <url>https://github.com/dschanoeh/Kayak</url>
+    </scm>
+    <prerequisites></prerequisites>
+    <repositories></repositories>
+    <pluginRepositories></pluginRepositories>
+    <distributionManagement></distributionManagement>
+    <profiles></profiles>
+</project>
