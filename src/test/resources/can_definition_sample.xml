@@ -28,7 +28,7 @@
 	<Node id="1" name="Motor ACME"/>
 	<Node id="17" name="Motor alternative supplier"/>
 	<Node id="2" name="Brake ACME"/>
-	<Node id="18" name="Bake alternative supplier"/>
+	<Node id="18" name="Brake alternative supplier"/>
 	<Node id="3" name="Gearbox"/>
 	<Node id="4" name="Crypto"/>
 	<Node id="5" name="CruiseControl"/>
@@ -349,3 +349,5 @@
 		</Message>
 	</Bus>
 </NetworkDefinition>
+
+
