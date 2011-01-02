@@ -1,6 +1,7 @@
 # ignore eclipse project file
 .project
 .classpath
+.settings
 
 # ignore local git configuration
 .git

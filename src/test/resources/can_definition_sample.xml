@@ -17,7 +17,7 @@
 --> 
 <NetworkDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="Definition.xsd"
- version="0.1">
+ version="0.2">
 	<Document name="The Homer" version="1.23" author="Herbert Powell" company="Powell Motors" date="1991-02-16">
 	A car designed by Homer J. Simpson that the average american consumer would want to buy.
 	The Homer has two bubble domes: one in the front and one for quarreling kids. 
@@ -45,7 +45,7 @@
 	<Node id="16" name="ParkDistance"/>
     
 	<Bus name="Motor">
-		 <Message id="0xA" name="Airbag">
+		 <Message id="0x00A" name="Airbag">
 		 	<Producer>
 		 		<NodeRef id="2"/>
 		 	</Producer>
@@ -59,7 +59,7 @@
 		 	<Signal name="SeatConfiguration" offset="16" length="8"/>
 		 </Message>
 		
-		<Message id="0xB2" name="ABS" triggered="true" interval="100">
+		<Message id="0x0B2" name="ABS" triggered="true" interval="100">
 	       <Notes>Anti lock brake system</Notes>
 	       <Producer>
 	         <NodeRef id="2"/>
@@ -335,7 +335,7 @@
 			<Signal name="Guidance" offset="2" length="8"/>
 		</Message>
 				
-		<Message id="0xDA7E" name="DateTime">
+		<Message id="0xDA7E" name="DateTime" format="extended">
 			<Producer>
 				<NodeRef id="8"/>
 			</Producer>
