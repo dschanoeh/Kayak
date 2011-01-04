@@ -54,7 +54,7 @@ The platform line is used to define the type of car in which the log file was re
 With device aliases it is possible to give the CAN busses a human readable name for later assignment. An alias pair consists of a human readable name (which may not contain spaces) and the bus name as used in the frame entries.
     
 ##### Regex
-    DEVICE_ALIAS [A-Za-z0-9] [a-z0-9]{1,6}
+    DEVICE_ALIAS [A-Za-z0-9]+ [a-z0-9]{1,6}
 
 Full example
 ------------
