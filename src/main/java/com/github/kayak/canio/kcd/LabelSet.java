@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -25,11 +26,12 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{}BasicSignalType">
- *       &lt;sequence>
- *         &lt;element ref="{}MuxGroup" maxOccurs="unbounded"/>
- *       &lt;/sequence>
- *     &lt;/extension>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;choice maxOccurs="unbounded">
+ *         &lt;element ref="{}Label" minOccurs="0"/>
+ *         &lt;element ref="{}LabelGroup" minOccurs="0"/>
+ *       &lt;/choice>
+ *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
@@ -38,43 +40,45 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "muxGroup"
+    "labelOrLabelGroup"
 })
-@XmlRootElement(name = "Multiplex")
-public class Multiplex
-    extends BasicSignalType
-{
+@XmlRootElement(name = "LabelSet")
+public class LabelSet {
 
-    @XmlElement(name = "MuxGroup", required = true)
-    protected List<MuxGroup> muxGroup;
+    @XmlElements({
+        @XmlElement(name = "Label", type = Label.class),
+        @XmlElement(name = "LabelGroup", type = LabelGroup.class)
+    })
+    protected List<BasicLabelType> labelOrLabelGroup;
 
     /**
-     * Gets the value of the muxGroup property.
+     * Gets the value of the labelOrLabelGroup property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the muxGroup property.
+     * This is why there is not a <CODE>set</CODE> method for the labelOrLabelGroup property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getMuxGroup().add(newItem);
+     *    getLabelOrLabelGroup().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link MuxGroup }
+     * {@link Label }
+     * {@link LabelGroup }
      * 
      * 
      */
-    public List<MuxGroup> getMuxGroup() {
-        if (muxGroup == null) {
-            muxGroup = new ArrayList<MuxGroup>();
+    public List<BasicLabelType> getLabelOrLabelGroup() {
+        if (labelOrLabelGroup == null) {
+            labelOrLabelGroup = new ArrayList<BasicLabelType>();
         }
-        return this.muxGroup;
+        return this.labelOrLabelGroup;
     }
 
 }

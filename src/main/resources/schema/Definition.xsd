@@ -16,7 +16,7 @@
   along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
   
 --> 
-<xs:schema version="0.2" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema version="0.3" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="NetworkDefinition">
     <xs:annotation>
       <xs:documentation>Definition of one or more CAN bus networks in one file.</xs:documentation>
@@ -35,7 +35,7 @@
     </xs:complexType>
     <xs:key name="nodeIdKey">
       <xs:annotation>
-        <xs:documentation>Assurance that the identifier (id) of a etwork node is unique.</xs:documentation>
+        <xs:documentation>Assurance that the identifier (id) of a network node is unique.</xs:documentation>
       </xs:annotation>
       <xs:selector xpath="Node"/>
       <xs:field xpath="@id"/>
@@ -75,7 +75,7 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:nonNegativeInteger">
-            <xs:minInclusive value="0"/>
+            <xs:minInclusive value="5000"/>
             <xs:maxInclusive value="1000000"/>
           </xs:restriction>
         </xs:simpleType>
@@ -107,7 +107,7 @@
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="0[x][A-F0-9]+"/>
+            <xs:pattern value="0x[A-F0-9]+"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
@@ -124,7 +124,7 @@
       </xs:attribute>
       <xs:attribute name="name" use="required" type="xs:string">
         <xs:annotation>
-          <xs:documentation>Human-readable name of the network message (e.g. "EngineSpeed").</xs:documentation>
+          <xs:documentation>Human-readable name of the network message (e.g."OBD-Info").</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="triggered" use="optional" type="xs:boolean" default="false">
@@ -198,6 +198,18 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="LabelSet">
+    <xs:annotation>
+      <xs:documentation>A set of label and label groups. Each label describes the meaning of a single raw value by an alias name. A single value can only belong to a one label or label group.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="Label" minOccurs="0"/>
+        <xs:element ref="LabelGroup" minOccurs="0"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="Signal">
     <xs:annotation>
       <xs:documentation>A discrete part of information contained in the payload of a message.</xs:documentation>
@@ -209,30 +221,18 @@
             <xs:element ref="Notes" minOccurs="0"/>
             <xs:element ref="Consumer" minOccurs="0"/>
             <xs:element ref="Value" minOccurs="0"/>
+            <xs:element ref="LabelSet" minOccurs="0"/>
           </xs:sequence>
-          <xs:attribute default="0" name="min" type="xs:int">
-            <xs:annotation>
-              <xs:documentation>Minimum value of the signal specified.</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute default="1" name="max" type="xs:int">
-            <xs:annotation>
-              <xs:documentation>Maximum value of the signal specified.</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute name="type" default="unsigned">
-            <xs:annotation>
-              <xs:documentation>Datatype of the signal e.g. "unsigned","signed" or IEE754 "single", "double".</xs:documentation>
-            </xs:annotation>
-            <xs:simpleType>
-              <xs:restriction base="xs:token">
-                <xs:enumeration value="unsigned"/>
-                <xs:enumeration value="signed"/>
-                <xs:enumeration value="single"/>
-                <xs:enumeration value="double"/>
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
+          <!-- <xs:attribute default="0" name="min" type="xs:int"> -->
+          <!--  <xs:annotation> -->
+          <!-- <xs:documentation>Minimum value of the signal specified.</xs:documentation> -->
+          <!-- </xs:annotation> -->
+          <!-- </xs:attribute> -->
+          <!-- <xs:attribute default="1" name="max" type="xs:int"> -->
+          <!-- <xs:annotation> -->
+          <!-- <xs:documentation>Maximum value of the signal specified.</xs:documentation> -->
+          <!-- </xs:annotation> -->
+          <!-- </xs:attribute> -->
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -268,13 +268,22 @@
 
   <xs:element name="Value">
     <xs:annotation>
-      <xs:documentation>A set of alias names for values within a signal.</xs:documentation>
+      <xs:documentation>Details of how the raw value of signal shall be interpreted.</xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:choice maxOccurs="unbounded">
-        <xs:element ref="Label" minOccurs="0"/>
-        <xs:element ref="LabelGroup" minOccurs="0"/>
-      </xs:choice>
+      <xs:attribute name="type" use="optional" default="unsigned">
+        <xs:annotation>
+          <xs:documentation>Datatype of the value e.g. "unsigned","signed" or IEE754 "single", "double".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="unsigned"/>
+            <xs:enumeration value="signed"/>
+            <xs:enumeration value="single"/>
+            <xs:enumeration value="double"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute default="1" name="slope" use="optional" type="xs:double">
         <xs:annotation>
           <xs:documentation>The slope "m" of a linear equation y = mx + b.</xs:documentation>
@@ -283,6 +292,11 @@
       <xs:attribute default="0" name="intercept" type="xs:double">
         <xs:annotation>
           <xs:documentation>The y-axis intercept "b" of a linear equation y = mx + b. </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute default="1" name="unit" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Physical unit of the value written as unit term as described in "The Unified Code for Units of Measure" (http://aurora.regenstrief.org/~ucum/ucum.html)</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
@@ -307,7 +321,7 @@
 
   <xs:element name="LabelGroup">
     <xs:annotation>
-      <xs:documentation>Descriptive name for a sequence of values.</xs:documentation>
+      <xs:documentation>Descriptive name for a sequence of adjacent values.</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:complexContent>

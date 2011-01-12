@@ -230,7 +230,7 @@ public class NetworkDefinitionTest {
 	 */
 	@Test
 	public void testGetVersion() {
-		assertEquals("Version uniqueness", "0.1", netdef.getVersion());
+		assertEquals("Version uniqueness", "0.3", netdef.getVersion());
 	}
 
 	/**
