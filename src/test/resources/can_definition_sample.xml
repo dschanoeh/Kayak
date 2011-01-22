@@ -17,7 +17,7 @@
 --> 
 <NetworkDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="Definition.xsd"
- version="0.2">
+ version="0.3">
 	<Document name="The Homer" version="1.23" author="Herbert Powell" company="Powell Motors" date="1991-02-16">
 	A car designed by Homer J. Simpson that the average american consumer would want to buy.
 	The Homer has two bubble domes: one in the front and one for quarreling kids. 
@@ -84,24 +84,26 @@
 	     			<Signal name="Info7" offset="8" length="8"/>
 	     		</MuxGroup>
 	     	</Multiplex>   	
-	     	<Signal name="OutsideTemp" offset="18" length="12" endianess="little" type="unsigned">
+	     	<Signal name="OutsideTemp" offset="18" length="12" endianess="little" >
 	     	  <Notes>Outside temperature.</Notes>
 	     	  <Consumer>
 	     	  	<NodeRef id="12"/>
 	     	  </Consumer>
-			  <Value slope="0.5" intercept="-40"> 
-		             <Label name="init" value="0"/>
-		             <LabelGroup type="error" name="Sensor error" from="1021" to="1023"/>
-		      </Value>
+	     	  <Value type="unsigned" slope="0.5" intercept="-40" unit="Cel"/>
+	       	  <LabelSet>
+	     	    <Label name="init" value="0"/>
+	     	    <LabelGroup type="error" name="Sensor error" from="1021" to="1023"/>
+			  </LabelSet>	     			
 		   </Signal>
 	       <Signal name="SpeedKm" offset="30" length="24">
 	       	<Notes>Middle speed of front wheels in kilometers per hour.</Notes>
 	       	<Consumer>
 	       		<NodeRef id="12"/>
 	       	</Consumer>	       	
-	       	<Value slope="0.2" intercept="0">
+	       	<Value slope="0.2" intercept="0" unit="km/h"/>
+	       	<LabelSet>
 	       		<Label type="error" name="invalid" value="16777215"/>
-	       	</Value>
+	       	</LabelSet>
 	       </Signal>
 		   <Signal name="Handbrake" offset="54" length="8"/>
 		</Message>
@@ -130,7 +132,17 @@
 				<NodeRef id="6"/>
 			</Producer>
 			<Signal name="RightHandDrive" offset="0"/>
-			<Signal name="WheelAngle" offset="1" length="32"/>
+			<Signal name="WheelAngle" offset="1" length="14">
+				<Value unit="deg" slope="0.1" intercept="-800"/>
+				<LabelSet>
+					<Label name="left" value="0"/>
+					<Label name="straight" value="8000"/>
+					<Label name="right" value="16000"/>
+					<LabelGroup name="undefined" from="16001" to="16381" type="invalid"/>
+					<Label name="init" value="16382" type="invalid"/>
+					<Label name="sensor " value="16383" type="error"/>
+				</LabelSet>
+			</Signal>
 		</Message>		
 		
 		<Message id="0x667" name="AntiTheft">
@@ -151,19 +163,19 @@
 					<NodeRef id="1"/>
 					<NodeRef id="17"/>
 				</Consumer>
-				<Value>
+				<LabelSet>
 					<Label name="disengaged" value="0" type="value"/>
-					<Label name="1" value="1" />
-					<Label name="2" value="2" />
-					<Label name="3" value="3" />
-					<Label name="4" value="4" />
-					<Label name="5" value="5" />
+					<Label name="1" value="1"/>
+					<Label name="2" value="2"/>
+					<Label name="3" value="3"/>
+					<Label name="4" value="4"/>
+					<Label name="5" value="5"/>
 					<Label name="6" value="6"/>
 					<LabelGroup name="undefined" from="7" to="9"/>
-					<LabelGroup name="reverse" from="10" to="10"/>
+					<Label name="reverse" value="10"/>
 					<LabelGroup name="undefined" from="11" to="14"/>
 					<Label type="error" name="Unspecific error" value="15"/>
-				</Value>
+				</LabelSet>
 			</Signal>
 		</Message>
 	</Bus>
@@ -192,9 +204,11 @@
 	     		<NodeRef id="12"/>
 	     	</Producer>	     	
 	     	<Signal name="Milage1" offset="0" length="24">
-	     		<Value slope="0.1"/>
+	     		<Value slope="0.1" unit="km"/>
 	     	</Signal>
-            <Signal name="Milage2" offset="24" length="48"/>
+            <Signal name="Milage2" offset="24" length="48">
+            	<Value slope="0.1" unit="km"/>
+            </Signal>
 		</Message>
 		
 		<Message id="0x5A2" name="TankController" interval="200">
@@ -202,7 +216,9 @@
 				<NodeRef id="7"/>
 			</Producer>
 			<Signal name="TankLevel" offset="0" length="16"/>
-			<Signal name="TankTemperature" offset="16" length="16" type="signed"/>
+			<Signal name="TankTemperature" offset="16" length="16">
+				<Value unit="Cel" type="signed"/>
+			</Signal>
 			<Signal name="FillingStatus" offset="32" length="4"/>
 		</Message>
 		
@@ -231,8 +247,12 @@
 			<Producer>
 				<NodeRef id="15"/>
 			</Producer>
-			<Signal name="InsideTempC" offset="0" length="12" type="signed"/>
-			<Signal name="OutsideTempC" offset="12" length="12" type="signed"/>
+			<Signal name="InsideTempC" offset="0" length="12">
+				<Value type="signed" unit="Cel"/>
+			</Signal>
+			<Signal name="OutsideTempC" offset="12" length="12">
+				<Value type="signed" unit="Cel"/>
+			</Signal>
 		</Message>
 		
 		<Message id="0x21D" name="AirCondition">
