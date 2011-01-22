@@ -63,13 +63,13 @@ With device aliases it is possible to give the CAN busses a human readable name 
 
 Events
 ------
-An event may be used anywhere in the file after the first frame. It is used to mark positions in the log file and add a description. A timestamp with the same syntax as for a frame may be included. If no timestamp is present it is assumed that the event occured at the time of the previous frame.
+An event may be used anywhere in the file after the first frame. It is used to mark positions in the log file and add a description. A timestamp with the same syntax as for a frame may be included. If no timestamp is present it is assumed that the event occured at the time of the previous frame. Optionally it is also possible to provide a bus name on which the event occured.
 
 ##### Regex
-    EVENT \([0-9]+\.[0-9]{6}\) "[:alnum::punct:]+"
+    EVENT \([0-9]+\.[0-9]{6}\) [a-z0-9]{1,16} "[:alnum::punct:]+"
 
 ##### Examples
-    EVENT (2.542456) "Engine running"
+    EVENT (2.542456) can0 "Engine running"
     EVENT "Engine off"
 
 Full example
