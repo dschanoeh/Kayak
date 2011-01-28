@@ -179,6 +179,10 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
+        <configuration>
+          <debug>false</debug>
+          <xmlOutput>true</xmlOutput>
+        </configuration>         
         <version>2.3.1</version>
       </plugin>
     </plugins>
