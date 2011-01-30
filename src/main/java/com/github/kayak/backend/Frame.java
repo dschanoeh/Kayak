@@ -69,4 +69,9 @@ public class Frame {
 	public byte[] getData() {
 		return data;
 	}
+	
+	public String toString() {
+		String s = "Frame [" + Integer.toHexString(identifier) + "] " + Util.byteArrayToHexString(data);
+		return s;
+	}
 }

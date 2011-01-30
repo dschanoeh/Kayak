@@ -37,6 +37,7 @@ public class Subscription {
 	public Subscription(FrameReceiver receiver, SubscriptionChangeReceiver changeReceiver) {
 		ids = new ArrayList<Integer>();
 		muted = false;
+		subscribeAll = false;
 		this.receiver = receiver;
 		this.changeReceiver = changeReceiver;
 	}
