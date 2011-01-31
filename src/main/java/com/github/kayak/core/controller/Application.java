@@ -17,12 +17,45 @@
  */
 package com.github.kayak.core.controller;
 
-public class Application {
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.github.kayak.backend.*;
+
+public class Application {
+	Logger logger = Logger.getLogger("com.github.kayak.core.controller");
 	
 	public void start(){
 
-		System.out.println("Program has started");
-        
+		RAWConnection con = new RAWConnection("127.0.0.1", 28600, "vcan0");
+		BCMConnection con2 = new BCMConnection("127.0.0.1", 28600, "vcan0");
+		con.open();
+		con2.open();
+		
+		Bus b = new Bus();
+		b.connectTo(con);
+		b.connectTo(con2);
+		
+		FrameReceiver f = new FrameReceiver() {
+
+			@Override
+			public void newFrame(Frame frame) {
+				logger.log(Level.INFO, frame.toString());
+			}
+			
+		};
+		Subscription s = new Subscription(f, b);
+		s.subscribe(649);
+		//s.setSubscribeAll(true);
+		b.addRAWSubscription(s);
+        try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		b.sendFrame(new Frame(649, new byte[] {12,21}));
+        con.close();
+        con2.close();
 	}
 }
