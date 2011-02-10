@@ -15,7 +15,7 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *	
  */
-package com.github.kayak.backend;
+package com.github.kayak.core;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

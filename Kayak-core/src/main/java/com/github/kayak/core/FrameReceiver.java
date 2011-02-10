@@ -15,7 +15,7 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *	
  */
-package com.github.kayak.backend;
+package com.github.kayak.core;
 
 /**
  * FrameReceiver is a simple interface that must be implemented to be able to register to

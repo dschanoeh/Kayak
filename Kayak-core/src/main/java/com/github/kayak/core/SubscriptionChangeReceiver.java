@@ -15,21 +15,10 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *	
  */
-package com.github.kayak.core.controller;
+package com.github.kayak.core;
 
-public class ApplicationStarter {
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		Application kayak = new Application();
-		kayak.start();
-	}
-
+public interface SubscriptionChangeReceiver {
+	public void subscribed(int id, Subscription s);
+	public void unsubscribed(int id, Subscription s);
+	public void subscriptionAllChanged(boolean all, Subscription s);
 }
-
-
-
-

@@ -15,7 +15,7 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *	
  */
-package com.github.kayak.backend;
+package com.github.kayak.core;
 
 public class Frame {
 	private byte[] data;

@@ -15,7 +15,7 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *	
  */
-package com.github.kayak.backend;
+package com.github.kayak.core;
 
 /**
  * Utility class that provides the Kayak classes with methods to convert

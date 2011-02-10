@@ -15,7 +15,7 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *	
  */
-package com.github.kayak.backend;
+package com.github.kayak.core;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -33,7 +33,6 @@ public class Bus implements SubscriptionChangeReceiver {
 	private ArrayList<Subscription> subscriptionsRAW;
 	private ArrayList<Subscription> subscriptionsBCM;
 	private TimeSource timeSource;
-	private com.github.kayak.canio.kcd.Bus busDefinition;
 	private RAWConnection rawConnection;
 	private BCMConnection bcmConnection;
 	
@@ -48,12 +47,6 @@ public class Bus implements SubscriptionChangeReceiver {
 			deliverBCMFrame(f);
 		}
 	};
-	
-	public String getName() {
-		if(busDefinition != null)
-			return busDefinition.getName();
-		return null;
-	}
 
 	public TimeSource getTimeSource() {
 		return timeSource;
@@ -67,12 +60,6 @@ public class Bus implements SubscriptionChangeReceiver {
 		subscriptionsRAW = new ArrayList<Subscription>();
 		subscriptionsBCM = new ArrayList<Subscription>();
 		
-	}
-	
-	public Bus(com.github.kayak.canio.kcd.Bus busDefinition) {
-		subscriptionsRAW = new ArrayList<Subscription>();
-		subscriptionsBCM = new ArrayList<Subscription>();
-		this.busDefinition = busDefinition;
 	}
 	
 	public void addRAWSubscription(Subscription s) {

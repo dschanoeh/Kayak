@@ -1,4 +1,21 @@
-package com.github.kayak.backend;
+/**
+ * 	This file is part of Kayak.
+ *	
+ *	Kayak is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *	
+ *	Kayak is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *	
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
+ *	
+ */
+package com.github.kayak.core;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,20 +27,20 @@ import java.util.logging.Logger;
 
 /**
  * A RAWConnection extends the {@link SocketcandConnection} and adds methods
- * that bring a socketcand in RAW mode. Frames are delivered asynchronously
+ * that bring a socketcand in BCM mode. Frames are delivered asynchronously
  * through an own thread.
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  *
  */
-public class RAWConnection extends SocketcandConnection implements Runnable {
+public class BCMConnection extends SocketcandConnection implements Runnable {
 	private Logger logger = Logger.getLogger("com.github.kayak.backend");
 	private Socket socket;
 	private PrintWriter output;
 	private Thread thread;
 	private boolean stopRequest = false;
 	private InputStreamReader input;
-
-	public RAWConnection(String host, int port, String busName) {
+	
+	public BCMConnection(String host, int port, String busName) {
 		this.host = host;
 		this.port = port;
 		this.busName = busName;
@@ -56,14 +73,6 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
 				logger.log(Level.SEVERE, "Could not open bus");
 			}
 			
-			output.print("< rawmode >");
-			output.flush();
-			
-			ret = getElement(input);
-			if(!ret.equals("< ok >")) {
-				logger.log(Level.SEVERE, "Could not switch to RAW mode.");
-			}
-			
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "IOException while creating the socket.",e);
 		}
@@ -82,6 +91,46 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
 			socket.close();
 		} catch (IOException e) {}
 	}
+	
+	public void subscribeTo(int id, int sec, int usec) {
+		output.print("< subscribe " 
+				+ Integer.toString(sec) + " " 
+				+ Integer.toString(usec) + " "
+				+ Integer.toHexString(id) + " >");
+		output.flush();
+	}
+	
+	public void unsubscribeFrom(int id) {
+		output.print("< unsubscribe " + Integer.toHexString(id) + " >");
+		output.flush();
+	}
+	
+	public void addSendJob(Frame f, int sec, int usec) {
+		output.print("< add " 
+				+ Integer.toString(sec) + " " 
+				+ Integer.toString(usec) + " "
+				+ Integer.toHexString(f.getIdentifier()) + " "
+				+ Integer.toString(f.getLength()) + " "
+				+ Util.byteArrayToHexString(f.getData()) + " >");
+		output.flush();
+	}
+	
+	public void updateSendJob(Frame f) {
+		output.print("< add " 
+				+ Integer.toHexString(f.getIdentifier()) + " "
+				+ Integer.toString(f.getLength()) + " "
+				+ Util.byteArrayToHexString(f.getData()) + " >");
+		output.flush();
+	}
+	
+	public void sendFrame(Frame f) {
+		output.print("< send " 
+				+ Integer.toHexString(f.getIdentifier()) + " "
+				+ Integer.toString(f.getLength()) + " "
+				+ Util.byteArrayToHexString(f.getData()) + " >");
+		output.flush();
+	}
+
 
 	@Override
 	public void run() {
@@ -94,6 +143,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
 				
 				String[] fields = frame.split("\\s");
 				
+				/* We received a frame */
 				if(fields[1].equals("frame")) {
 					try {
 						Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(fields[3]));
