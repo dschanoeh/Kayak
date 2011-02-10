@@ -1,204 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   	This file is part of Kayak.
- 	
+
  	Kayak is free software: you can redistribute it and/or modify
  	it under the terms of the GNU Lesser General Public License as published by
  	the Free Software Foundation, either version 3 of the License, or
  	(at your option) any later version.
- 	
+
  	Kayak is distributed in the hope that it will be useful,
  	but WITHOUT ANY WARRANTY; without even the implied warranty of
  	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  	GNU General Public License for more details.
- 	
+
  	You should have received a copy of the GNU Lesser General Public License
  	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
- 	
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
-    <!-- The Basics -->
+
     <groupId>com.github.kayak</groupId>
-    <artifactId>kayak</artifactId>
-    <version>0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <artifactId>Kayak</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    
+    <repositories>
+        <!-- this is a remote repository hosting the netbeans api artifacts.
+         the versions of the artifacts are netbeans IDE release based, eg. RELEASE65
+         You might want to use your own repository. To create one, use the nbm:populate-repository goal.
+          -->
+        <repository>
+            <id>netbeans</id>
+            <name>repository hosting netbeans.org api artifacts</name>
+            <url>http://bits.netbeans.org/maven2</url>
+        </repository>
+    </repositories>
+
     <dependencies>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.3.1</version>
-        <scope>src</scope>
-      </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-  
-    <!-- <parent></parent> -->
-    <!-- <dependencyManagement></dependencyManagement> -->
-    <!-- <modules></modules> -->
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>nbm-maven-plugin</artifactId>
+                    <version>3.2</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <brandingToken>${brandingToken}</brandingToken>
+                        <cluster>kayak</cluster>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <!-- netbeans modules in 6.9+ are 1.6 compatible -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3</version>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <modules>
+        <module>branding</module>
+        <module>application</module>
+        <module>Kayak-ui</module>
+    <module>Kayak-kcd</module>
+  </modules>
+
+    <reporting>
+        <outputDirectory>${project.build.directory}/site</outputDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <configuration>
+                    <debug>false</debug>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+                <version>2.3.1</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
+
     <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <netbeans.version>RELEASE691</netbeans.version>
+        <brandingToken>kayak</brandingToken>
     </properties>
-    
-    <!-- Build settings -->
-  <build>
-    <directory>${project.basedir}/target</directory>
-    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-    <finalName>${project.artifactId}-${project.version}</finalName>
-    <testOutputDirectory>${project.build.directory}/test-classes</testOutputDirectory>
-    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
-    <!-- TODO: MNG-3731 maven-plugin-tools-api < 2.4.4 expect this to be relative... -->
-    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
-    <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
-    <resources>
-      <resource>
-        <directory>${project.basedir}/src/main/resources</directory>
-      </resource>
-    </resources>
-    <testResources>
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-      </testResource>
-    </testResources>
-   <pluginManagement>
-       <plugins>
-         <plugin>
-           <artifactId>maven-antrun-plugin</artifactId>
-           <version>1.3</version>
-         </plugin>       
-         <plugin>
-           <artifactId>maven-assembly-plugin</artifactId>
-           <version>2.2-beta-2</version>
-         </plugin>         
-         <plugin>
-           <artifactId>maven-clean-plugin</artifactId>
-           <version>2.2</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-compiler-plugin</artifactId>
-           <version>2.3.2</version>
-           <configuration>
-              <source>1.6</source>
-              <target>1.6</target>             
-           </configuration>
-         </plugin>
-         <plugin>
-           <artifactId>maven-dependency-plugin</artifactId>
-           <version>2.0</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-deploy-plugin</artifactId>
-           <version>2.4</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-ear-plugin</artifactId>
-           <version>2.3.1</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-ejb-plugin</artifactId>
-           <version>2.1</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-install-plugin</artifactId>
-           <version>2.2</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-jar-plugin</artifactId>
-           <version>2.2</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-javadoc-plugin</artifactId>
-           <version>2.5</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-plugin-plugin</artifactId>
-           <version>2.4.3</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-rar-plugin</artifactId>
-           <version>2.2</version>
-         </plugin>        
-         <plugin>                
-           <artifactId>maven-release-plugin</artifactId>
-           <version>2.0-beta-8</version>
-         </plugin>
-         <plugin>                
-           <artifactId>maven-resources-plugin</artifactId>
-           <version>2.3</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-site-plugin</artifactId>
-           <version>2.0.1</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-source-plugin</artifactId>
-           <version>2.0.4</version>
-         </plugin>         
-         <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.4.3</version>
-         </plugin>
-         <plugin>
-           <artifactId>maven-war-plugin</artifactId>
-           <version>2.1-alpha-2</version>
-         </plugin>
-         <plugin>
-           <!-- Usage: mvn org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:generate -->
-           <groupId>org.jvnet.jaxb2.maven2</groupId>
-           <artifactId>maven-jaxb2-plugin</artifactId>
-           <version>0.7.4</version>
-           <configuration>
-             <schemaDirectory>src/main/resources/schema</schemaDirectory>
-             <schemaIncludes>
-               <include>Definition.xsd</include>
-             </schemaIncludes>			
-             <!-- <schemaExcludes> -->
-               <!-- <exclude>one/two/*.xsd</exclude> -->
-             <!-- </schemaExcludes> -->			
-             <bindingDirectory>src/main/resources/binding</bindingDirectory>
-             <bindingIncludes>
-               <include>*.xjb</include>
-             </bindingIncludes>			
-             <!-- <bindingExcludes> -->
-               <!-- <exclude>one/two/*.xjb</exclude> -->
-             <!-- </bindingExcludes> -->			
-             <generateDirectory>target/generated-sources/xjc</generateDirectory>
-             <generatePackage>com.github.kayak.canio.kcd</generatePackage>
-             <writeCode>true</writeCode> 
-             <readOnly>false</readOnly>
-             <removeOldOutput>false</removeOldOutput>
-             <forceRegenerate>false</forceRegenerate>
-           </configuration>
-         </plugin>
-       </plugins>
-     </pluginManagement>
-  </build>
 
-  <reporting>
-    <outputDirectory>${project.build.directory}/site</outputDirectory>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <configuration>
-          <debug>false</debug>
-          <xmlOutput>true</xmlOutput>
-        </configuration>         
-        <version>2.3.1</version>
-      </plugin>
-    </plugins>
-  </reporting>
-
-    
     <!-- More project info -->
     <name>Kayak</name>
     <description>
-    	Kayak aims to be a Java framework and GUI for CAN data handling. It will 
-    	include an abstract data model for different CAN hard- and software 
-    	solutions. SocketCAN and IP will be used as an abstraction layer above 
-    	the hardware. Platform independence is a goal and therefore all logic 
-    	will be implemented in Java. To run the framework on a Windows client 
+    	Kayak aims to be a Java framework and GUI for CAN data handling. It will
+    	include an abstract data model for different CAN hard- and software
+    	solutions. SocketCAN and IP will be used as an abstraction layer above
+    	the hardware. Platform independence is a goal and therefore all logic
+    	will be implemented in Java. To run the framework on a Windows client
     	a socketCAN over ethernet protocol will be implemented.
     </description>
     <url>https://github.com/dschanoeh/Kayak/</url>
@@ -210,70 +120,42 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <organization></organization>
+    <organization/>
     <developers>
-		<developer>
-			<id>dschanoe</id>
-	      	<name></name>
-	      	<email>dschanoe@googlemail.com</email>
-	      	<roles>
-	        	<role>architect</role>
-	        	<role>developer</role>
-	      	</roles>
-	      	<timezone>+1</timezone>
-	      	<properties>
-	        	<picUrl></picUrl>
-	      	</properties>
-	    </developer>
-	</developers>
-	<contributors>
-    	<contributor>
-    		<name>julietkilo</name>
-      		<email></email>
-      		<roles>
-        		<role>developer, tester</role>
-      		</roles>
-      		<timezone>-1</timezone>
-      		<properties>
-      		</properties>
-      	</contributor>
-  	</contributors>
-    
+        <developer>
+            <id>dschanoe</id>
+            <name/>
+            <email>dschanoe@googlemail.com</email>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+            <properties>
+                <picUrl/>
+            </properties>
+        </developer>
+    </developers>
+    <contributors>
+        <contributor>
+            <name>julietkilo</name>
+            <email/>
+            <roles>
+                <role>developer, tester</role>
+            </roles>
+            <timezone>-1</timezone>
+            <properties>
+            </properties>
+        </contributor>
+    </contributors>
+
     <!-- Environment settings -->
-    <issueManagement></issueManagement>
-    <ciManagement></ciManagement>
-    <mailingLists></mailingLists>
+    <issueManagement/>
+    <ciManagement/>
+    <mailingLists/>
     <scm>
         <connection>scm:git:git://github.com/dschanoeh/Kayak.git</connection>
         <url>https://github.com/dschanoeh/Kayak</url>
     </scm>
-    <prerequisites></prerequisites>
-    <repositories>
-      <!-- <repository> -->
-      <!--  <id>maven2-repository.dev.java.net</id> -->
-      <!--  <name>Java.net Maven 2 Repository</name> -->
-      <!--  <url>http://download.java.net/maven/2</url> -->
-      <!-- </repository> -->
-    </repositories>
-    <pluginRepositories>
-     <!-- <pluginRepository> -->
-     <!--   <id>maven2-repository.dev.java.net</id> -->
-     <!--   <name>Java.net Maven 2 Repository</name> -->
-     <!--   <releases> -->
-     <!--     <enabled>true</enabled> -->
-     <!--     <updatePolicy>never</updatePolicy> -->
-     <!--     <checksumPolicy>ignore</checksumPolicy> -->
-     <!--   </releases> -->
-     <!--   <snapshots> -->
-     <!--     <enabled>false</enabled> -->
-     <!--     <updatePolicy>never</updatePolicy> -->
-     <!--     <checksumPolicy>ignore</checksumPolicy> -->
-     <!--   </snapshots> -->
-     <!--   <url>http://download.java.net/maven/2</url> -->
-     <!--   <layout>default</layout> -->
-     <!-- </pluginRepository> -->
-    </pluginRepositories>
-    <distributionManagement></distributionManagement>
-    <profiles></profiles>
+    <prerequisites/>
 </project>
-
