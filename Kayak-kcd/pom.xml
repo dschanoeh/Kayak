@@ -73,14 +73,14 @@
                 <artifactId>maven-jaxb2-plugin</artifactId>
                 <version>0.7.4</version>
                 <configuration>
-                    <schemaDirectory>src/main/resources/schema</schemaDirectory>
+                    <schemaDirectory>src/main/resources/com/github/kayak/canio/kcd/schema</schemaDirectory>
                     <schemaIncludes>
                         <include>Definition.xsd</include>
                     </schemaIncludes>
              <!-- <schemaExcludes> -->
                <!-- <exclude>one/two/*.xsd</exclude> -->
              <!-- </schemaExcludes> -->
-                    <bindingDirectory>src/main/resources/binding</bindingDirectory>
+                    <bindingDirectory>src/main/resources/com/github/kayak/canio/kcd/binding</bindingDirectory>
                     <bindingIncludes>
                         <include>*.xjb</include>
                     </bindingIncludes>
@@ -88,7 +88,7 @@
                <!-- <exclude>one/two/*.xjb</exclude> -->
              <!-- </bindingExcludes> -->
                     <generateDirectory>target/generated-sources/xjc</generateDirectory>
-                    <generatePackage>com.github.kayak.kayakkcd</generatePackage>
+                    <generatePackage>com.github.kayak.canio.kcd</generatePackage>
                     <writeCode>true</writeCode>
                     <readOnly>false</readOnly>
                     <removeOldOutput>false</removeOldOutput>
