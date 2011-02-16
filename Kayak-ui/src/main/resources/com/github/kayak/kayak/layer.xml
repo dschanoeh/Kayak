@@ -1,5 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.0//EN" "http://www.netbeans.org/dtds/filesystem-1_0.dtd">
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
  
+    <folder name="Actions">
+        <folder name="Window">
+            <file name="com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.ui.busconfiguration.BusConfigurationTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.busconfiguration.Bundle#CTL_BusConfigurationAction"/>
+                <attr name="iconBase" stringvalue="com/github/kayak/ui/busconfiguration/preferences-desktop.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+            <file name="com-github-kayak-ui-busses-BussesAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.ui.busses.BussesTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.busses.Bundle#CTL_BussesAction"/>
+                <attr name="iconBase" stringvalue="com/github/kayak/ui/busses/network-idle.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+            <file name="com-github-kayak-ui-rawview-RawViewAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.ui.rawview.RawViewTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.rawview.Bundle#CTL_RawViewAction"/>
+                <attr name="iconBase" stringvalue="com/github/kayak/ui/rawview/format-justify-fill.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+            <file name="com-github-kayak-ui-connections-ConnectionsAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.ui.connections.ConnectionsTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.connections.Bundle#CTL_ConnectionsAction"/>
+                <attr name="iconBase" stringvalue="com/github/kayak/ui/connections/network-wireless.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="Window">
+            <file name="BusConfigurationAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance"/>
+            </file>
+            <file name="BussesAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-busses-BussesAction.instance"/>
+            </file>
+            <file name="RawViewAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-rawview-RawViewAction.instance"/>
+            </file>
+            <file name="ConnectionsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-connections-ConnectionsAction.instance"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="BusConfigurationTopComponent.settings" url="BusConfigurationTopComponentSettings.xml"/>
+            <file name="BussesTopComponent.settings" url="BussesTopComponentSettings_1.xml"/>
+            <file name="RawViewTopComponent.settings" url="RawViewTopComponentSettings.xml"/>
+            <file name="ConnectionsTopComponent.settings" url="ConnectionsTopComponentSettings.xml"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="editor">
+                <file name="BusConfigurationTopComponent.wstcref" url="BusConfigurationTopComponentWstcref.xml"/>
+                <file name="RawViewTopComponent.wstcref" url="RawViewTopComponentWstcref.xml"/>
+            </folder>
+            <folder name="explorer">
+                <file name="BussesTopComponent.wstcref" url="BussesTopComponentWstcref_1.xml"/>
+            </folder>
+            <folder name="rightSlidingSide">
+                <file name="ConnectionsTopComponent.wstcref" url="ConnectionsTopComponentWstcref.xml"/>
+            </folder>
+        </folder>
+    </folder>
 </filesystem>
