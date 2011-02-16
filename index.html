@@ -8,20 +8,20 @@
   <style type="text/css">
     body {
       margin-top: 1.0em;
-      background-color: #08c993;
+      background-color: #ffffff;
       font-family: "Helvetica,Arial,FreeSans";
-      color: #ffffff;
+      color: #000000;
     }
     #container {
       margin: 0 auto;
       width: 700px;
     }
-    h1 { font-size: 3.8em; color: #f7366c; margin-bottom: 3px; }
+    h1 { font-size: 3.8em; color: #000000; margin-bottom: 3px; }
     h1 .small { font-size: 0.4em; }
     h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #f7366c; }
-    h3 { text-align: center; color: #f7366c; }
-    a { color: #f7366c; }
+    h2 { font-size: 1.5em; color: #000000; }
+    h3 { text-align: center; color: #000000; }
+    a { color: #000000; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
     .download { float: right; }
     pre { background: #000; color: #fff; padding: 15px;}
@@ -42,22 +42,19 @@
         <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
     </div>
 
-    <h1><a href="http://github.com/dschanoeh/Kayak">Kayak</a>
-      <span class="small">by <a href="http://github.com/dschanoeh">dschanoeh</a></span></h1>
+    <h1><a href="http://github.com/dschanoeh/Kayak">Kayak</a></h1>
 
     <div class="description">
-      A generic framework to access CAN bus data
-    </div>
+      Kayak aims to be a Java framework and Application for CAN data monitoring and . It includes an abstract data model for different CAN hard- and software solutions. SocketCAN and IP will be used as an abstraction layer above the hardware. 
+      Platform independence is a goal and therefore it if fully implemented in Java. To provide a rich user interface Kayak is a Netbeans RCP application.</div>
 
     <h2>Authors</h2>
-<p>Jan-Niklas Meier (dschanoeh@googlemail.com)<br/>julietkilo (nospam@mytrashmail.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p>Jan-Niklas Meier (dschanoeh@googlemail.com)<br/>      </p>
-
+<p>Jan-Niklas Meier (dschanoeh@googlemail.com)<br/>
+julietkilo<br/><br/>      </p>
 
     <h2>Download</h2>
     <p>
-      You can download this project in either
+      You can download the project sourcecode in either
       <a href="http://github.com/dschanoeh/Kayak/zipball/master">zip</a> or
       <a href="http://github.com/dschanoeh/Kayak/tarball/master">tar</a> formats.
     </p>
@@ -65,6 +62,10 @@
       by running:
       <pre>$ git clone git://github.com/dschanoeh/Kayak</pre>
     </p>
+
+    <h2>Build</h2>
+    To build Kayak you only need a working maven2 installation. To initiate the packaging go into the Kayak source folder and run
+      <pre>$ mvn clean package</pre>
 
     <div class="footer">
       get the source code on GitHub : <a href="http://github.com/dschanoeh/Kayak">dschanoeh/Kayak</a>
