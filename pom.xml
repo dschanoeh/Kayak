@@ -109,6 +109,7 @@
     <properties>
         <netbeans.version>RELEASE691</netbeans.version>
         <brandingToken>kayak</brandingToken>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <!-- More project info -->
