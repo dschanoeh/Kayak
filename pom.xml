@@ -74,6 +74,10 @@
                     <artifactId>maven-site-plugin</artifactId>
                     <version>2.0.1</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -129,17 +133,15 @@
     <organization/>
     <developers>
         <developer>
-            <id>dschanoe</id>
-            <name/>
-            <email>dschanoe@googlemail.com</email>
+            <id>dschanoeh</id>
+            <name>Jan-Niklas Meier</name>
+            <email>dschanoeh@googlemail.com</email>
             <roles>
                 <role>architect</role>
                 <role>developer</role>
             </roles>
             <timezone>+1</timezone>
-            <properties>
-                <picUrl/>
-            </properties>
+            <properties/>
         </developer>
     </developers>
     <contributors>
@@ -149,19 +151,23 @@
             <roles>
                 <role>developer, tester</role>
             </roles>
-            <timezone>-1</timezone>
+            <timezone>+1</timezone>
             <properties>
             </properties>
         </contributor>
     </contributors>
 
     <!-- Environment settings -->
-    <issueManagement/>
+    <issueManagement>
+        <url>https://github.com/dschanoeh/Kayak/issues</url>
+        <system>github</system>
+    </issueManagement>
     <ciManagement/>
     <mailingLists/>
     <scm>
         <connection>scm:git:git://github.com/dschanoeh/Kayak.git</connection>
-        <url>https://github.com/dschanoeh/Kayak</url>
+        <url>scm:git:git://github.com/dschanoeh/Kayak.git</url>
+        <developerConnection>scm:git:git://github.com/dschanoeh/Kayak.git</developerConnection>
     </scm>
     <prerequisites/>
 </project>
