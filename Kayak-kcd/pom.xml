@@ -14,6 +14,10 @@
 
     <name>Kayak-kcd NetBeans Module</name>
 
+    <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
          the versions of the artifacts are netbeans IDE release based, eg. RELEASE65.
@@ -35,9 +39,23 @@
             <artifactId>org-openide-util</artifactId>
             <version>RELEASE691</version>
         </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <testOutputDirectory>${project.build.directory}/test-classes</testOutputDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>${project.basedir}/src/test/resources</directory>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -77,16 +95,10 @@
                     <schemaIncludes>
                         <include>Definition.xsd</include>
                     </schemaIncludes>
-             <!-- <schemaExcludes> -->
-               <!-- <exclude>one/two/*.xsd</exclude> -->
-             <!-- </schemaExcludes> -->
-                    <bindingDirectory>src/main/resources/com/github/kayak/canio/kcd/binding</bindingDirectory>
+                    <bindingDirectory>src/main/resources/com/github/kayak/canio/kcd/</bindingDirectory>
                     <bindingIncludes>
                         <include>*.xjb</include>
                     </bindingIncludes>
-             <!-- <bindingExcludes> -->
-               <!-- <exclude>one/two/*.xjb</exclude> -->
-             <!-- </bindingExcludes> -->
                     <generateDirectory>target/generated-sources/xjc</generateDirectory>
                     <generatePackage>com.github.kayak.canio.kcd</generatePackage>
                     <writeCode>true</writeCode>
