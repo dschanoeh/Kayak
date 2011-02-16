@@ -17,25 +17,15 @@
  */
 package com.github.kayak.backend;
 
-import java.util.ArrayList;
-
 /**
- * This class is used to synchronize the time between different busses or other
- * classes. After a TimeSource is created it can be connected to any number of
- * objects. Objects can either simply call getTime() to receive the time or
- * register themselves to receive TimeEvents via the {@link TimeEventReceiver}
- * interface. This can be used to synchronize multiple components.
+ * This class is used to synchronize the time between different busses. After a
+ * TimeSource is created it can be connected to any number of busses. Each frame
+ * passing through the bus will get a timestamp from the TimeSource.
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  *
  */
 public class TimeSource {
-	private static final int MODE_STOP = 0;
-	private static final int MODE_PLAY = 1;
-	private static final int MODE_PAUSE = 2;
 	private long reference;
-	private long pauseReference;
-	private int mode = MODE_STOP;
-	private ArrayList<TimeEventReceiver> receivers;
 	
 	public TimeSource() {
 		reference = System.currentTimeMillis();
@@ -46,55 +36,6 @@ public class TimeSource {
 	}
 	
 	public long getTime() {
-		switch(mode) {
-			case MODE_PLAY:
-				return System.currentTimeMillis() - reference;
-			
-			case MODE_STOP:
-				return 0;
-				
-			case MODE_PAUSE:
-				return pauseReference;
-				
-			default:
-				return 0;
-		}
-	}
-	
-	public void register(TimeEventReceiver receiver) {
-		receivers.add(receiver);
-	}
-	
-	public void deregister(TimeEventReceiver receiver) {
-		receivers.remove(receiver);
-	}
-	
-	public void play() {
-		mode = MODE_PLAY;
-		
-		for(TimeEventReceiver receiver : receivers) {
-			if(receiver != null)
-				receiver.played();
-		}
-	}
-	
-	public void pause() {
-		mode = MODE_PAUSE;
-		
-		pauseReference = System.currentTimeMillis() - reference;
-		
-		for(TimeEventReceiver receiver : receivers) {
-			if(receiver != null)
-				receiver.paused();
-		}
-	}
-	
-	public void stop() {
-		mode = MODE_STOP;
-		
-		for(TimeEventReceiver receiver : receivers) {
-			if(receiver != null)
-				receiver.stopped();
-		}
+		return System.currentTimeMillis() - reference;
 	}
 }

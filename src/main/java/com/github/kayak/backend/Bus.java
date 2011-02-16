@@ -83,14 +83,6 @@ public class Bus implements SubscriptionChangeReceiver {
 		subscriptionsBCM.add(s);
 	}
 	
-	public void removeRAWSubscription(Subscription s) {
-		subscriptionsRAW.remove(s);
-	}
-	
-	public void removeBCMSubscription(Subscription s) {
-		subscriptionsBCM.remove(s);
-	}
-	
 	public void connectTo(RAWConnection conn) {
 		this.rawConnection = conn;
 		conn.setReceiver(rawReceiver);
