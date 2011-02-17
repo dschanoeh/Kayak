@@ -24,6 +24,8 @@ public class BusURLNode extends AbstractNode {
     }
 
     private static Type type;
+    private BusURL url;
+    private ConnectionManager manager;
 
     public static Type getType() {
         return type;
@@ -31,29 +33,50 @@ public class BusURLNode extends AbstractNode {
 
     private class BookmarkConnectionAction extends AbstractAction {
 
-
         public BookmarkConnectionAction() {
             putValue(NAME, "Bookmark");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            BusURL beacon = getLookup().lookup(BusURL.class);
-            BusBeaconDiscoveryFactory discoveryFactory = Lookup.getDefault().lookup(BusBeaconDiscoveryFactory.class);
-            if(discoveryFactory != null)
-                JOptionPane.showMessageDialog(null, "Hello from " + beacon);
+            if(type != BusURLNode.Type.FAVOURITE) {
+                manager.addFavourite(url);
+            }
         }
-
     }
 
-    public BusURLNode(BusURL beacon, Type type) {
-        super(Children.LEAF, Lookups.fixed(beacon));
-        setDisplayName(beacon.toString());
+    private class DeleteConnectionAction extends AbstractAction {
+
+        public DeleteConnectionAction() {
+            putValue(NAME, "Delete");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(type == BusURLNode.Type.FAVOURITE) {
+                manager.removeFavourite(url);
+            } else if(type == BusURLNode.Type.RECENT) {
+                manager.removeRecent(url);
+            }
+        }
+    }
+
+    public BusURLNode(BusURL url, Type type, ConnectionManager manager) {
+        super(Children.LEAF);
+        this.url = url;
+        setDisplayName(url.toString());
         this.type = type;
+        this.manager = manager;
     }
 
     @Override
     public Action[] getActions(boolean popup) {
-        return new Action[] { new BookmarkConnectionAction() };
+        if(type == BusURLNode.Type.FAVOURITE) {
+            return new Action[] { new BookmarkConnectionAction(), new DeleteConnectionAction() };
+        } else if(type == BusURLNode.Type.DISCOVERY) {
+            return new Action[] { new BookmarkConnectionAction() };
+        } else {
+            return new Action[] { new BookmarkConnectionAction(), new DeleteConnectionAction() };
+        }
     }
 }

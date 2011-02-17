@@ -93,4 +93,14 @@ public class ConnectionManager {
 
         listeners = new ArrayList<ConnectionListener>();
     }
+
+    void addRecent(BusURL beacon) {
+        recent.add(beacon);
+        notifyListeners();
+    }
+
+    void removeRecent(BusURL url) {
+        recent.remove(url);
+        notifyListeners();
+    }
 }

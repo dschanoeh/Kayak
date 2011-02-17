@@ -4,16 +4,24 @@
  */
 package com.github.kayak.ui.connections;
 
+import java.util.Collection;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import org.openide.filesystems.FileStateInvalidException;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.explorer.ExplorerManager;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataFolder;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
 
 
@@ -31,20 +39,22 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
 
     private ExplorerManager manager = new ExplorerManager();
 
+    private ConnectionManager connectionManager;
+
     public ConnectionsTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(ConnectionsTopComponent.class, "CTL_ConnectionsTopComponent"));
         setToolTipText(NbBundle.getMessage(ConnectionsTopComponent.class, "HINT_ConnectionsTopComponent"));
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
+       
+        connectionManager = new ConnectionManager();
+        ConnectionNodeFactory factory = new ConnectionNodeFactory(connectionManager);
 
-        ConnectionManager connectionManager = new ConnectionManager();
-        ConnectionNodeFactory nodeFactory = new ConnectionNodeFactory(connectionManager);
-        AbstractNode rootNode = new AbstractNode(Children.create(nodeFactory,false));
-        rootNode.setDisplayName("Root");
-
+        AbstractNode rootNode = new AbstractNode(Children.create(factory, true));
 
         manager.setRootContext(rootNode);
+ 
     }
 
     /** This method is called from within the constructor to
@@ -103,6 +113,8 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
         });
         jToolBar1.add(deleteButton);
 
+        beanTreeView1.setRootVisible(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,37 +132,18 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
     }// </editor-fold>//GEN-END:initComponents
 
     private void newButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newButtonActionPerformed
-        /*String url = JOptionPane.showInputDialog("Please type in a socket to connect with.", "socket://192.168.30.129:28640");
+        String url = JOptionPane.showInputDialog("Please type in a socket to connect with.", "socket://192.168.30.129:28640");
 
         if(url != null) {
-            SocketcandBeacon beacon = SocketcandBeacon.fromString(url);
+            BusURL beacon = BusURL.fromString(url);
             if(beacon != null) {
-                DefaultMutableTreeNode child = new DefaultMutableTreeNode(beacon);
-                recentElement.add(child);
-                treeModel.reload();
-                for (int i = 0; i < connectionsTree.getRowCount(); i++) {
-                    connectionsTree.expandRow(i);
-                }
-            } else {
-            }
-        }*/
+                connectionManager.addRecent(beacon);
+            } 
+        }
     }//GEN-LAST:event_newButtonActionPerformed
 
     private void bookmarkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookmarkButtonActionPerformed
-        /*TreePath path = connectionsTree.getSelectionPath();
-
-        if(path != null) {
-            Object[] objectPath = path.getPath();
-
-            if(objectPath[1] == recentElement || objectPath[1] == discoveryElement) {
-                DefaultMutableTreeNode child = new DefaultMutableTreeNode(objectPath[objectPath.length-1]);
-                favouritesElement.add(child);
-                treeModel.reload();
-                for (int i = 0; i < connectionsTree.getRowCount(); i++) {
-                    connectionsTree.expandRow(i);
-                }
-            }
-        }*/
+       
     }//GEN-LAST:event_bookmarkButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed

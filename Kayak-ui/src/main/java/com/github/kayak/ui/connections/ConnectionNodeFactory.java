@@ -5,6 +5,7 @@
 
 package com.github.kayak.ui.connections;
 
+import com.github.kayak.ui.busses.BusNode;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.ChangeEvent;
@@ -53,40 +54,27 @@ public class ConnectionNodeFactory extends ChildFactory implements ConnectionLis
             Folder folder = (Folder) key;
             switch(folder) {
                 case DISCOVERY:
-                    /*Children.Keys<ArrayList<BusURL>> discoveryChildren = new Children.Keys<ArrayList<BusURL>>() {
-
-                        @Override
-                        protected Node[] createNodes(ArrayList<BusURL> key) {
-                            ArrayList<Node> nodes = new ArrayList<Node>();
-                            for(BusURL busURL : key) {
-                                nodes.add(new BusURLNode(busURL, BusURLNode.Type.RECENT));
-                            }
-                            return nodes.toArray(new Node[0]);
-                        }
-                    };*/
-                    Children.Array discoveryChildren = new Children.Array();
-                    for(BusURL url : manager.getAutoDiscovery()) {
-                        discoveryChildren.add(createNodesForKey(url));
-                    }
-
-                    AbstractNode discoveryFolderNode = new AbstractNode(discoveryChildren);
-                    discoveryFolderNode.setDisplayName("Auto discovery");   
-                    return new Node[] { discoveryFolderNode };
+                    AbstractNode discoveryNode = new AbstractNode(new ConnectionChildrenFactory(manager, BusURLNode.Type.DISCOVERY));
+                    discoveryNode.setDisplayName("Auto discovery");
+                    discoveryNode.setIconBaseWithExtension("com/github/kayak/ui/connections/network-wireless.png");
+                    return new Node[] { discoveryNode };
                 case FAVOURITES:
-                    AbstractNode favouritesFolderNode = new AbstractNode(Children.LEAF);
+                    AbstractNode favouritesFolderNode = new AbstractNode(new ConnectionChildrenFactory(manager, BusURLNode.Type.FAVOURITE));
                     favouritesFolderNode.setDisplayName("Favourites");
+                    favouritesFolderNode.setIconBaseWithExtension("com/github/kayak/ui/connections/bookmark-new.png");
                     return new Node[] { favouritesFolderNode };
                 case RECENT:
-                    AbstractNode recentFolderNode = new AbstractNode(Children.LEAF);
+                    AbstractNode recentFolderNode = new AbstractNode(new ConnectionChildrenFactory(manager, BusURLNode.Type.RECENT));
                     recentFolderNode.setDisplayName("Recent");
+                    recentFolderNode.setIconBaseWithExtension("com/github/kayak/ui/connections/folder.png");
                     return new Node[] { recentFolderNode };
                 default:
                     return null;
             }
         } else if(key instanceof BusURL) {
-            BusURLNode node = new BusURLNode((BusURL) key, BusURLNode.Type.RECENT);
-            return new Node[] { node };
+            
         }
         return null;
     }
+
 }
