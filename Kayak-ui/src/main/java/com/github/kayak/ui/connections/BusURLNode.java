@@ -18,7 +18,10 @@
 
 package com.github.kayak.ui.connections;
 
+import com.github.kayak.core.BusURL;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.openide.nodes.AbstractNode;
@@ -30,16 +33,22 @@ import org.openide.nodes.Children;
  */
 public class BusURLNode extends AbstractNode {
     public static enum Type {
-        RECENT, FAVOURITE, DISCOVERY
+        RECENT, FAVOURITE, DISCOVERY, CONNECTED
     }
 
     private static Type type;
     private BusURL url;
-    private ConnectionManager manager;
+    private ConnectionManager manager = ConnectionManager.getGlobalConnectionManager();
 
     public static Type getType() {
         return type;
     }
+
+    @Override
+    public Transferable drag() throws IOException {
+        return url;
+    }
+
 
     private class BookmarkConnectionAction extends AbstractAction {
 
@@ -49,7 +58,7 @@ public class BusURLNode extends AbstractNode {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(type != BusURLNode.Type.FAVOURITE) {
+            if(type == BusURLNode.Type.DISCOVERY || type == BusURLNode.Type.RECENT) {
                 manager.addFavourite(url);
             }
         }
@@ -71,12 +80,11 @@ public class BusURLNode extends AbstractNode {
         }
     }
 
-    public BusURLNode(BusURL url, Type type, ConnectionManager manager) {
+    public BusURLNode(BusURL url, Type type) {
         super(Children.LEAF);
         this.url = url;
         setDisplayName(url.toString());
         this.type = type;
-        this.manager = manager;
     }
 
     @Override

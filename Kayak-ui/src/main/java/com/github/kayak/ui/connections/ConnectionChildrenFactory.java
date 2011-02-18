@@ -18,6 +18,7 @@
 
 package com.github.kayak.ui.connections;
 
+import com.github.kayak.core.BusURL;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 
@@ -52,7 +53,7 @@ public class ConnectionChildrenFactory extends Children.Keys<BusURL> implements 
 
     @Override
     protected Node[] createNodes(BusURL busURL) {
-        return new Node[] {new BusURLNode(busURL, type, manager)};
+        return new Node[] {new BusURLNode(busURL, type)};
     }
 
     @Override

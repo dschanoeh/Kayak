@@ -2,6 +2,15 @@
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
     <folder name="Actions">
+        <folder name="File">
+            <file name="com-github-kayak-ui-projects-NewProject.instance">
+                <attr name="delegate" newvalue="com.github.kayak.ui.projects.NewProject"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_NewProject"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="iconBase" stringvalue="com/github/kayak/ui/projects/package-x-generic.png"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+        </folder>
         <folder name="Window">
             <file name="com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.busconfiguration.BusConfigurationTopComponent.findInstance"/>
@@ -13,6 +22,12 @@
                 <attr name="component" methodvalue="com.github.kayak.ui.busses.BussesTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.busses.Bundle#CTL_BussesAction"/>
                 <attr name="iconBase" stringvalue="com/github/kayak/ui/busses/network-idle.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+            <file name="com-github-kayak-ui-projects-ProjectsAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.ui.projects.ProjectsTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_ProjectsAction"/>
+                <attr name="iconBase" stringvalue="com/github/kayak/ui/projects/package-x-generic.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
             <file name="com-github-kayak-ui-rawview-RawViewAction.instance">
@@ -29,13 +44,31 @@
             </file>
         </folder>
     </folder>
+    <folder name="Toolbars">
+        <folder name="File">
+            <file name="com-github-kayak-ui-projects-NewProject.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProject.instance"/>
+                <attr name="position" intvalue="1300"/>
+            </file>
+        </folder>
+    </folder>
+
     <folder name="Menu">
+        <folder name="File">
+            <file name="com-github-kayak-ui-projects-NewProject.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProject.instance"/>
+                <attr name="position" intvalue="1300"/>
+            </file>
+        </folder>
         <folder name="Window">
             <file name="BusConfigurationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance"/>
             </file>
             <file name="BussesAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-busses-BussesAction.instance"/>
+            </file>
+            <file name="ProjectsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-projects-ProjectsAction.instance"/>
             </file>
             <file name="RawViewAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-rawview-RawViewAction.instance"/>
@@ -45,10 +78,16 @@
             </file>
         </folder>
     </folder>
+    <folder name="Shortcuts">
+        <file name="D-N.shadow">
+            <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProject.instance"/>
+        </file>
+    </folder>
     <folder name="Windows2">
         <folder name="Components">
             <file name="BusConfigurationTopComponent.settings" url="BusConfigurationTopComponentSettings.xml"/>
             <file name="BussesTopComponent.settings" url="BussesTopComponentSettings_1.xml"/>
+            <file name="ProjectsTopComponent.settings" url="ProjectsTopComponentSettings.xml"/>
             <file name="RawViewTopComponent.settings" url="RawViewTopComponentSettings.xml"/>
             <file name="ConnectionsTopComponent.settings" url="ConnectionsTopComponentSettings.xml"/>
         </folder>
@@ -59,6 +98,7 @@
             </folder>
             <folder name="explorer">
                 <file name="BussesTopComponent.wstcref" url="BussesTopComponentWstcref_1.xml"/>
+                <file name="ProjectsTopComponent.wstcref" url="ProjectsTopComponentWstcref.xml"/>
             </folder>
             <folder name="rightSlidingSide">
                 <file name="ConnectionsTopComponent.wstcref" url="ConnectionsTopComponentWstcref.xml"/>

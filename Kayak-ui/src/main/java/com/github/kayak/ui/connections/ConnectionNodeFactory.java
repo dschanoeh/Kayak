@@ -18,6 +18,7 @@
 
 package com.github.kayak.ui.connections;
 
+import com.github.kayak.core.BusURL;
 import java.util.List;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;

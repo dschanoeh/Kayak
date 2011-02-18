@@ -29,144 +29,186 @@ import java.util.logging.Logger;
  *
  */
 public class Bus implements SubscriptionChangeReceiver {
-	private Logger logger = Logger.getLogger("com.github.kayak.backend.bus");
-	private ArrayList<Subscription> subscriptionsRAW;
-	private ArrayList<Subscription> subscriptionsBCM;
-	private TimeSource timeSource;
-	private RAWConnection rawConnection;
-	private BCMConnection bcmConnection;
-	
-	private FrameReceiver rawReceiver = new FrameReceiver() {
-		public void newFrame(Frame f) {
-			deliverRAWFrame(f);
-		}
-	};
-	
-	private FrameReceiver bcmReceiver = new FrameReceiver() {
-		public void newFrame(Frame f) {
-			deliverBCMFrame(f);
-		}
-	};
 
-	public TimeSource getTimeSource() {
-		return timeSource;
-	}
+    private Logger logger = Logger.getLogger("com.github.kayak.backend.bus");
+    private ArrayList<Subscription> subscriptionsRAW;
+    private ArrayList<Subscription> subscriptionsBCM;
+    private TimeSource timeSource;
+    private RAWConnection rawConnection;
+    private BCMConnection bcmConnection;
+    private String name;
+    private BusURL connection;
+    private ArrayList<BusChangeListener> listeners;
 
-	public void setTimeSource(TimeSource timeSource) {
-		this.timeSource = timeSource;
-	}
+    public BusURL getConnection() {
+        return connection;
+    }
 
-	public Bus() {
-		subscriptionsRAW = new ArrayList<Subscription>();
-		subscriptionsBCM = new ArrayList<Subscription>();
-		
-	}
-	
-	public void addRAWSubscription(Subscription s) {
-		subscriptionsRAW.add(s);
-	}
-	
-	public void addBCMSubscription(Subscription s) {
-		subscriptionsBCM.add(s);
-	}
-	
-	public void removeRAWSubscription(Subscription s) {
-		subscriptionsRAW.remove(s);
-	}
-	
-	public void removeBCMSubscription(Subscription s) {
-		subscriptionsBCM.remove(s);
-	}
-	
-	public void connectTo(RAWConnection conn) {
-		this.rawConnection = conn;
-		conn.setReceiver(rawReceiver);
-	}
-	
-	public void connectTo(BCMConnection conn) {
-		this.bcmConnection = conn;
-		conn.setReceiver(bcmReceiver);
-	}
-	
-	public void disconnect() {
-		if(rawConnection != null)
-			rawConnection.setReceiver(null);
-		
-		if(bcmConnection != null)
-			bcmConnection.setReceiver(null);
-	}
-	
-	public void sendFrame(Frame frame) {
-		if(bcmConnection != null) {
-			bcmConnection.sendFrame(frame);
-		/* If no BCM connection is present we have to do loopback locally */
-		} else {
-			deliverBCMFrame(frame);
-			deliverRAWFrame(frame);
-		}
-	}
-	
-	private void deliverBCMFrame(Frame frame) {
-		for(Subscription s : subscriptionsBCM) {
-			if(!s.isMuted())
-				s.deliverFrame(frame);
-		}
-	}
-	
-	private void deliverRAWFrame(Frame frame) {
-		for(Subscription s : subscriptionsRAW) {
-			if(!s.isMuted())
-				s.deliverFrame(frame);
-		}
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public void subscribed(int id, Subscription s) {
-		if(subscriptionsBCM.contains(s)) {
-			if(bcmConnection != null) {
-				bcmConnection.subscribeTo(id, 0, 0);
-			} else {
-				logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
-			}
-		}
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public void unsubscribed(int id, Subscription s) {
-		/* only if every other subscription does not include the id
-		 * the BCM connection can be told to fully unsubscribe the id.
-		 * otherwise the deliverBCMFrame method will handle filtering.
-		 */
-		Boolean found = false;
-		for(Subscription sub : subscriptionsBCM) {
-			if(sub.includes(id)) {
-				found = true;
-				break;
-			}
-		}
-		
-		if(!found) {
-			if(bcmConnection != null) {
-				bcmConnection.unsubscribeFrom(id);
-			} else {
-				logger.log(Level.WARNING, "A BCM unsubscription was made but no BCM connection is present");
-			}
-		}	
-	}
+    private FrameReceiver rawReceiver = new FrameReceiver() {
 
-	@Override
-	public void subscriptionAllChanged(boolean all, Subscription s) {
-		if(all == true) {
-			subscriptionsBCM.remove(s);
-			subscriptionsRAW.add(s);
-			
-			/* TODO unsubscribe from all ids of the subscription */
-		} else {
-			subscriptionsRAW.remove(s);
-			subscriptionsBCM.add(s);
-			
-			/* TODO resubscribe to all ids of the subscription */
-		}
-		
-	}
+        @Override
+        public void newFrame(Frame f) {
+            deliverRAWFrame(f);
+        }
+    };
+
+    private FrameReceiver bcmReceiver = new FrameReceiver() {
+
+        @Override
+        public void newFrame(Frame f) {
+            deliverBCMFrame(f);
+        }
+    };
+
+    public TimeSource getTimeSource() {
+        return timeSource;
+    }
+
+    public void setTimeSource(TimeSource timeSource) {
+        this.timeSource = timeSource;
+    }
+
+    public Bus() {
+        subscriptionsRAW = new ArrayList<Subscription>();
+        subscriptionsBCM = new ArrayList<Subscription>();
+        listeners = new ArrayList<BusChangeListener>();
+    }
+
+    public void addRAWSubscription(Subscription s) {
+        subscriptionsRAW.add(s);
+    }
+
+    public void addBCMSubscription(Subscription s) {
+        subscriptionsBCM.add(s);
+    }
+
+    public void removeRAWSubscription(Subscription s) {
+        subscriptionsRAW.remove(s);
+    }
+
+    public void removeBCMSubscription(Subscription s) {
+        subscriptionsBCM.remove(s);
+    }
+
+    public void addBusChangeListener(BusChangeListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeBusChangeListener(BusChangeListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void setConnection(BusURL url) {
+        disconnect();
+        
+        this.connection = url;
+        /* FIXME we won't do this now
+        rawConnection = new RAWConnection(url);
+        bcmConnection = new BCMConnection(url);*/
+
+        notifyListenersConnection();
+    }
+
+    public void disconnect() {
+        /* FIXME we won't do this now
+        if (rawConnection != null) {
+            rawConnection.close();
+        }
+
+        if (bcmConnection != null) {
+            bcmConnection.close();
+        }*/
+
+        notifyListenersConnection();
+    }
+
+    public void sendFrame(Frame frame) {
+        if (bcmConnection != null) {
+            bcmConnection.sendFrame(frame);
+            /* If no BCM connection is present we have to do loopback locally */
+        } else {
+            deliverBCMFrame(frame);
+            deliverRAWFrame(frame);
+        }
+    }
+
+    private void deliverBCMFrame(Frame frame) {
+        for (Subscription s : subscriptionsBCM) {
+            if (!s.isMuted()) {
+                s.deliverFrame(frame);
+            }
+        }
+    }
+
+    private void deliverRAWFrame(Frame frame) {
+        for (Subscription s : subscriptionsRAW) {
+            if (!s.isMuted()) {
+                s.deliverFrame(frame);
+            }
+        }
+    }
+
+    private void notifyListenersConnection() {
+        for(BusChangeListener listener : listeners) {
+            listener.connectionChanged();
+        }
+    }
+
+    @Override
+    public void subscribed(int id, Subscription s) {
+        if (subscriptionsBCM.contains(s)) {
+            if (bcmConnection != null) {
+                bcmConnection.subscribeTo(id, 0, 0);
+            } else {
+                logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+            }
+        }
+    }
+
+    @Override
+    public void unsubscribed(int id, Subscription s) {
+        /* only if every other subscription does not include the id
+         * the BCM connection can be told to fully unsubscribe the id.
+         * otherwise the deliverBCMFrame method will handle filtering.
+         */
+        Boolean found = false;
+        for (Subscription sub : subscriptionsBCM) {
+            if (sub.includes(id)) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            if (bcmConnection != null) {
+                bcmConnection.unsubscribeFrom(id);
+            } else {
+                logger.log(Level.WARNING, "A BCM unsubscription was made but no BCM connection is present");
+            }
+        }
+    }
+
+    @Override
+    public void subscriptionAllChanged(boolean all, Subscription s) {
+        if (all == true) {
+            subscriptionsBCM.remove(s);
+            subscriptionsRAW.add(s);
+
+            /* TODO unsubscribe from all ids of the subscription */
+        } else {
+            subscriptionsRAW.remove(s);
+            subscriptionsBCM.add(s);
+
+            /* TODO resubscribe to all ids of the subscription */
+        }
+
+    }
 }

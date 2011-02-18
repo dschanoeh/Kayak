@@ -16,9 +16,12 @@
  *
  */
 
-package com.github.kayak.ui.connections;
+package com.github.kayak.core;
 
-import java.io.Serializable;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -26,7 +29,9 @@ import java.util.Map;
  * that is provided by a socketcand
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class BusURL implements Serializable {
+public class BusURL implements Transferable {
+
+    public static final DataFlavor DATA_FLAVOR = new DataFlavor(BusURL.class, "BusURL");
     private String host;
     private String name;
     private int port;
@@ -126,6 +131,25 @@ public class BusURL implements Serializable {
             return name + " ( socket://" + host + ":" + Integer.toString(port) + " )";
         } else {
             return "socket://" + host + ":" + Integer.toString(port);
+        }
+    }
+
+    @Override
+    public DataFlavor[] getTransferDataFlavors() {
+        return new DataFlavor[]{DATA_FLAVOR};
+    }
+
+    @Override
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+        return flavor == DATA_FLAVOR;
+    }
+
+    @Override
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+        if(flavor == DATA_FLAVOR) {
+            return this;
+        } else {
+            throw new UnsupportedFlavorException(flavor);
         }
     }
 

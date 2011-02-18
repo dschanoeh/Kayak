@@ -18,6 +18,7 @@
 
 package com.github.kayak.ui.connections;
 
+import com.github.kayak.core.BusURL;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;

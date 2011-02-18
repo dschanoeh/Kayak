@@ -40,10 +40,10 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
 	private boolean stopRequest = false;
 	private InputStreamReader input;
 
-	public RAWConnection(String host, int port, String busName) {
-		this.host = host;
-		this.port = port;
-		this.busName = busName;
+	public RAWConnection(BusURL url) {
+		this.host = url.getHost();
+		this.port = url.getPort();
+		this.busName = url.getName();
 				
 		socket = new Socket();
 	}
