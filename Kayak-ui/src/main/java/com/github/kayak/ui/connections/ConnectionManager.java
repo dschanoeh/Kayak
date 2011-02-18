@@ -18,10 +18,23 @@
 
 package com.github.kayak.ui.connections;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.openide.util.Exceptions;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class ConnectionManager {
     private static ConnectionManager globalManager;
@@ -122,13 +135,78 @@ public class ConnectionManager {
         listeners = new ArrayList<ConnectionListener>();
     }
 
-    void addRecent(BusURL beacon) {
+    public void addRecent(BusURL beacon) {
         recent.add(beacon);
         notifyListeners();
     }
 
-    void removeRecent(BusURL url) {
+    public void removeRecent(BusURL url) {
         recent.remove(url);
         notifyListeners();
+    }
+    
+    public void loadFromFile(InputStream stream) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(stream);
+
+            NodeList favouritesList = doc.getElementsByTagName("Favourites");
+            if(favouritesList.getLength()==1) {
+                Node favouritesNode = favouritesList.item(0);
+                NodeList favourites = favouritesNode.getChildNodes();
+
+                for(int i=0;i<favourites.getLength();i++) {
+                    try {
+                        NamedNodeMap attributes = favourites.item(i).getAttributes();
+                        Node nameNode = attributes.getNamedItem("name");
+                        String name = nameNode.getNodeValue();
+                        Node hostNode = attributes.getNamedItem("host");
+                        String host = hostNode.getNodeValue();
+                        Node portNode = attributes.getNamedItem("port");
+                        int port = Integer.parseInt(portNode.getNodeValue());
+
+                        this.favourites.add(new BusURL(host, port, name));
+                    } catch (Exception ex) {
+                        
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            logOutput.getErr().write("Error while reading connections from file\n");
+        }
+    }
+
+    public void writeToFile(OutputStream stream) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.newDocument();
+            Element root = doc.createElement("Connections");
+            doc.appendChild(root);
+
+            Element favouritesElement = doc.createElement("Favourites");
+            for (BusURL url : favourites) {
+                try {
+                    Element favourite = doc.createElement("Connection");
+                    favourite.setAttribute("host", url.getHost());
+                    favourite.setAttribute("port", Integer.toString(url.getPort()));
+                    favourite.setAttribute("name", url.getName());
+                    favouritesElement.appendChild(favourite);
+                } catch (Exception ex) {
+                }
+            }
+            root.appendChild(favouritesElement);
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+
+            StreamResult result = new StreamResult(stream);
+            transformer.transform(source, result);
+        } catch (Exception ex) {
+            logOutput.getErr().write("Error while writing connections to file\n");
+        }
     }
 }

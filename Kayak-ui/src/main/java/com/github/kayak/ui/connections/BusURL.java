@@ -79,7 +79,7 @@ public class BusURL implements Serializable {
 
             b.setPort(Integer.parseInt(s.substring(portSeparator+1)));
             b.setHost(s.substring(at +1, portSeparator));
-            b.setName(s.substring(9,at-1));
+            b.setName(s.substring(9,at));
 
             return b;
         } else {

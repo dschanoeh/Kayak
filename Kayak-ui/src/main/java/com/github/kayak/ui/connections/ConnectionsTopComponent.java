@@ -4,25 +4,16 @@
  */
 package com.github.kayak.ui.connections;
 
-import java.util.Collection;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import org.openide.filesystems.FileStateInvalidException;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.explorer.ExplorerManager;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
-import org.openide.loaders.DataFolder;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-import org.openide.nodes.Node;
-import org.openide.util.Lookup;
-import org.openide.util.lookup.Lookups;
 
 
 /**
@@ -132,7 +123,7 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
     }// </editor-fold>//GEN-END:initComponents
 
     private void newButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newButtonActionPerformed
-        String url = JOptionPane.showInputDialog("Please type in a socket to connect with.", "socket://192.168.30.129:28640");
+        String url = JOptionPane.showInputDialog("Please type in a socket to connect with.", "socket://can0@192.168.30.129:28640");
 
         if(url != null) {
             BusURL beacon = BusURL.fromString(url);
@@ -212,7 +203,7 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
 
     @Override
     public void componentClosed() {
-       
+        
     }
 
     void writeProperties(java.util.Properties p) {

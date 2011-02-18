@@ -75,6 +75,11 @@
             <artifactId>org-openide-io</artifactId>
             <version>RELEASE691</version>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
+            <version>RELEASE691</version>
+        </dependency>
     </dependencies>
 
     <build>
