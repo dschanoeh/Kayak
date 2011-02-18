@@ -18,12 +18,6 @@
                 <attr name="iconBase" stringvalue="com/github/kayak/ui/busconfiguration/preferences-desktop.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
-            <file name="com-github-kayak-ui-busses-BussesAction.instance">
-                <attr name="component" methodvalue="com.github.kayak.ui.busses.BussesTopComponent.findInstance"/>
-                <attr name="displayName" bundlevalue="com.github.kayak.ui.busses.Bundle#CTL_BussesAction"/>
-                <attr name="iconBase" stringvalue="com/github/kayak/ui/busses/network-idle.png"/>
-                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
-            </file>
             <file name="com-github-kayak-ui-projects-ProjectsAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.projects.ProjectsTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_ProjectsAction"/>
@@ -64,9 +58,6 @@
             <file name="BusConfigurationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance"/>
             </file>
-            <file name="BussesAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-busses-BussesAction.instance"/>
-            </file>
             <file name="ProjectsAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-projects-ProjectsAction.instance"/>
             </file>
@@ -86,7 +77,6 @@
     <folder name="Windows2">
         <folder name="Components">
             <file name="BusConfigurationTopComponent.settings" url="BusConfigurationTopComponentSettings.xml"/>
-            <file name="BussesTopComponent.settings" url="BussesTopComponentSettings_1.xml"/>
             <file name="ProjectsTopComponent.settings" url="ProjectsTopComponentSettings.xml"/>
             <file name="RawViewTopComponent.settings" url="RawViewTopComponentSettings.xml"/>
             <file name="ConnectionsTopComponent.settings" url="ConnectionsTopComponentSettings.xml"/>
@@ -97,7 +87,6 @@
                 <file name="RawViewTopComponent.wstcref" url="RawViewTopComponentWstcref.xml"/>
             </folder>
             <folder name="explorer">
-                <file name="BussesTopComponent.wstcref" url="BussesTopComponentWstcref_1.xml"/>
                 <file name="ProjectsTopComponent.wstcref" url="ProjectsTopComponentWstcref.xml"/>
             </folder>
             <folder name="rightSlidingSide">
