@@ -22,11 +22,12 @@ import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 
 /**
- *
+ * Creates the children in a connection folder according to the given folder
+ * type. The @link{ConnectionManager} is asked for the elements.
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ConnectionChildrenFactory extends Children.Keys<BusURL> implements ConnectionListener {
-    private ConnectionManager manager;
+    private ConnectionManager manager = ConnectionManager.getGlobalConnectionManager();
     private BusURLNode.Type type;
 
     @Override
@@ -44,8 +45,7 @@ public class ConnectionChildrenFactory extends Children.Keys<BusURL> implements 
         }
     }
 
-    public ConnectionChildrenFactory(ConnectionManager manager, BusURLNode.Type type) {
-        this.manager = manager;
+    public ConnectionChildrenFactory(BusURLNode.Type type) {
         this.type = type;
         manager.addConnectionListener(this);
     }
@@ -57,7 +57,17 @@ public class ConnectionChildrenFactory extends Children.Keys<BusURL> implements 
 
     @Override
     public void connectionsChanged() {
-        addNotify();
+        switch(type) {
+            case DISCOVERY:
+                setKeys(manager.getAutoDiscovery().toArray(new BusURL[0]));
+                break;
+            case FAVOURITE:
+                setKeys(manager.getFavourites().toArray(new BusURL[0]));
+                break;
+            case RECENT:
+                setKeys(manager.getRecent().toArray(new BusURL[0]));
+                break;
+        }
     }
 
 }

@@ -57,7 +57,12 @@ public class BusURL implements Serializable {
 
 
     private BusURL() {
+    }
 
+    public BusURL(String host, int port, String name) {
+        this.host = host;
+        this.port = port;
+        this.name = name;
     }
 
     /**

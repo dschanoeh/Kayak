@@ -1,42 +1,40 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 	This file is part of Kayak.
+ *
+ *	Kayak is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	Kayak is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package com.github.kayak.ui.connections;
 
-import com.github.kayak.ui.busses.BusNode;
-import java.util.ArrayList;
 import java.util.List;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;
-import org.openide.nodes.Children;
 import org.openide.nodes.Node;
-import org.openide.util.Lookup;
-import org.openide.util.Utilities;
 
 /**
  *
  * @author dsi9mjn
  */
-public class ConnectionNodeFactory extends ChildFactory implements ConnectionListener {
-    private ConnectionManager manager;
-
-
-    @Override
-    public void connectionsChanged() {
-        refresh(false);
-    }
+public class ConnectionNodeFactory extends ChildFactory {
+    private ConnectionManager manager = ConnectionManager.getGlobalConnectionManager();
 
     private static enum Folder {
         DISCOVERY, FAVOURITES, RECENT;
     }
 
-    public ConnectionNodeFactory(ConnectionManager manager) {
-        this.manager = manager;
-        manager.addConnectionListener(this);
+    public ConnectionNodeFactory() {
     }
 
     @Override
@@ -54,17 +52,17 @@ public class ConnectionNodeFactory extends ChildFactory implements ConnectionLis
             Folder folder = (Folder) key;
             switch(folder) {
                 case DISCOVERY:
-                    AbstractNode discoveryNode = new AbstractNode(new ConnectionChildrenFactory(manager, BusURLNode.Type.DISCOVERY));
+                    AbstractNode discoveryNode = new AbstractNode(new ConnectionChildrenFactory(BusURLNode.Type.DISCOVERY));
                     discoveryNode.setDisplayName("Auto discovery");
                     discoveryNode.setIconBaseWithExtension("com/github/kayak/ui/connections/network-wireless.png");
                     return new Node[] { discoveryNode };
                 case FAVOURITES:
-                    AbstractNode favouritesFolderNode = new AbstractNode(new ConnectionChildrenFactory(manager, BusURLNode.Type.FAVOURITE));
+                    AbstractNode favouritesFolderNode = new AbstractNode(new ConnectionChildrenFactory(BusURLNode.Type.FAVOURITE));
                     favouritesFolderNode.setDisplayName("Favourites");
                     favouritesFolderNode.setIconBaseWithExtension("com/github/kayak/ui/connections/bookmark-new.png");
                     return new Node[] { favouritesFolderNode };
                 case RECENT:
-                    AbstractNode recentFolderNode = new AbstractNode(new ConnectionChildrenFactory(manager, BusURLNode.Type.RECENT));
+                    AbstractNode recentFolderNode = new AbstractNode(new ConnectionChildrenFactory(BusURLNode.Type.RECENT));
                     recentFolderNode.setDisplayName("Recent");
                     recentFolderNode.setIconBaseWithExtension("com/github/kayak/ui/connections/folder.png");
                     return new Node[] { recentFolderNode };

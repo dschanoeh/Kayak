@@ -48,8 +48,8 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
        
-        connectionManager = new ConnectionManager();
-        ConnectionNodeFactory factory = new ConnectionNodeFactory(connectionManager);
+        connectionManager = ConnectionManager.getGlobalConnectionManager();
+        ConnectionNodeFactory factory = new ConnectionNodeFactory();
 
         AbstractNode rootNode = new AbstractNode(Children.create(factory, true));
 

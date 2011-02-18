@@ -20,13 +20,17 @@ package com.github.kayak.ui.connections;
 
 import java.util.ArrayList;
 import org.openide.util.Exceptions;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 public class ConnectionManager {
+    private static ConnectionManager globalManager;
     private ArrayList<BusURL> favourites;
     private ArrayList<BusURL> recent;
     private ArrayList<BusURL> autoDiscovery;
     private Thread discoveryThread;
     private ArrayList<ConnectionListener> listeners;
+    private static InputOutput logOutput = IOProvider.getDefault().getIO("Connections", false);
     
     private Runnable discoveryRunnable = new Runnable() {
 
@@ -34,15 +38,16 @@ public class ConnectionManager {
         public void run() {
             autoDiscovery.add(BusURL.fromString("socket://can0@127.0.0.1:28600"));
             notifyListeners();
-
+            int i=0;
             while(true) {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException ex) {
                     Exceptions.printStackTrace(ex);
                 }
-                autoDiscovery.add(BusURL.fromString("socket://can0@129.0.0.1:28601"));
+                autoDiscovery.add(BusURL.fromString("socket://can0@129.0.0.1:"+Integer.toString(i)));
                 notifyListeners();
+                i++;
             }
         }
     };
@@ -59,8 +64,25 @@ public class ConnectionManager {
         return recent;
     }
 
+    /**
+     * Add a @link{BusURL} to the favourites. A new instance with the same
+     * parameters is created. If the favourites already contain this element
+     * nothing is added.
+     * @param url
+     */
     public void addFavourite(BusURL url) {
-        favourites.add(url);
+        
+        /* no duplicates */
+        for(BusURL u : favourites) {
+            if(u.equals(url)) {
+                logOutput.getErr().print("URL already in favourites!\n");
+                return;
+            }
+        }
+
+        BusURL url2 = new BusURL(url.getHost(), url.getPort(), url.getName());
+        logOutput.getOut().print("adding favourite: " + url2.toString() + "\n");
+        favourites.add(url2);
         notifyListeners();
     }
 
@@ -83,7 +105,13 @@ public class ConnectionManager {
         }
     }
 
-    public ConnectionManager() {
+    public static ConnectionManager getGlobalConnectionManager() {
+        if(globalManager == null)
+            globalManager = new ConnectionManager();
+        return globalManager;
+    }
+
+    private ConnectionManager() {
         favourites = new ArrayList<BusURL>();
         recent = new ArrayList<BusURL>();
         autoDiscovery = new ArrayList<BusURL>();
