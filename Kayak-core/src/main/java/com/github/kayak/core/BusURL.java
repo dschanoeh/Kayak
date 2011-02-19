@@ -27,6 +27,7 @@ import java.util.Map;
 /**
  * URL class that absoulutely defines the connection parameters for a single bus
  * that is provided by a socketcand
+ *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class BusURL implements Transferable {
@@ -92,19 +93,6 @@ public class BusURL implements Transferable {
         }
     }
 
-    public static BusURL fromMap(Map<String, ?> params) {
-        BusURL url = new BusURL();
-        String name = (String) params.get("name");
-        String host = (String) params.get("host");
-        Integer port = (Integer) params.get("port");
-
-        url.setName(name);
-        url.setHost(host);
-        url.setPort(port);
-
-        return url;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if(this.hashCode() == obj.hashCode() && obj instanceof BusURL)
@@ -152,5 +140,4 @@ public class BusURL implements Transferable {
             throw new UnsupportedFlavorException(flavor);
         }
     }
-
 }

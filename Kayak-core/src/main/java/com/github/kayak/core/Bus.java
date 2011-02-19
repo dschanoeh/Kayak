@@ -15,6 +15,7 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *	
  */
+
 package com.github.kayak.core;
 
 import java.util.ArrayList;
@@ -72,6 +73,10 @@ public class Bus implements SubscriptionChangeReceiver {
         return timeSource;
     }
 
+    /**
+     * Set the {@link TimeSource} that will be used to coordinate
+     * the message flow on the bus (play, pause, timestamps...)
+     */
     public void setTimeSource(TimeSource timeSource) {
         this.timeSource = timeSource;
     }
@@ -98,6 +103,10 @@ public class Bus implements SubscriptionChangeReceiver {
         subscriptionsBCM.remove(s);
     }
 
+    /**
+     * A BusChangeListener may use this method if he wants to be notified
+     * about changes to the bus like added connections etc.
+     */
     public void addBusChangeListener(BusChangeListener listener) {
         listeners.add(listener);
     }
@@ -106,6 +115,11 @@ public class Bus implements SubscriptionChangeReceiver {
         listeners.remove(listener);
     }
 
+    /**
+     * Connect the Bus to a given BusURL. Internally a RAW- and a BCM
+     * connection will be opened. If the Bus was already connected it
+     * is disconnected first.
+     */
     public void setConnection(BusURL url) {
         disconnect();
         
@@ -117,6 +131,9 @@ public class Bus implements SubscriptionChangeReceiver {
         notifyListenersConnection();
     }
 
+    /**
+     * If the Bus was connected terminate all connections.
+     */
     public void disconnect() {
         /* FIXME we won't do this now
         if (rawConnection != null) {
@@ -130,6 +147,10 @@ public class Bus implements SubscriptionChangeReceiver {
         notifyListenersConnection();
     }
 
+    /**
+     * Send a frame on the bus. All FrameReceivers will also receive this
+     * frame.
+     */
     public void sendFrame(Frame frame) {
         if (bcmConnection != null) {
             bcmConnection.sendFrame(frame);

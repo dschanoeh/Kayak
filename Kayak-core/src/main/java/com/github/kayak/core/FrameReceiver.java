@@ -15,14 +15,14 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *	
  */
+
 package com.github.kayak.core;
 
 /**
  * FrameReceiver is a simple interface that must be implemented to be able to register to
  * a bus and receive frames. 
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
- *
  */
 public interface FrameReceiver {
-	public void newFrame(Frame frame);
+    public void newFrame(Frame frame);
 }
