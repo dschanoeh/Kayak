@@ -144,6 +144,8 @@ public class Bus implements SubscriptionChangeReceiver {
             bcmConnection.close();
         }*/
 
+        connection = null;
+
         notifyListenersConnection();
     }
 

@@ -19,9 +19,13 @@
 package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.BusURL;
 import com.github.kayak.ui.connections.BusURLNode;
+import java.awt.event.ActionEvent;
 import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
 
@@ -30,10 +34,20 @@ import org.openide.nodes.Node;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ConnectionChildFactory extends ChildFactory<BusURL> {
+
     private Bus bus;
+
+    private BusChangeListener listener = new BusChangeListener() {
+
+        @Override
+        public void connectionChanged() {
+            refresh(true);
+        }
+    };
 
     public ConnectionChildFactory(Bus bus) {
         this.bus = bus;
+        bus.addBusChangeListener(listener);
     }
     @Override
     protected boolean createKeys(List<BusURL> toPopulate) {
@@ -46,6 +60,35 @@ public class ConnectionChildFactory extends ChildFactory<BusURL> {
 
     @Override
     protected Node[] createNodesForKey(BusURL key) {
-        return new Node[] {new BusURLNode(key, BusURLNode.Type.CONNECTED)};
+        return new Node[] {new MyBusURLNode(key, bus)};
     }
+
+    private class MyBusURLNode extends BusURLNode {
+        private Bus bus;
+
+        private class DisconnectAction extends AbstractAction {
+
+            public DisconnectAction() {
+                putValue(NAME, "Disconnect");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                bus.disconnect();
+            }
+
+        };
+
+        public MyBusURLNode(BusURL url, Bus bus) {
+            super(url, BusURLNode.Type.CONNECTED);
+            this.bus = bus;
+        }
+
+        @Override
+        public Action[] getActions(boolean popup) {
+            return new Action[] {
+              new DisconnectAction()
+            };
+        }
+    };
 }

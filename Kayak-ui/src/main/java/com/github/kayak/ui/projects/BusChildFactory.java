@@ -43,8 +43,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
     }
 
     public enum Folders {
-
-        CONNECTION;
+        CONNECTION, DESCRIPTION, INPUT, OUTPUT;
     }
     private Bus bus;
 
@@ -56,7 +55,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
 
     @Override
     public void addNotify() {
-        setKeys(new Folders[] {Folders.CONNECTION});
+        setKeys(new Folders[] {Folders.CONNECTION, Folders.DESCRIPTION, Folders.INPUT, Folders.OUTPUT});
     }
 
     @Override
@@ -65,6 +64,27 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
 
             AbstractNode node = new AbstractNodeImpl(Children.create(new ConnectionChildFactory(bus), false));
             node.setDisplayName("Connection");
+            node.setIconBaseWithExtension("com/github/kayak/ui/projects/network-wired.png");
+
+            return new Node[]{node};
+        } else if (key == Folders.DESCRIPTION) {
+
+            AbstractNode node = new AbstractNode(Children.LEAF);
+            node.setDisplayName("Description");
+
+            return new Node[]{node};
+        } else if (key == Folders.INPUT) {
+
+            AbstractNode node = new AbstractNode(Children.LEAF);
+            node.setDisplayName("Log input");
+            node.setIconBaseWithExtension("com/github/kayak/ui/projects/go-previous.png");
+
+            return new Node[]{node};
+        }else if (key == Folders.OUTPUT) {
+
+            AbstractNode node = new AbstractNode(Children.LEAF);
+            node.setDisplayName("Log output");
+            node.setIconBaseWithExtension("com/github/kayak/ui/projects/go-next.png");
 
             return new Node[]{node};
         }
@@ -87,7 +107,6 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
                     @Override
                     public Transferable paste() throws IOException {
                         bus.setConnection(url);
-                        addNotify();
                         return null;
                     }
                 };

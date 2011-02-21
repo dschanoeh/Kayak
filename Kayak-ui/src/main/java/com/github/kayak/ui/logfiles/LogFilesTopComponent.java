@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.kayak.ui.projects;
+package com.github.kayak.ui.logfiles;
 
+import com.github.kayak.core.LogFile;
+import java.io.File;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -17,26 +19,23 @@ import org.openide.nodes.Children;
 /**
  * Top component which displays something.
  */
-@ConvertAsProperties(dtd = "-//com.github.kayak.ui.projects//Projects//EN",
+@ConvertAsProperties(dtd = "-//com.github.kayak.ui.logfiles//LogFiles//EN",
 autostore = false)
-public final class ProjectsTopComponent extends TopComponent implements ExplorerManager.Provider {
+public final class LogFilesTopComponent extends TopComponent implements ExplorerManager.Provider {
 
-    private static ProjectsTopComponent instance;
-    private ExplorerManager manager = new ExplorerManager();
+    private static LogFilesTopComponent instance;
     /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "com/github/kayak/ui/projects/package-x-generic.png";
-    private static final String PREFERRED_ID = "ProjectsTopComponent";
+    static final String ICON_PATH = "com/github/kayak/ui/logfiles/accessories-text-editor.png";
+    private static final String PREFERRED_ID = "LogFilesTopComponent";
+    private ExplorerManager manager = new ExplorerManager();
 
-    public ProjectsTopComponent() {
+    public LogFilesTopComponent() {
         initComponents();
-        setName(NbBundle.getMessage(ProjectsTopComponent.class, "CTL_ProjectsTopComponent"));
-        setToolTipText(NbBundle.getMessage(ProjectsTopComponent.class, "HINT_ProjectsTopComponent"));
+        setName(NbBundle.getMessage(LogFilesTopComponent.class, "CTL_LogFilesTopComponent"));
+        setToolTipText(NbBundle.getMessage(LogFilesTopComponent.class, "HINT_LogFilesTopComponent"));
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-        putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
-        putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
-        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
-        
-        AbstractNode rootNode = new AbstractNode(Children.create(new ProjectNodeFactory(), true));
+
+        AbstractNode rootNode = new AbstractNode(Children.create(new LogFilesNodeFactory(), true));
         manager.setRootContext(rootNode);
     }
 
@@ -48,51 +47,61 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jSplitPane1 = new javax.swing.JSplitPane();
+        propertySheet1 = new org.openide.explorer.propertysheet.PropertySheet();
         beanTreeView1 = new org.openide.explorer.view.BeanTreeView();
 
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setRightComponent(propertySheet1);
+
         beanTreeView1.setRootVisible(false);
+        jSplitPane1.setTopComponent(beanTreeView1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(beanTreeView1, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(beanTreeView1, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1216, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.openide.explorer.view.BeanTreeView beanTreeView1;
+    private javax.swing.JSplitPane jSplitPane1;
+    private org.openide.explorer.propertysheet.PropertySheet propertySheet1;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
-    public static synchronized ProjectsTopComponent getDefault() {
+    public static synchronized LogFilesTopComponent getDefault() {
         if (instance == null) {
-            instance = new ProjectsTopComponent();
+            instance = new LogFilesTopComponent();
         }
         return instance;
     }
 
     /**
-     * Obtain the ProjectsTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the LogFilesTopComponent instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized ProjectsTopComponent findInstance() {
+    public static synchronized LogFilesTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
-            Logger.getLogger(ProjectsTopComponent.class.getName()).warning(
+            Logger.getLogger(LogFilesTopComponent.class.getName()).warning(
                     "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
             return getDefault();
         }
-        if (win instanceof ProjectsTopComponent) {
-            return (ProjectsTopComponent) win;
+        if (win instanceof LogFilesTopComponent) {
+            return (LogFilesTopComponent) win;
         }
-        Logger.getLogger(ProjectsTopComponent.class.getName()).warning(
+        Logger.getLogger(LogFilesTopComponent.class.getName()).warning(
                 "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior.");
         return getDefault();
