@@ -37,9 +37,7 @@ public class BusNodeFactory extends ChildFactory<String> {
 
     @Override
     protected boolean createKeys(List<String> toPopulate) {
-        toPopulate.add("can0");
-        toPopulate.add("can1");
-        toPopulate.add("can1");
+        toPopulate.addAll(logFile.getBusses());
 
         return true;
     }

@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -45,6 +47,18 @@ public class LogFile {
     private String description;
     private String platform;
     private HashMap<String,String> deviceAlias;
+
+    public ArrayList<String> getBusses() {
+        ArrayList<String> busNames = new ArrayList<String>();
+        Set<String> keys = deviceAlias.keySet();
+
+        for(String bus : keys) {
+            busNames.add(deviceAlias.get(bus));
+        }
+        
+        return busNames;
+
+    }
 
     public String getDescription() {
         return description;

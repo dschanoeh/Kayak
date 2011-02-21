@@ -19,13 +19,10 @@
 package com.github.kayak.ui.logfiles;
 
 import com.github.kayak.core.LogFile;
-import java.lang.reflect.InvocationTargetException;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-import org.openide.nodes.Node;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
-import org.openide.nodes.Sheet.Set;
 import org.openide.util.Exceptions;
 
 
