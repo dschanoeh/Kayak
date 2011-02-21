@@ -20,6 +20,7 @@ package com.github.kayak.ui.projects;
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.BusURL;
+import com.github.kayak.ui.logfiles.LogFileBusTupel;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
@@ -62,7 +63,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
     protected Node[] createNodes(Folders key) {
         if (key == Folders.CONNECTION) {
 
-            AbstractNode node = new AbstractNodeImpl(Children.create(new ConnectionChildFactory(bus), false));
+            AbstractNode node = new ConnectionFolderNode(Children.create(new ConnectionChildFactory(bus), false));
             node.setDisplayName("Connection");
             node.setIconBaseWithExtension("com/github/kayak/ui/projects/network-wired.png");
 
@@ -75,7 +76,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
             return new Node[]{node};
         } else if (key == Folders.INPUT) {
 
-            AbstractNode node = new AbstractNode(Children.LEAF);
+            AbstractNode node = new LogFileFolderNode(Children.LEAF);
             node.setDisplayName("Log input");
             node.setIconBaseWithExtension("com/github/kayak/ui/projects/go-previous.png");
 
@@ -92,9 +93,9 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
         return null;
     }
 
-    private class AbstractNodeImpl extends AbstractNode {
+    private class ConnectionFolderNode extends AbstractNode {
 
-        public AbstractNodeImpl(Children children) {
+        public ConnectionFolderNode(Children children) {
             super(children);
         }
 
@@ -107,6 +108,33 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
                     @Override
                     public Transferable paste() throws IOException {
                         bus.setConnection(url);
+                        return null;
+                    }
+                };
+            } catch (UnsupportedFlavorException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            return null;
+        }
+    }
+
+    private class LogFileFolderNode extends AbstractNode {
+
+        public LogFileFolderNode(Children children) {
+            super(children);
+        }
+
+        @Override
+        public PasteType getDropType(Transferable t, int action, int index) {
+            try {
+                final LogFileBusTupel tupel = (LogFileBusTupel) t.getTransferData(LogFileBusTupel.DATA_FLAVOR);
+                return new PasteType() {
+
+                    @Override
+                    public Transferable paste() throws IOException {
+                        
                         return null;
                     }
                 };
