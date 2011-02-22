@@ -3,12 +3,22 @@
 <filesystem>
     <folder name="Actions">
         <folder name="File">
-            <file name="com-github-kayak-ui-projects-NewProject.instance">
-                <attr name="delegate" newvalue="com.github.kayak.ui.projects.NewProject"/>
+            <file name="com-github-kayak-ui-projects-NewProjectAction.instance">
+                <attr name="delegate" newvalue="com.github.kayak.ui.projects.NewProjectAction"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_NewProject"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/package-x-generic.png"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+            <file name="com-github-kayak-ui-projects-NewBusAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_NewBusAction"/>
+                <attr name="injectable" stringvalue="com.github.kayak.ui.projects.NewBusAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="com.github.kayak.ui.projects.NewBusCookie"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/places/network-workgroup.png"/>
             </file>
         </folder>
         <folder name="Window">
@@ -47,7 +57,11 @@
     <folder name="Toolbars">
         <folder name="File">
             <file name="com-github-kayak-ui-projects-NewProject.shadow">
-                <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProject.instance"/>
+                <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProjectAction.instance"/>
+                <attr name="position" intvalue="1300"/>
+            </file>
+            <file name="com-github-kayak-ui-projects-NewBusAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewBusAction.instance"/>
                 <attr name="position" intvalue="1300"/>
             </file>
         </folder>
@@ -55,8 +69,12 @@
 
     <folder name="Menu">
         <folder name="File">
+            <file name="com-github-kayak-ui-projects-NewBusAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewBusAction.instance"/>
+                <attr name="position" intvalue="1000"/>
+            </file>
             <file name="com-github-kayak-ui-projects-NewProject.shadow">
-                <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProject.instance"/>
+                <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProjectAction.instance"/>
                 <attr name="position" intvalue="1300"/>
             </file>
         </folder>
@@ -80,7 +98,7 @@
     </folder>
     <folder name="Shortcuts">
         <file name="D-N.shadow">
-            <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProject.instance"/>
+            <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProjectAction.instance"/>
         </file>
     </folder>
     <folder name="Windows2">

@@ -29,11 +29,12 @@ import org.openide.nodes.Node;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class ProjectChildFactory extends ChildFactory<Bus> {
+public class ProjectChildFactory extends ChildFactory<Bus> implements ProjectChangeListener {
     private Project project;
 
     public ProjectChildFactory(Project project) {
         this.project = project;
+        project.addProjectChangeListener(this);
     }
 
     @Override
@@ -50,5 +51,10 @@ public class ProjectChildFactory extends ChildFactory<Bus> {
         busNode.setDisplayName(key.getName());
 
         return new Node[] {busNode};
+    }
+
+    @Override
+    public void projectChanged() {
+        refresh(true);
     }
 }

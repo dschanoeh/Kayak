@@ -11,8 +11,10 @@ import org.openide.windows.WindowManager;
 import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.explorer.ExplorerManager;
+import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.util.lookup.Lookups;
 
 /**
  * Top component which displays something.
@@ -38,6 +40,7 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
         
         AbstractNode rootNode = new AbstractNode(Children.create(new ProjectNodeFactory(), true));
         manager.setRootContext(rootNode);
+        associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
     }
 
     /** This method is called from within the constructor to

@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 
-public final class NewProject implements ActionListener {
+public final class NewProjectAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {

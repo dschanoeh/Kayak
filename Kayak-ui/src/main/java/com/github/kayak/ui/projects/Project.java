@@ -28,6 +28,15 @@ import java.util.ArrayList;
 public class Project {
     private ArrayList<Bus> busses;
     private String name;
+    private ArrayList<ProjectChangeListener> listeners;
+
+    public void addProjectChangeListener(ProjectChangeListener listener) {
+        listeners.add(listener);
+    }
+    
+    public void removeProjectChangeListener(ProjectChangeListener listener) {
+        listeners.remove(listener);
+    }
 
     public ArrayList<Bus> getBusses() {
         return busses;
@@ -35,15 +44,23 @@ public class Project {
 
     public void addBus(Bus b) {
         busses.add(b);
+        notifyListeners();
     }
 
     public String getName() {
         return name;
     }
 
+    private void notifyListeners() {
+        for(ProjectChangeListener listener : listeners) {
+            listener.projectChanged();
+        }
+    }
+
     public Project(String name) {
         this.name = name;
         busses = new ArrayList<Bus>();
+        listeners = new ArrayList<ProjectChangeListener>();
     }
 
 

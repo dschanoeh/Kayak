@@ -23,10 +23,12 @@ import javax.swing.Action;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -71,18 +73,14 @@ public class ProjectNodeFactory extends ChildFactory<Project> implements Project
         }
 
         @Override
-        public <T extends Cookie> T getCookie(Class<T> type) {
-            if(type.equals(NewBusCookie.class)) {
-                return (T) this;
-            }
-            return super.getCookie(type);
-        }
-
-        @Override
         public void addNewBus() {
-            Bus b = new Bus();
-            b.setName("test");
-            project.addBus(b);
+            String name = JOptionPane.showInputDialog("Please give a name for the Bus", "newBus");
+
+            if(name != null) {
+                Bus b = new Bus();
+                b.setName(name);
+                project.addBus(b);
+            }
         }
 
         @Override
