@@ -24,9 +24,7 @@ import com.github.kayak.ui.logfiles.LogFileBusTupel;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.List;
 import org.openide.nodes.AbstractNode;
-import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
@@ -65,7 +63,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
 
             AbstractNode node = new ConnectionFolderNode(Children.create(new ConnectionChildFactory(bus), false));
             node.setDisplayName("Connection");
-            node.setIconBaseWithExtension("com/github/kayak/ui/projects/network-wired.png");
+            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");
 
             return new Node[]{node};
         } else if (key == Folders.DESCRIPTION) {
@@ -78,14 +76,14 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
 
             AbstractNode node = new LogFileFolderNode(Children.LEAF);
             node.setDisplayName("Log input");
-            node.setIconBaseWithExtension("com/github/kayak/ui/projects/go-previous.png");
+            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/go-previous.png");
 
             return new Node[]{node};
         }else if (key == Folders.OUTPUT) {
 
             AbstractNode node = new AbstractNode(Children.LEAF);
             node.setDisplayName("Log output");
-            node.setIconBaseWithExtension("com/github/kayak/ui/projects/go-next.png");
+            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/go-next.png");
 
             return new Node[]{node};
         }

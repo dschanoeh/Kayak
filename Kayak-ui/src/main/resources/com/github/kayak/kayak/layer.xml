@@ -7,7 +7,7 @@
                 <attr name="delegate" newvalue="com.github.kayak.ui.projects.NewProject"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_NewProject"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
-                <attr name="iconBase" stringvalue="com/github/kayak/ui/projects/package-x-generic.png"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/package-x-generic.png"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
             </file>
         </folder>
@@ -15,31 +15,31 @@
             <file name="com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.busconfiguration.BusConfigurationTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.busconfiguration.Bundle#CTL_BusConfigurationAction"/>
-                <attr name="iconBase" stringvalue="com/github/kayak/ui/busconfiguration/preferences-desktop.png"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/categories/preferences-desktop.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
             <file name="com-github-kayak-ui-logfiles-LogFilesAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.logfiles.LogFilesTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.logfiles.Bundle#CTL_LogFilesAction"/>
-                <attr name="iconBase" stringvalue="com/github/kayak/ui/logfiles/accessories-text-editor.png"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/apps/accessories-text-editor.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
             <file name="com-github-kayak-ui-projects-ProjectsAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.projects.ProjectsTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_ProjectsAction"/>
-                <attr name="iconBase" stringvalue="com/github/kayak/ui/projects/package-x-generic.png"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/package-x-generic.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
             <file name="com-github-kayak-ui-rawview-RawViewAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.rawview.RawViewTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.rawview.Bundle#CTL_RawViewAction"/>
-                <attr name="iconBase" stringvalue="com/github/kayak/ui/rawview/format-justify-fill.png"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/format-justify-fill.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
             <file name="com-github-kayak-ui-connections-ConnectionsAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.connections.ConnectionsTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.connections.Bundle#CTL_ConnectionsAction"/>
-                <attr name="iconBase" stringvalue="com/github/kayak/ui/connections/network-wireless.png"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/devices/network-wireless.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
         </folder>

@@ -32,15 +32,16 @@ import org.openide.nodes.Children;
  * @author dsi9mjn
  */
 public class BusURLNode extends AbstractNode {
+
     public static enum Type {
         RECENT, FAVOURITE, DISCOVERY, CONNECTED
     }
 
-    private static Type type;
+    private Type type;
     private BusURL url;
     private ConnectionManager manager = ConnectionManager.getGlobalConnectionManager();
 
-    public static Type getType() {
+    public Type getType() {
         return type;
     }
 
@@ -85,6 +86,7 @@ public class BusURLNode extends AbstractNode {
         this.url = url;
         setDisplayName(url.toString());
         this.type = type;
+        setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");
     }
 
     @Override

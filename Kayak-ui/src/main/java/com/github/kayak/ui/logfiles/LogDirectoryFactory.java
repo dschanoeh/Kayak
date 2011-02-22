@@ -18,8 +18,6 @@
 
 package com.github.kayak.ui.logfiles;
 
-import com.github.kayak.core.LogFile;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.TreeSet;
 import org.openide.nodes.AbstractNode;
@@ -46,6 +44,7 @@ public class LogDirectoryFactory extends ChildFactory<String> {
     @Override
     protected Node[] createNodesForKey(String key) {
         AbstractNode node = new AbstractNode(Children.create(new PlatformChildFactory(key), true));
+        node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
         node.setDisplayName(key);
 
         return new Node[] {node};

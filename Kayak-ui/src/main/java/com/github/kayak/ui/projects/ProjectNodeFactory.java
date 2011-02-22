@@ -49,7 +49,7 @@ public class ProjectNodeFactory extends ChildFactory<Project> implements Project
        
         AbstractNode projectNode = new AbstractNode(Children.create(new ProjectChildFactory(key), true));
         projectNode.setDisplayName(key.getName());
-        projectNode.setIconBaseWithExtension("com/github/kayak/ui/projects/package-x-generic.png");
+        projectNode.setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/package-x-generic.png");
         return new Node[] { projectNode };
     }
 

@@ -44,6 +44,7 @@ public class LogFilesNodeFactory extends ChildFactory<LogFilesNodeFactory.Folder
         if(key == Folders.DIRECTORY) {
             AbstractNode node = new AbstractNode(Children.create(new LogDirectoryFactory(), true));
             node.setDisplayName("Log directory");
+            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
             return new Node[] {node};
         } else if(key == Folders.FAVOURTIES) {
             AbstractNode node = new AbstractNode(Children.LEAF);

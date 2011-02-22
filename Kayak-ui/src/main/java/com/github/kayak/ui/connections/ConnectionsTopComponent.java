@@ -66,12 +66,10 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        newButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/github/kayak/ui/connections/document-new.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(newButton, org.openide.util.NbBundle.getMessage(ConnectionsTopComponent.class, "ConnectionsTopComponent.newButton.text")); // NOI18N
         newButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionsTopComponent.class, "ConnectionsTopComponent.newButton.toolTipText")); // NOI18N
         newButton.setFocusable(false);
         newButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        newButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         newButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newButtonActionPerformed(evt);
@@ -79,7 +77,6 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
         });
         jToolBar1.add(newButton);
 
-        bookmarkButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/github/kayak/ui/connections/bookmark-new.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(bookmarkButton, org.openide.util.NbBundle.getMessage(ConnectionsTopComponent.class, "ConnectionsTopComponent.bookmarkButton.text")); // NOI18N
         bookmarkButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionsTopComponent.class, "ConnectionsTopComponent.bookmarkButton.toolTipText")); // NOI18N
         bookmarkButton.setFocusable(false);
@@ -92,7 +89,6 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
         });
         jToolBar1.add(bookmarkButton);
 
-        deleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/github/kayak/ui/connections/edit-delete.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(deleteButton, org.openide.util.NbBundle.getMessage(ConnectionsTopComponent.class, "ConnectionsTopComponent.deleteButton.text")); // NOI18N
         deleteButton.setToolTipText(org.openide.util.NbBundle.getMessage(ConnectionsTopComponent.class, "ConnectionsTopComponent.deleteButton.toolTipText")); // NOI18N
         deleteButton.setFocusable(false);

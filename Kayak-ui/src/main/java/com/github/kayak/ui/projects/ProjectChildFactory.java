@@ -46,6 +46,7 @@ public class ProjectChildFactory extends ChildFactory<Bus> {
     @Override
     protected Node[] createNodesForKey(Bus key) {
         AbstractNode busNode = new AbstractNode(new BusChildFactory(key));
+        busNode.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
         busNode.setDisplayName(key.getName());
 
         return new Node[] {busNode};
