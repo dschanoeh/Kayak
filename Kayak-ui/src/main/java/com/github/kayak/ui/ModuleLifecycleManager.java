@@ -19,6 +19,7 @@
 package com.github.kayak.ui;
 
 import com.github.kayak.ui.connections.ConnectionManager;
+import com.github.kayak.ui.projects.ProjectManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,6 +38,7 @@ public class ModuleLifecycleManager extends ModuleInstall {
     @Override
     public void restored() {
         readConnections();
+        readProjects();
     }
 
     @Override
@@ -44,6 +46,7 @@ public class ModuleLifecycleManager extends ModuleInstall {
         super.close();
 
         writeConnections();
+        writeProjects();
     }
 
     private void writeConnections() {
@@ -75,6 +78,35 @@ public class ModuleLifecycleManager extends ModuleInstall {
         }
     }
 
+    private void writeProjects() {
+        FileObject root = FileUtil.getConfigRoot();
+
+        FileObject projectStorage = root.getFileObject("Projects.xml");
+        if (projectStorage == null) {
+            try {
+                projectStorage = root.createData("Projects.xml");
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+
+        FileLock lock;
+        try {
+            lock = projectStorage.lock();
+
+            try {
+                OutputStream stream = projectStorage.getOutputStream(lock);
+                ProjectManager.getGlobalProjectManager().writeToFile(stream);
+                stream.close();
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            } finally {
+                lock.releaseLock();
+            }
+        } catch(IOException ex) {
+        }
+    }
+
     private void readConnections() {
         FileObject root = FileUtil.getConfigRoot();
 
@@ -89,6 +121,30 @@ public class ModuleLifecycleManager extends ModuleInstall {
             try {
                 InputStream stream = connectionStorage.getInputStream();
                 ConnectionManager.getGlobalConnectionManager().loadFromFile(stream);
+                stream.close();
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            } finally {
+                lock.releaseLock();
+            }
+        } catch(IOException ex) {
+        }
+    }
+
+    private void readProjects() {
+        FileObject root = FileUtil.getConfigRoot();
+
+        FileObject projectStorage = root.getFileObject("Projects.xml");
+        if(projectStorage==null)
+            return;
+
+        FileLock lock;
+        try {
+            lock = projectStorage.lock();
+
+            try {
+                InputStream stream = projectStorage.getInputStream();
+                ProjectManager.getGlobalProjectManager().loadFromFile(stream);
                 stream.close();
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);

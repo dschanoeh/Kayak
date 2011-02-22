@@ -41,6 +41,11 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
         addNotify();
     }
 
+    @Override
+    public void nameChanged() {
+        
+    }
+
     public enum Folders {
         CONNECTION, DESCRIPTION, INPUT, OUTPUT;
     }

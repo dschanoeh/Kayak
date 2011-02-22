@@ -19,17 +19,16 @@
 package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.core.BusChangeListener;
 import java.util.List;
-import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;
-import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class ProjectChildFactory extends ChildFactory<Bus> implements ProjectChangeListener {
+public class ProjectChildFactory extends ChildFactory<Bus> implements ProjectChangeListener, BusChangeListener {
     private Project project;
 
     public ProjectChildFactory(Project project) {
@@ -46,15 +45,22 @@ public class ProjectChildFactory extends ChildFactory<Bus> implements ProjectCha
 
     @Override
     protected Node[] createNodesForKey(Bus key) {
-        AbstractNode busNode = new AbstractNode(new BusChildFactory(key));
-        busNode.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
-        busNode.setDisplayName(key.getName());
-
+        key.addBusChangeListener(this);
+        BusNode busNode = new BusNode(key, project);
         return new Node[] {busNode};
     }
 
     @Override
     public void projectChanged() {
+        refresh(true);
+    }
+
+    @Override
+    public void connectionChanged() {
+    }
+
+    @Override
+    public void nameChanged() {
         refresh(true);
     }
 }

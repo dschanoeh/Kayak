@@ -51,6 +51,7 @@ public class Bus implements SubscriptionChangeReceiver {
 
     public void setName(String name) {
         this.name = name;
+        notifyListenersName();
     }
 
     private FrameReceiver rawReceiver = new FrameReceiver() {
@@ -182,6 +183,12 @@ public class Bus implements SubscriptionChangeReceiver {
     private void notifyListenersConnection() {
         for(BusChangeListener listener : listeners) {
             listener.connectionChanged();
+        }
+    }
+
+    private void notifyListenersName() {
+        for(BusChangeListener listener : listeners) {
+            listener.nameChanged();
         }
     }
 

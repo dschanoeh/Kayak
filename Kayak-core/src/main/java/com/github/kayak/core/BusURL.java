@@ -122,6 +122,10 @@ public class BusURL implements Transferable {
         }
     }
 
+    public String toURLString() {
+        return  "socket://" + name + "@" + host + ":" + Integer.toString(port);
+    }
+
     @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[]{DATA_FLAVOR};

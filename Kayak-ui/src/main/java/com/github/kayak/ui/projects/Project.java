@@ -47,6 +47,11 @@ public class Project {
         notifyListeners();
     }
 
+    public void removeBus(Bus b) {
+        busses.remove(b);
+        notifyListeners();
+    }
+
     public String getName() {
         return name;
     }

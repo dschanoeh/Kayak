@@ -43,6 +43,11 @@ public class ConnectionChildFactory extends ChildFactory<BusURL> {
         public void connectionChanged() {
             refresh(true);
         }
+
+        @Override
+        public void nameChanged() {
+            
+        }
     };
 
     public ConnectionChildFactory(Bus bus) {
