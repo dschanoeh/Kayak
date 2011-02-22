@@ -90,7 +90,13 @@ public class BusURLNode extends AbstractNode {
     }
 
     @Override
-    public Action[] getActions(boolean popup) { 
+    public Action[] getActions(boolean popup) {
+        if(type == Type.FAVOURITE)
+            return new Action[] { new DeleteConnectionAction() };
+        else if(type == Type.DISCOVERY)
+            return new Action[] { new BookmarkConnectionAction() };
+        else if(type == Type.CONNECTED)
+            return new Action[] {};
         return new Action[] { new BookmarkConnectionAction(), new DeleteConnectionAction() };
     }
 }
