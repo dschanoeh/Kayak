@@ -40,6 +40,7 @@ public class TimeSource {
     
     public TimeSource() {
         reference = System.currentTimeMillis();
+        receivers = new ArrayList<TimeEventReceiver>();
     }
     
     public void reset() {

@@ -2,6 +2,29 @@
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
     <folder name="Actions">
+        <folder name="Time">
+            <file name="com-github-kayak-ui-time-PauseAction.instance">
+                <attr name="delegate" newvalue="com.github.kayak.ui.time.PauseAction"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.time.Bundle#CTL_PauseAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/media-playback-pause.png"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+            <file name="com-github-kayak-ui-time-PlayAction.instance">
+                <attr name="delegate" newvalue="com.github.kayak.ui.time.PlayAction"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.time.Bundle#CTL_PlayAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/media-playback-start.png"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+            <file name="com-github-kayak-ui-time-StopAction.instance">
+                <attr name="delegate" newvalue="com.github.kayak.ui.time.StopAction"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.time.Bundle#CTL_StopAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/media-playback-stop.png"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+        </folder>
         <folder name="File">
             <file name="com-github-kayak-ui-projects-NewProjectAction.instance">
                 <attr name="delegate" newvalue="com.github.kayak.ui.projects.NewProjectAction"/>
@@ -65,9 +88,33 @@
                 <attr name="position" intvalue="1300"/>
             </file>
         </folder>
+        <folder name="Time">
+            <file name="com-github-kayak-ui-time-PauseAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Time/com-github-kayak-ui-time-PauseAction.instance"/>
+            </file>
+            <file name="com-github-kayak-ui-time-PlayAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Time/com-github-kayak-ui-time-PlayAction.instance"/>
+            </file>
+            <file name="com-github-kayak-ui-time-StopAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Time/com-github-kayak-ui-time-StopAction.instance"/>
+            </file>
+        </folder>
     </folder>
 
     <folder name="Menu">
+        <folder name="Time">
+            <attr name="com-github-kayak-ui-time-PauseAction.shadow/com-github-kayak-ui-time-PlayAction.shadow" boolvalue="true"/>
+            <attr name="com-github-kayak-ui-time-StopAction.shadow/com-github-kayak-ui-time-PauseAction.shadow" boolvalue="true"/>
+            <file name="com-github-kayak-ui-time-PauseAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Time/com-github-kayak-ui-time-PauseAction.instance"/>
+            </file>
+            <file name="com-github-kayak-ui-time-PlayAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Time/com-github-kayak-ui-time-PlayAction.instance"/>
+            </file>
+            <file name="com-github-kayak-ui-time-StopAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Time/com-github-kayak-ui-time-StopAction.instance"/>
+            </file>
+        </folder>
         <folder name="File">
             <file name="com-github-kayak-ui-projects-NewBusAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewBusAction.instance"/>
