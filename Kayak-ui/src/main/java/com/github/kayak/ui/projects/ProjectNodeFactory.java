@@ -18,7 +18,11 @@
 
 package com.github.kayak.ui.projects;
 
+import com.github.kayak.core.Bus;
+import javax.swing.Action;
+import java.awt.event.ActionEvent;
 import java.util.List;
+import javax.swing.AbstractAction;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Children;
@@ -47,15 +51,58 @@ public class ProjectNodeFactory extends ChildFactory<Project> implements Project
     @Override
     protected Node[] createNodesForKey(Project key) {
        
-        AbstractNode projectNode = new AbstractNode(Children.create(new ProjectChildFactory(key), true));
-        projectNode.setDisplayName(key.getName());
-        projectNode.setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/package-x-generic.png");
-        return new Node[] { projectNode };
+        ProjectNode node = new ProjectNode(key);
+        return new Node[] { node };
     }
 
     @Override
     public void projectChanged() {
         refresh(true);
     }
+
+    private class ProjectNode extends AbstractNode implements NewBusCookie {
+        private Project project;
+
+        public ProjectNode(Project project) {
+            super(Children.create(new ProjectChildFactory(project), true));
+            this.project = project;
+            setDisplayName(project.getName());
+            setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/package-x-generic.png");
+        }
+
+        @Override
+        public <T extends Cookie> T getCookie(Class<T> type) {
+            if(type.equals(NewBusCookie.class)) {
+                return (T) this;
+            }
+            return super.getCookie(type);
+        }
+
+        @Override
+        public void addNewBus() {
+            Bus b = new Bus();
+            b.setName("test");
+            project.addBus(b);
+        }
+
+        @Override
+        public Action[] getActions(boolean popup) {
+            return new Action[] { new DeleteAction() };
+        }
+
+        private class DeleteAction extends AbstractAction {
+
+            public DeleteAction() {
+                putValue(NAME, "Delete");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ProjectManager.getGlobalProjectManager().removeProject(project);
+            }
+
+        };
+
+    };
 
 }

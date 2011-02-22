@@ -40,6 +40,11 @@ public class ProjectManager {
         notifyListeners();
     }
 
+    public void removeProject(Project e) {
+        projects.remove(e);
+        notifyListeners();
+    }
+
     public void addListener(ProjectChangeListener listener) {
         listeners.add(listener);
     }
