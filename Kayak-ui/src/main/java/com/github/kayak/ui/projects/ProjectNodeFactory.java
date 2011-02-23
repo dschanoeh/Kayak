@@ -24,11 +24,11 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import org.openide.actions.RenameAction;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
-import org.openide.util.Lookup;
 
 /**
  *
@@ -52,7 +52,6 @@ public class ProjectNodeFactory extends ChildFactory<Project> implements Project
 
     @Override
     protected Node[] createNodesForKey(Project key) {
-       
         ProjectNode node = new ProjectNode(key);
         return new Node[] { node };
     }
@@ -68,7 +67,7 @@ public class ProjectNodeFactory extends ChildFactory<Project> implements Project
         public ProjectNode(Project project) {
             super(Children.create(new ProjectChildFactory(project), true));
             this.project = project;
-            setDisplayName(project.getName());
+            super.setDisplayName(project.getName());
             setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/package-x-generic.png");
         }
 
@@ -84,8 +83,14 @@ public class ProjectNodeFactory extends ChildFactory<Project> implements Project
         }
 
         @Override
+        public void setDisplayName(String s) {
+            super.setDisplayName(s);
+            project.setName(s);
+        }
+
+        @Override
         public Action[] getActions(boolean popup) {
-            return new Action[] { new DeleteAction() };
+            return new Action[] { new RenameAction(), new DeleteAction() };
         }
 
         private class DeleteAction extends AbstractAction {
@@ -97,6 +102,23 @@ public class ProjectNodeFactory extends ChildFactory<Project> implements Project
             @Override
             public void actionPerformed(ActionEvent e) {
                 ProjectManager.getGlobalProjectManager().removeProject(project);
+            }
+
+        };
+
+        private class RenameAction extends AbstractAction {
+
+            public RenameAction() {
+                putValue(NAME, "Rename...");
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = JOptionPane.showInputDialog("Please give a new name for the bus", project.getName());
+
+                if (name != null) {
+                    setDisplayName(name);
+                }
             }
 
         };

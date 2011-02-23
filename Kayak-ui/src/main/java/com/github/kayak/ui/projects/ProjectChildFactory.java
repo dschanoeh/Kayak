@@ -45,7 +45,6 @@ public class ProjectChildFactory extends ChildFactory<Bus> implements ProjectCha
 
     @Override
     protected Node[] createNodesForKey(Bus key) {
-        key.addBusChangeListener(this);
         BusNode busNode = new BusNode(key, project);
         return new Node[] {busNode};
     }

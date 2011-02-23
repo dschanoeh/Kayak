@@ -19,7 +19,6 @@
 package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.Bus;
-import com.github.kayak.core.BusChangeListener;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -39,9 +38,15 @@ class BusNode extends AbstractNode {
         super(new BusChildFactory(bus));
 
         setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
-        setDisplayName(bus.getName());
+        super.setDisplayName(bus.getName());
         this.bus = bus;
         this.project = project;
+    }
+
+    @Override
+    public void setDisplayName(String s) {
+        super.setDisplayName(s);
+        bus.setName(s);
     }
 
     @Override
@@ -53,7 +58,7 @@ class BusNode extends AbstractNode {
     private class RenameBusAction extends AbstractAction {
 
         public RenameBusAction() {
-            putValue(NAME, "Rename");
+            putValue(NAME, "Rename...");
         }
 
         @Override
@@ -61,7 +66,7 @@ class BusNode extends AbstractNode {
             String name = JOptionPane.showInputDialog("Please give a new name for the bus", bus.getName());
 
             if (name != null) {
-                bus.setName(name);
+                setDisplayName(name);
             }
         }
 

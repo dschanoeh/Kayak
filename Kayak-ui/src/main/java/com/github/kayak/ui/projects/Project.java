@@ -56,6 +56,10 @@ public class Project {
         return name;
     }
 
+     public void setName(String name) {
+        this.name = name;
+    }
+
     private void notifyListeners() {
         for(ProjectChangeListener listener : listeners) {
             listener.projectChanged();
