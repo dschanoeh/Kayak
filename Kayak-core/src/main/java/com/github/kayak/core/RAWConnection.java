@@ -113,7 +113,11 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
 				
 				if(fields[1].equals("frame")) {
 					try {
-						Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(fields[3]));
+                                                String dataString = "";
+                                                for(int i=3;i<fields.length;i++) {
+                                                    dataString += fields[i];
+                                                }
+						Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(dataString));
 						FrameReceiver receiver = this.getReceiver();
 						if(receiver != null)
 							receiver.newFrame(f);

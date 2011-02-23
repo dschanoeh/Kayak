@@ -26,7 +26,7 @@ package com.github.kayak.core;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class Frame {
+public class Frame implements Comparable<Frame> {
 
     private byte[] data;
     private int identifier;
@@ -83,5 +83,10 @@ public class Frame {
     public String toString() {
         String s = "Frame [" + Integer.toHexString(identifier) + "] " + Util.byteArrayToHexString(data);
         return s;
+    }
+
+    @Override
+    public int compareTo(Frame o) {
+        return ((Integer) this.getIdentifier()).compareTo((Integer) o.getIdentifier());
     }
 }
