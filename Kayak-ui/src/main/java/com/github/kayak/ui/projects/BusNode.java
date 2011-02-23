@@ -24,18 +24,19 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import org.openide.nodes.AbstractNode;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-class BusNode extends AbstractNode {
+public class BusNode extends AbstractNode {
 
     private Bus bus;
     private Project project;
 
     public BusNode(Bus bus, Project project) {
-        super(new BusChildFactory(bus));
+        super(new BusChildFactory(bus), Lookups.fixed(bus));
 
         setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
         super.setDisplayName(bus.getName());

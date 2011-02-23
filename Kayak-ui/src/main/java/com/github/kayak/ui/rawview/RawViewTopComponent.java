@@ -4,10 +4,14 @@
  */
 package com.github.kayak.ui.rawview;
 
+import com.github.kayak.core.Bus;
+import com.github.kayak.core.Frame;
+import com.github.kayak.core.FrameReceiver;
+import com.github.kayak.core.Subscription;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 
@@ -23,12 +27,22 @@ public final class RawViewTopComponent extends TopComponent {
     static final String ICON_PATH = "com/github/kayak/ui/rawview/format-justify-fill.png";
     private static final String PREFERRED_ID = "RawViewTopComponent";
 
+    private static Logger logger = Logger.getLogger(RawViewTopComponent.class.getName());
+    private Bus bus;
+    private Subscription subscription;
+    private FrameReceiver frameReceiver = new FrameReceiver() {
+
+        @Override
+        public void newFrame(Frame frame) {
+            logger.log(Level.INFO, frame.toString());
+        }
+    };
+
     public RawViewTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent"));
         setToolTipText(NbBundle.getMessage(RawViewTopComponent.class, "HINT_RawViewTopComponent"));
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-
     }
 
     /** This method is called from within the constructor to
@@ -127,36 +141,6 @@ public final class RawViewTopComponent extends TopComponent {
     private javax.swing.JTextField jTextField1;
     private javax.swing.JToolBar jToolBar1;
     // End of variables declaration//GEN-END:variables
-    /**
-     * Gets default instance. Do not use directly: reserved for *.settings files only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-     * To obtain the singleton instance, use {@link #findInstance}.
-     */
-    public static synchronized RawViewTopComponent getDefault() {
-        if (instance == null) {
-            instance = new RawViewTopComponent();
-        }
-        return instance;
-    }
-
-    /**
-     * Obtain the RawViewTopComponent instance. Never call {@link #getDefault} directly!
-     */
-    public static synchronized RawViewTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(RawViewTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-            return getDefault();
-        }
-        if (win instanceof RawViewTopComponent) {
-            return (RawViewTopComponent) win;
-        }
-        Logger.getLogger(RawViewTopComponent.class.getName()).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
-        return getDefault();
-    }
 
     @Override
     public int getPersistenceType() {
@@ -170,7 +154,8 @@ public final class RawViewTopComponent extends TopComponent {
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        if(subscription != null && bus != null)
+            bus.removeRAWSubscription(subscription);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -196,5 +181,13 @@ public final class RawViewTopComponent extends TopComponent {
     @Override
     protected String preferredID() {
         return PREFERRED_ID;
+    }
+
+    public void setBus(Bus bus) {
+        this.bus = bus;
+        setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent") + " - " + bus.getName());
+
+        subscription = new Subscription(frameReceiver, bus);
+        bus.addRAWSubscription(subscription);
     }
 }

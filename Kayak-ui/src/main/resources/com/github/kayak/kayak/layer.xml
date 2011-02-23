@@ -44,6 +44,18 @@
                 <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/places/network-workgroup.png"/>
             </file>
         </folder>
+        <folder name="BusViews">
+            <file name="com-github-kayak-ui-rawview-OpenRawViewAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.rawview.Bundle#CTL_OpenRawViewAction"/>
+                <attr name="injectable" stringvalue="com.github.kayak.ui.rawview.OpenRawViewAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="com.github.kayak.core.Bus"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png"/>
+            </file>
+        </folder>
         <folder name="Window">
             <file name="com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.busconfiguration.BusConfigurationTopComponent.findInstance"/>
@@ -61,12 +73,6 @@
                 <attr name="component" methodvalue="com.github.kayak.ui.projects.ProjectsTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_ProjectsAction"/>
                 <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/package-x-generic.png"/>
-                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
-            </file>
-            <file name="com-github-kayak-ui-rawview-RawViewAction.instance">
-                <attr name="component" methodvalue="com.github.kayak.ui.rawview.RawViewTopComponent.findInstance"/>
-                <attr name="displayName" bundlevalue="com.github.kayak.ui.rawview.Bundle#CTL_RawViewAction"/>
-                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/format-justify-fill.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
             <file name="com-github-kayak-ui-connections-ConnectionsAction.instance">
@@ -99,6 +105,12 @@
                 <attr name="originalFile" stringvalue="Actions/Time/com-github-kayak-ui-time-StopAction.instance"/>
             </file>
         </folder>
+        <folder name="Bus views">
+            <file name="com-github-kayak-ui-rawview-OpenRawViewAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/BusViews/com-github-kayak-ui-rawview-OpenRawViewAction.instance"/>
+                <attr name="position" intvalue="0"/>
+            </file>
+        </folder>
     </folder>
 
     <folder name="Menu">
@@ -123,6 +135,12 @@
             <file name="com-github-kayak-ui-projects-NewProject.shadow">
                 <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProjectAction.instance"/>
                 <attr name="position" intvalue="1300"/>
+            </file>
+        </folder>
+        <folder name="Bus views">
+            <file name="com-github-kayak-ui-rawview-OpenRawViewAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/BusViews/com-github-kayak-ui-rawview-OpenRawViewAction.instance"/>
+                <attr name="position" intvalue="0"/>
             </file>
         </folder>
         <folder name="Window">
