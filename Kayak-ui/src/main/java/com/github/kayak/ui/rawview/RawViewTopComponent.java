@@ -189,5 +189,6 @@ public final class RawViewTopComponent extends TopComponent {
 
         subscription = new Subscription(frameReceiver, bus);
         bus.addRAWSubscription(subscription);
+        subscription.setSubscribeAll(Boolean.TRUE);
     }
 }

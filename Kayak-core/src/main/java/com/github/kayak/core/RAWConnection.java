@@ -94,7 +94,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
 		stopRequest = true;
 		try {
 			thread.join();
-		} catch (InterruptedException e) {}
+		} catch (Exception e) {}
 		try {
 			socket.close();
 		} catch (IOException e) {}

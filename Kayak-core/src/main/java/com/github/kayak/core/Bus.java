@@ -125,9 +125,16 @@ public class Bus implements SubscriptionChangeReceiver {
         disconnect();
         
         this.connection = url;
-        /* FIXME we won't do this now
+        /* FIXME we won't do this now*/
         rawConnection = new RAWConnection(url);
-        bcmConnection = new BCMConnection(url);*/
+        bcmConnection = new BCMConnection(url);
+
+        rawConnection.setReceiver(rawReceiver);
+        bcmConnection.setReceiver(bcmReceiver);
+
+        rawConnection.open();
+        bcmConnection.open();
+
 
         notifyListenersConnection();
     }
@@ -136,14 +143,14 @@ public class Bus implements SubscriptionChangeReceiver {
      * If the Bus was connected terminate all connections.
      */
     public void disconnect() {
-        /* FIXME we won't do this now
+        /* FIXME we won't do this now*/
         if (rawConnection != null) {
             rawConnection.close();
         }
 
         if (bcmConnection != null) {
             bcmConnection.close();
-        }*/
+        }
 
         connection = null;
 

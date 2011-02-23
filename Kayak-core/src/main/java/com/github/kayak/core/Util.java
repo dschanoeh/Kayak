@@ -29,10 +29,12 @@ public class Util {
     static final String HEXES = "0123456789ABCDEF";
     
     /**
-     * Convert a hex string to a byte array. The length of the string 
-     * must be % 2
+     * Convert a hex string to a byte array.
      */
     public static byte[] hexStringToByteArray(String s) {
+        if((s.length() % 2) != 0) {
+            s = "0" + s;
+        }
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {

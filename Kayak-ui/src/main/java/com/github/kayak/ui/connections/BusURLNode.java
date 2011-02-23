@@ -84,6 +84,23 @@ public class BusURLNode extends AbstractNode {
         }
     }
 
+    private class TestConnectionAction extends AbstractAction {
+
+        public TestConnectionAction() {
+            putValue(NAME, "Check connection");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Boolean result = url.checkConnection();
+
+            if(!result)
+                setIconBaseWithExtension("org/freedesktop/tango/16x16/emblems/emblem-unreadable.png");
+            else
+                setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");
+        }
+    }
+
     public BusURLNode(BusURL url, Type type) {
         super(Children.LEAF);
         this.url = url;
@@ -95,12 +112,12 @@ public class BusURLNode extends AbstractNode {
     @Override
     public Action[] getActions(boolean popup) {
         if(type == Type.FAVOURITE)
-            return new Action[] { new DeleteConnectionAction() };
+            return new Action[] { new DeleteConnectionAction(), new TestConnectionAction() };
         else if(type == Type.DISCOVERY)
-            return new Action[] { new BookmarkConnectionAction() };
+            return new Action[] { new BookmarkConnectionAction(), new TestConnectionAction() };
         else if(type == Type.CONNECTED)
             return new Action[] {};
-        return new Action[] { new BookmarkConnectionAction(), new DeleteConnectionAction() };
+        return new Action[] { new BookmarkConnectionAction(), new DeleteConnectionAction(), new TestConnectionAction() };
     }
 
     @Override

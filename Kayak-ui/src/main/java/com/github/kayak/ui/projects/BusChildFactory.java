@@ -110,7 +110,8 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
 
                     @Override
                     public Transferable paste() throws IOException {
-                        bus.setConnection(url);
+                        if(url.checkConnection())
+                            bus.setConnection(url);
                         return null;
                     }
                 };

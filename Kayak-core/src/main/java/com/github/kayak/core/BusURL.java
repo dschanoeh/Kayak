@@ -22,7 +22,9 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.Map;
+import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 /**
  * URL class that absoulutely defines the connection parameters for a single bus
@@ -143,5 +145,30 @@ public class BusURL implements Transferable {
         } else {
             throw new UnsupportedFlavorException(flavor);
         }
+    }
+
+    public Boolean checkConnection() {
+        Socket socket = new Socket();
+        InetSocketAddress address = new InetSocketAddress(host, port);
+
+        try {
+            socket.setSoTimeout(10);
+            socket.connect(address);
+
+            InputStreamReader input = new InputStreamReader(
+                    socket.getInputStream());
+
+            /*String ret = "";
+
+            for(int i=0;i<)
+
+            if (!ret.equals("< hi >")) {
+                logger.log(Level.SEVERE, "Did not receive greeting from host.");
+            }*/
+        } catch (IOException ex) {
+            return false;
+        }
+
+        return true;
     }
 }
