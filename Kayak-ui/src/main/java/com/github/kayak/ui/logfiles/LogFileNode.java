@@ -19,6 +19,7 @@
 package com.github.kayak.ui.logfiles;
 
 import com.github.kayak.core.LogFile;
+import java.lang.reflect.InvocationTargetException;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -48,17 +49,47 @@ public class LogFileNode extends AbstractNode {
         Sheet s = super.createSheet();
         Sheet.Set set = s.createPropertiesSet();
 
-        set.setName("Log file");
+        Property platform = new PropertySupport.ReadOnly<String>("Platform", String.class, "Platform", "Platform that was specified in the log file") {
 
-        try {
-            Property platform = new PropertySupport.Reflection<String>(logFile.getPlatform(), String.class, "Platform", null);
-            platform.setName("Platform");
-            set.put(platform);
-        } catch (NoSuchMethodException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return logFile.getPlatform();
+            }
 
+        };
+
+        Property fileName = new PropertySupport.ReadOnly<String>("File name", String.class, "File name", "Full file name of the log file") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return logFile.getFileName();
+            }
+
+        };
+
+        Property compressed = new PropertySupport.ReadOnly<Boolean>("Is compressed", Boolean.class, "Is compressed", "Indicates if the file was gzipped") {
+
+            @Override
+            public Boolean getValue() throws IllegalAccessException, InvocationTargetException {
+                return logFile.getCompressed();
+            }
+
+        };
+
+        Property description = new PropertySupport.ReadOnly<String>("Description", String.class, "Description", "Description that was defined in the log file") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return logFile.getDescription();
+            }
+
+        };
         
+        set.put(platform);
+        set.put(fileName);
+        set.put(compressed);
+        set.put(description);
+
         s.put(set);
 
         return s;

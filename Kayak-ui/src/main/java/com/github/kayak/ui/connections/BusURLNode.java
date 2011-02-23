@@ -22,10 +22,13 @@ import com.github.kayak.core.BusURL;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.nodes.PropertySupport;
+import org.openide.nodes.Sheet;
 
 /**
  *
@@ -98,5 +101,46 @@ public class BusURLNode extends AbstractNode {
         else if(type == Type.CONNECTED)
             return new Action[] {};
         return new Action[] { new BookmarkConnectionAction(), new DeleteConnectionAction() };
+    }
+
+    @Override
+    protected Sheet createSheet() {
+        Sheet s = super.createSheet();
+        Sheet.Set set = s.createPropertiesSet();
+
+        Property host = new PropertySupport.ReadOnly<String>("Host", String.class, "Host", "The host of the connection") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return url.getHost();
+            }
+
+        };
+
+        Property port = new PropertySupport.ReadOnly<Integer>("Port", Integer.class, "Port", "Port of the connection") {
+
+            @Override
+            public Integer getValue() throws IllegalAccessException, InvocationTargetException {
+                return url.getPort();
+            }
+
+        };
+
+        Property bus = new PropertySupport.ReadOnly<String>("Bus name", String.class, "Bus name", "Name of the bus on the host") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return url.getName();
+            }
+
+        };
+
+        set.put(host);
+        set.put(port);
+        set.put(bus);
+
+        s.put(set);
+
+        return s;
     }
 }

@@ -13,6 +13,7 @@ import org.openide.windows.WindowManager;
 import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.explorer.ExplorerManager;
+import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 
@@ -46,7 +47,7 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
         AbstractNode rootNode = new AbstractNode(Children.create(factory, true));
 
         manager.setRootContext(rootNode);
- 
+        associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
     }
 
     /** This method is called from within the constructor to
