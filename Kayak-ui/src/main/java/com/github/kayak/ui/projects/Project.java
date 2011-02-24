@@ -19,6 +19,7 @@
 package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.*;
+import com.github.kayak.ui.time.TimeSourceManager;
 import java.util.ArrayList;
 
 /**
@@ -44,6 +45,7 @@ public class Project {
 
     public void addBus(Bus b) {
         busses.add(b);
+        b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
         notifyListeners();
     }
 

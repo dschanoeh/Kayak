@@ -5,8 +5,6 @@
 package com.github.kayak.ui.rawview;
 
 import com.github.kayak.core.Bus;
-import com.github.kayak.core.Frame;
-import com.github.kayak.core.FrameReceiver;
 import com.github.kayak.core.Subscription;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +25,7 @@ public final class RawViewTopComponent extends TopComponent {
     static final String ICON_PATH = "com/github/kayak/ui/rawview/format-justify-fill.png";
     private static final String PREFERRED_ID = "RawViewTopComponent";
 
-    private static Logger logger = Logger.getLogger(RawViewTopComponent.class.getName());
+    private static final Logger logger = Logger.getLogger(RawViewTopComponent.class.getName());
     private Bus bus;
     private Subscription subscription;
     private RawViewTableModel model;
@@ -57,6 +55,10 @@ public final class RawViewTopComponent extends TopComponent {
 
         jTable1.setFont(new java.awt.Font("Terminus", 0, 14)); // NOI18N
         jTable1.setModel(model);
+        jTable1.getColumnModel().getColumn(0).setPreferredWidth(60);
+        jTable1.getColumnModel().getColumn(1).setPreferredWidth(25);
+        jTable1.getColumnModel().getColumn(2).setPreferredWidth(20);
+        jTable1.getColumnModel().getColumn(3).setPreferredWidth(160);
         jScrollPane1.setViewportView(jTable1);
 
         jToolBar1.setRollover(true);
@@ -101,7 +103,32 @@ public final class RawViewTopComponent extends TopComponent {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        // TODO add your handling code here:
+        String filterString = jTextField1.getText();
+
+        if(jCheckBox1.isSelected()) {
+            subscription.clear();
+            subscription.setSubscribeAll(Boolean.FALSE);
+            
+
+            String[] idStrings = filterString.split("\\s");
+
+            for(int i=0;i<idStrings.length;i++) {
+                try {
+                    if(idStrings[i].startsWith("0x")) {
+                        subscription.subscribe(Integer.parseInt(idStrings[i].substring(2), 16));
+                    } else {
+                        subscription.subscribe(Integer.parseInt(idStrings[i], 16));
+                    }
+                } catch(Exception ex) {
+                    logger.log(Level.WARNING, "Error while parsing filter string\n");
+                }
+            }
+
+            model.clear();
+
+        } else {
+            subscription.setSubscribeAll(Boolean.TRUE);
+        }
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -115,7 +142,7 @@ public final class RawViewTopComponent extends TopComponent {
 
     @Override
     public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_ALWAYS;
+        return TopComponent.PERSISTENCE_NEVER;
     }
 
     @Override
@@ -126,7 +153,7 @@ public final class RawViewTopComponent extends TopComponent {
     @Override
     public void componentClosed() {
         if(subscription != null && bus != null)
-            bus.removeRAWSubscription(subscription);
+            subscription.Terminate();
     }
 
     void writeProperties(java.util.Properties p) {
@@ -159,7 +186,6 @@ public final class RawViewTopComponent extends TopComponent {
         setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent") + " - " + bus.getName());
 
         subscription = new Subscription(model, bus);
-        bus.addRAWSubscription(subscription);
         subscription.setSubscribeAll(Boolean.TRUE);
     }
 }

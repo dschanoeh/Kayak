@@ -61,6 +61,9 @@
               <Connection code="model" type="code"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jTable1.getColumnModel().getColumn(0).setPreferredWidth(60);&#xd;&#xa;jTable1.getColumnModel().getColumn(1).setPreferredWidth(25);&#xd;&#xa;jTable1.getColumnModel().getColumn(2).setPreferredWidth(20);&#xd;&#xa;jTable1.getColumnModel().getColumn(3).setPreferredWidth(160);"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

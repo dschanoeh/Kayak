@@ -17,7 +17,8 @@
  */
 package com.github.kayak.core;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Subscription describes the relation between a class that acts as a frame
@@ -28,76 +29,132 @@ import java.util.ArrayList;
  *
  */
 public class Subscription {
-	private ArrayList<Integer> ids;
-	private Boolean muted;
-	private Boolean subscribeAll;
-	private FrameReceiver receiver;
-	private SubscriptionChangeReceiver changeReceiver;
-	
-	public Subscription(FrameReceiver receiver, SubscriptionChangeReceiver changeReceiver) {
-		ids = new ArrayList<Integer>();
-		muted = false;
-		subscribeAll = false;
-		this.receiver = receiver;
-		this.changeReceiver = changeReceiver;
-	}
-	
-	public void subscribe(int id) {
-		ids.add(id);
-		changeReceiver.subscribed(id, this);
-	}
-	
-	public void subscribeRange(int from, int to) {		
-		for(int i=from;i<=to;i++) {
-			ids.add(i);
-			changeReceiver.subscribed(i, this);
-		}
-	}
-	
-	public void unsubscribe(int id) {
-		ids.remove(id);
-		changeReceiver.unsubscribed(id, this);
-	}
-	
-	public void unsubscribeRange(int from, int to) {
-		for(int i=from;i<=to;i++) {
-			ids.remove(i);
-			changeReceiver.unsubscribed(i, this);
-		}
-	}
-	
-	public Boolean isMuted() {
-		return muted;
-	}
 
-	public void setMuted(Boolean muted) {
-		this.muted = muted;
-	}
-	
-	public boolean includes(int id) {
-		if(subscribeAll)
-			return true;
-		else
-			if(ids.contains(id))
-				return true;
-		return false;
-	}
-	
-	public void deliverFrame(Frame frame) {
-		if(subscribeAll)
-			receiver.newFrame(frame);
-		else {
-			if(ids.contains(frame.getIdentifier()))
-				receiver.newFrame(frame);
-		}
-	}
+    private HashSet<Integer> ids;
+    private Boolean muted;
+    private Boolean subscribeAll;
+    private FrameReceiver receiver;
+    private SubscriptionChangeReceiver changeReceiver;
 
-	public void setSubscribeAll(Boolean subscribeAll) {
-		this.subscribeAll = subscribeAll;
-		changeReceiver.subscriptionAllChanged(subscribeAll, this);
-	}
+    /**
+     * Creates a new Subscription. The new Subscription is automatically
+     * registered at the {@link SubscriptionChangeReceiver}.
+     * @param receiver
+     * @param changeReceiver
+     */
+    public Subscription(FrameReceiver receiver, SubscriptionChangeReceiver changeReceiver) {
+        ids = new HashSet<Integer>();
+        muted = false;
+        subscribeAll = false;
+        this.receiver = receiver;
+        this.changeReceiver = changeReceiver;
+        
+        changeReceiver.addSubscription(this);
+    }
 
-	public Boolean getSubscribeAll() {
-		return subscribeAll;
-	}
+    /**
+     * Subscribe for a single identifier
+     * @param id identifier
+     */
+    public void subscribe(int id) {
+        if (!ids.contains(id)) {
+            ids.add(id);
+            changeReceiver.subscribed(id, this);
+        }
+    }
+
+    /**
+     * Subscribe for a range of identifiers. Note that it is not recommended
+     * to do this for large ranges because it will need much time.
+     * @param from
+     * @param to
+     */
+    public void subscribeRange(int from, int to) {
+        for (int i = from; i <= to; i++) {
+            if(!ids.contains(i)) {
+                ids.add(i);
+                changeReceiver.subscribed(i, this);
+            }
+        }
+    }
+
+    /**
+     * Remove all identifiers from the subscription.
+     */
+    public void clear() {
+        for (Integer id : ids) {
+            unsubscribe(id);
+        }
+    }
+
+    /**
+     * Remove a single identifier from the subscription.
+     * @param id
+     */
+    public void unsubscribe(int id) {
+        if(ids.contains(id)) {
+            ids.remove(id);
+            changeReceiver.unsubscribed(id, this);
+        }
+    }
+
+    /**
+     * Remove a range of identifiers. Note that it is not recommended
+     * to do this for large ranges because it will need much time.
+     * @param from
+     * @param to
+     */
+    public void unsubscribeRange(int from, int to) {
+        for (int i = from; i <= to; i++) {
+            if(ids.contains(i)) {
+                ids.remove(i);
+                changeReceiver.unsubscribed(i, this);
+            }
+        }
+    }
+
+    public Boolean isMuted() {
+        return muted;
+    }
+
+    public void setMuted(Boolean muted) {
+        this.muted = muted;
+    }
+
+    public boolean includes(int id) {
+        if (subscribeAll) {
+            return true;
+        } else if (ids.contains(id)) {
+            return true;
+        }
+        return false;
+    }
+
+    public void deliverFrame(Frame frame) {
+        if (subscribeAll) {
+            receiver.newFrame(frame);
+        } else {
+            if (ids.contains(frame.getIdentifier())) {
+                receiver.newFrame(frame);
+            }
+        }
+    }
+
+    public void setSubscribeAll(Boolean subscribeAll) {
+        this.subscribeAll = subscribeAll;
+        changeReceiver.subscriptionAllChanged(subscribeAll, this);
+    }
+
+    public Boolean getSubscribeAll() {
+        return subscribeAll;
+    }
+
+    public Set<Integer> getAllIdentifiers() {
+        return ids;
+    }
+
+    public void Terminate() {
+        if(changeReceiver != null)
+            changeReceiver.subscriptionTerminated(this);
+    }
 }

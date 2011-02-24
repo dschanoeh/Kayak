@@ -19,6 +19,7 @@ package com.github.kayak.core;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.SocketTimeoutException;
 
 /**
  * This abstract class provides some common methods that are necessary for
@@ -66,7 +67,7 @@ public abstract class SocketcandConnection {
 	 * @return the first element read
 	 * @throws IOException
 	 */
-	protected String getElement(InputStreamReader in) throws IOException {
+	protected String getElement(InputStreamReader in) throws IOException, InterruptedException, SocketTimeoutException {
 		Boolean first = true;
 		
 		while(true) {

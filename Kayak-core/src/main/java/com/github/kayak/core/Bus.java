@@ -19,6 +19,7 @@
 package com.github.kayak.core;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
  */
 public class Bus implements SubscriptionChangeReceiver {
 
-    private Logger logger = Logger.getLogger("com.github.kayak.backend.bus");
+    private static final Logger logger = Logger.getLogger("com.github.kayak.backend.bus");
     private ArrayList<Subscription> subscriptionsRAW;
     private ArrayList<Subscription> subscriptionsBCM;
     private TimeSource timeSource;
@@ -58,6 +59,7 @@ public class Bus implements SubscriptionChangeReceiver {
 
         @Override
         public void newFrame(Frame f) {
+            f.setTimestamp(timeSource.getTime());
             deliverRAWFrame(f);
         }
     };
@@ -66,6 +68,7 @@ public class Bus implements SubscriptionChangeReceiver {
 
         @Override
         public void newFrame(Frame f) {
+            f.setTimestamp(timeSource.getTime());
             deliverBCMFrame(f);
         }
     };
@@ -88,20 +91,26 @@ public class Bus implements SubscriptionChangeReceiver {
         listeners = new ArrayList<BusChangeListener>();
     }
 
-    public void addRAWSubscription(Subscription s) {
-        subscriptionsRAW.add(s);
+    @Override
+    public void addSubscription(Subscription s) {
+        if(s.getSubscribeAll()) {
+            subscriptionsRAW.add(s);
+            openRAWConnection();
+        } else {
+            subscriptionsBCM.add(s);
+            openBCMConnection();
+        }
     }
 
-    public void addBCMSubscription(Subscription s) {
-        subscriptionsBCM.add(s);
-    }
-
-    public void removeRAWSubscription(Subscription s) {
+    private void removeSubscription(Subscription s) {
         subscriptionsRAW.remove(s);
-    }
-
-    public void removeBCMSubscription(Subscription s) {
         subscriptionsBCM.remove(s);
+
+        if(subscriptionsBCM.isEmpty() && bcmConnection != null && bcmConnection.isConnected())
+            bcmConnection.close();
+
+        if(subscriptionsRAW.isEmpty() && rawConnection != null && rawConnection.isConnected())
+            rawConnection.close();
     }
 
     /**
@@ -132,10 +141,6 @@ public class Bus implements SubscriptionChangeReceiver {
         rawConnection.setReceiver(rawReceiver);
         bcmConnection.setReceiver(bcmReceiver);
 
-        rawConnection.open();
-        bcmConnection.open();
-
-
         notifyListenersConnection();
     }
 
@@ -144,11 +149,11 @@ public class Bus implements SubscriptionChangeReceiver {
      */
     public void disconnect() {
         /* FIXME we won't do this now*/
-        if (rawConnection != null) {
+        if (rawConnection != null && rawConnection.isConnected()) {
             rawConnection.close();
         }
 
-        if (bcmConnection != null) {
+        if (bcmConnection != null && bcmConnection.isConnected()) {
             bcmConnection.close();
         }
 
@@ -237,15 +242,107 @@ public class Bus implements SubscriptionChangeReceiver {
     public void subscriptionAllChanged(boolean all, Subscription s) {
         if (all == true) {
             subscriptionsBCM.remove(s);
-            subscriptionsRAW.add(s);
+            if(!subscriptionsRAW.contains(s))
+                subscriptionsRAW.add(s);
 
-            /* TODO unsubscribe from all ids of the subscription */
+            /* If no one needs the BCM connection close it */
+            if(subscriptionsBCM.isEmpty() && bcmConnection != null && bcmConnection.isConnected()) {
+                logger.log(Level.INFO, "No more BCM subscriptions. Closing connection.");
+                bcmConnection.close();
+            /* Otherwise check if we can unsubscribe from the used identifiers */
+            } else {
+                Set<Integer> ids = s.getAllIdentifiers();
+                for(Integer identifier : ids) {
+                    Boolean found = false;
+
+                    for(Subscription subscription : subscriptionsBCM) {
+                        if(subscription.includes(identifier)) {
+                            found = true;
+                            return;
+                        }
+                    }
+
+                    if(!found)
+                        bcmConnection.unsubscribeFrom(identifier);
+                }
+            }
+
+            openRAWConnection();
         } else {
             subscriptionsRAW.remove(s);
-            subscriptionsBCM.add(s);
+            if(!subscriptionsBCM.contains(s))
+                subscriptionsBCM.add(s);
 
-            /* TODO resubscribe to all ids of the subscription */
+            if(subscriptionsRAW.isEmpty() && rawConnection != null && rawConnection.isConnected()) {
+                logger.log(Level.INFO, "No more raw subscriptions. Closing connection.");
+                rawConnection.close();
+            }
+
+            /* Make sure BCM connection is opened */
+            openBCMConnection();
+
+            /* Make sure we get all identifiers that are in the subscription */
+            Set<Integer> identifiers = s.getAllIdentifiers();
+            for(Integer identifier : identifiers) {
+                bcmConnection.subscribeTo(identifier, 0, 0);
+            }
         }
 
+    }
+
+    /**
+     * Checks if the BCM connection exists and is connected. If not tries
+     * to create a new one and/or connects it.
+     */
+    private void openBCMConnection() {
+        /* If the connection was not created yet try to create connection */
+        if(bcmConnection == null) {
+            if(connection != null) {
+                bcmConnection = new BCMConnection(connection);
+            } else {
+                return;
+            }
+        }
+
+        /* Nothing to do here */
+        if(bcmConnection.isConnected())
+            return;
+
+        bcmConnection.setReceiver(bcmReceiver);
+        bcmConnection.open();
+
+        /* Check for all present BCM subscriptions and bring the connection
+         * up to date.
+         */
+        for(Subscription s : subscriptionsBCM) {
+            /* TODO implement */
+        }
+    }
+
+    /**
+     * Checks if the raw connection exists and is connected. If not tries
+     * to create a new one and/or connects it.
+     */
+    private void openRAWConnection() {
+        /* If the connection was not created yet try to create connection */
+        if(rawConnection == null) {
+            if(connection != null) {
+                rawConnection = new RAWConnection(connection);
+            } else {
+                return;
+            }
+        }
+
+        /* Nothing to do here */
+        if(rawConnection.isConnected())
+            return;
+
+        rawConnection.setReceiver(rawReceiver);
+        rawConnection.open();
+    }
+
+    @Override
+    public void subscriptionTerminated(Subscription s) {
+        removeSubscription(s);
     }
 }

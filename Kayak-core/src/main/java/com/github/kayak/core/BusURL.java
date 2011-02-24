@@ -153,7 +153,7 @@ public class BusURL implements Transferable {
 
         try {
             socket.setSoTimeout(10);
-            socket.connect(address);
+            socket.connect(address, 50);
 
             InputStreamReader input = new InputStreamReader(
                     socket.getInputStream());

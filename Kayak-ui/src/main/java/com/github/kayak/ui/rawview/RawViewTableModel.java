@@ -34,9 +34,17 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
         data = new TreeMap<Integer, Frame>();
     }
 
+    public void clear() {
+        synchronized(this) {
+            data.clear();
+        }
+    }
+
     @Override
     public int getRowCount() {
-        return data.size();
+        synchronized(this) {
+            return data.size();
+        }
     }
 
     @Override
@@ -56,45 +64,51 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Integer[] keys = data.keySet().toArray(new Integer[] {});
+        synchronized (this) {
+            Integer[] keys = data.keySet().toArray(new Integer[]{});
 
-        switch(columnIndex) {
-            case 0:
-                return data.get(keys[rowIndex]).getTimestamp();
-            case 1:
-                return "0x" + Integer.toHexString(data.get(keys[rowIndex]).getIdentifier());
-            case 2:
-                return data.get(keys[rowIndex]).getData().length;
-            case 3:
-                byte[] dat = data.get(keys[rowIndex]).getData();
-                String datString = com.github.kayak.core.Util.byteArrayToHexString(dat);
-                if(datString.length() %2 != 0)
-                    datString = "0" + datString;
+            switch (columnIndex) {
+                case 0:
+                    return data.get(keys[rowIndex]).getTimestamp();
+                case 1:
+                    return "0x" + Integer.toHexString(data.get(keys[rowIndex]).getIdentifier());
+                case 2:
+                    return data.get(keys[rowIndex]).getData().length;
+                case 3:
+                    byte[] dat = data.get(keys[rowIndex]).getData();
+                    String datString = com.github.kayak.core.Util.byteArrayToHexString(dat);
+                    if (datString.length() % 2 != 0) {
+                        datString = "0" + datString;
+                    }
 
-                String res = "";
-                for(int i=0;i<datString.length();i+=2) {
-                    res += datString.substring(i, i+2);
-                    if(i != datString.length())
-                        res += " ";
-                }
-                return res;
-            default:
-                return null;
+                    String res = "";
+                    for (int i = 0; i < datString.length(); i += 2) {
+                        res += datString.substring(i, i + 2);
+                        if (i != datString.length()) {
+                            res += " ";
+                        }
+                    }
+                    return res;
+                default:
+                    return null;
+            }
         }
     }
 
     @Override
     public void newFrame(Frame frame) {
-        int row = getRowForKey(frame.getIdentifier());
-        if(row != -1) {
-            Frame old = data.get(frame.getIdentifier());
-            data.remove(frame.getIdentifier());
-            data.put(frame.getIdentifier(), frame);
-            fireTableRowsUpdated(row, row);
-        } else {
-            data.put(frame.getIdentifier(), frame);
-            int newRow = getRowForKey(frame.getIdentifier());
-            fireTableRowsInserted(newRow, newRow);
+        synchronized(this) {
+            int row = getRowForKey(frame.getIdentifier());
+            if (row != -1) {
+                Frame old = data.get(frame.getIdentifier());
+                data.remove(frame.getIdentifier());
+                data.put(frame.getIdentifier(), frame);
+                fireTableRowsUpdated(row, row);
+            } else {
+                data.put(frame.getIdentifier(), frame);
+                int newRow = getRowForKey(frame.getIdentifier());
+                fireTableRowsInserted(newRow, newRow);
+            }
         }
     }
 

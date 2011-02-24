@@ -33,137 +33,154 @@ import java.util.logging.Logger;
  *
  */
 public class BCMConnection extends SocketcandConnection implements Runnable {
-	private Logger logger = Logger.getLogger("com.github.kayak.backend");
-	private Socket socket;
-	private PrintWriter output;
-	private Thread thread;
-	private boolean stopRequest = false;
-	private InputStreamReader input;
-	
-	public BCMConnection(BusURL url) {
-		this.host = url.getHost();
-		this.port = url.getPort();
-		this.busName = url.getName();
-				
-		socket = new Socket();
-	}
-	
-	public void open() {
-		InetSocketAddress address = new InetSocketAddress(host, port);
-		
-		try {
-			socket.connect(address);
-			socket.setSoTimeout(1000);
-			
-			input = new InputStreamReader(
+
+    private static final Logger logger = Logger.getLogger(BCMConnection.class.getName());
+    private Socket socket;
+    private PrintWriter output;
+    private Thread thread;
+    private InputStreamReader input;
+    private Boolean connected = false;
+
+    public Boolean isConnected() {
+        return connected;
+    }
+
+    public BCMConnection(BusURL url) {
+        this.host = url.getHost();
+        this.port = url.getPort();
+        this.busName = url.getName();
+    }
+
+    public void open() {
+        InetSocketAddress address = new InetSocketAddress(host, port);
+
+        try {
+            socket = new Socket();
+            socket.connect(address);
+            socket.setSoTimeout(1000);
+
+            input = new InputStreamReader(
                     socket.getInputStream());
-			
-			output = new PrintWriter(socket.getOutputStream(),true);
-			
-			String ret = getElement(input);
-			if(!ret.equals("< hi >")) {
-				logger.log(Level.SEVERE, "Did not receive greeting from host.");
-			}
-			
-			output.print("< open " + busName + " >");
-			output.flush();
-			
-			ret = getElement(input);
-			if(!ret.equals("< ok >")) {
-				logger.log(Level.SEVERE, "Could not open bus");
-			}
-			
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "IOException while creating the socket.",e);
-		}
-		
-		/* Start worker thread for frame reception */
-		thread = new Thread(this);
-		thread.start();
-	}
-	
-	public void close() {
-		stopRequest = true;
-		try {
-			thread.join();
-		} catch (InterruptedException e) {}
-		try {
-			socket.close();
-		} catch (IOException e) {}
-	}
-	
-	public void subscribeTo(int id, int sec, int usec) {
-		output.print("< subscribe " 
-				+ Integer.toString(sec) + " " 
-				+ Integer.toString(usec) + " "
-				+ Integer.toHexString(id) + " >");
-		output.flush();
-	}
-	
-	public void unsubscribeFrom(int id) {
-		output.print("< unsubscribe " + Integer.toHexString(id) + " >");
-		output.flush();
-	}
-	
-	public void addSendJob(Frame f, int sec, int usec) {
-		output.print("< add " 
-				+ Integer.toString(sec) + " " 
-				+ Integer.toString(usec) + " "
-				+ Integer.toHexString(f.getIdentifier()) + " "
-				+ Integer.toString(f.getLength()) + " "
-				+ Util.byteArrayToHexString(f.getData()) + " >");
-		output.flush();
-	}
-	
-	public void updateSendJob(Frame f) {
-		output.print("< add " 
-				+ Integer.toHexString(f.getIdentifier()) + " "
-				+ Integer.toString(f.getLength()) + " "
-				+ Util.byteArrayToHexString(f.getData()) + " >");
-		output.flush();
-	}
-	
-	public void sendFrame(Frame f) {
-		output.print("< send " 
-				+ Integer.toHexString(f.getIdentifier()) + " "
-				+ Integer.toString(f.getLength()) + " "
-				+ Util.byteArrayToHexString(f.getData()) + " >");
-		output.flush();
-	}
 
+            output = new PrintWriter(socket.getOutputStream(), true);
 
-	@Override
-	public void run() {
-		while(true) {
-			if(stopRequest)
-				break;
-			
-			try {
-				String frame = getElement(input);
-				
-				String[] fields = frame.split("\\s");
-				
-				/* We received a frame */
-				if(fields[1].equals("frame")) {
-					try {
-                                                String dataString = "";
-                                                for(int i=3;i<fields.length;i++) {
-                                                    dataString += fields[i];
-                                                }
-						Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(dataString));
-						FrameReceiver receiver = this.getReceiver();
-						if(receiver != null)
-							receiver.newFrame(f);
-						
-					} catch(Exception ex) {
-						logger.log(Level.WARNING, "Could not properly deliver CAN frame", ex);
-					}
-				} else if(fields[1].equals("error")) {
-					logger.log(Level.WARNING, "Received error from socketcand: " + frame);
-				}
-			} catch (IOException ex) {
-				
-			}
-		}
-	}
+            String ret = getElement(input);
+            if (!ret.equals("< hi >")) {
+                logger.log(Level.SEVERE, "Did not receive greeting from host.");
+            }
+
+            output.print("< open " + busName + " >");
+            output.flush();
+
+            ret = getElement(input);
+            if (!ret.equals("< ok >")) {
+                logger.log(Level.SEVERE, "Could not open bus");
+            }
+            socket.setSoTimeout(100);
+
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "IOException while creating the socket.", e);
+            return;
+        }
+
+        /* Start worker thread for frame reception */
+        thread = new Thread(this);
+        thread.start();
+        connected = true;
+    }
+
+    public void close() {
+        if (thread != null && thread.isAlive()) {
+            try {
+                thread.interrupt();
+                thread.join();
+            } catch (Exception e) {
+            }
+        }
+
+        try {
+            socket.close();
+        } catch (IOException e) {
+        }
+        connected = false;
+    }
+
+    public void subscribeTo(int id, int sec, int usec) {
+        output.print("< subscribe "
+                + Integer.toString(sec) + " "
+                + Integer.toString(usec) + " "
+                + Integer.toHexString(id) + " >");
+        output.flush();
+    }
+
+    public void unsubscribeFrom(int id) {
+        output.print("< unsubscribe " + Integer.toHexString(id) + " >");
+        output.flush();
+    }
+
+    public void addSendJob(Frame f, int sec, int usec) {
+        output.print("< add "
+                + Integer.toString(sec) + " "
+                + Integer.toString(usec) + " "
+                + Integer.toHexString(f.getIdentifier()) + " "
+                + Integer.toString(f.getLength()) + " "
+                + Util.byteArrayToHexString(f.getData()) + " >");
+        output.flush();
+    }
+
+    public void updateSendJob(Frame f) {
+        output.print("< add "
+                + Integer.toHexString(f.getIdentifier()) + " "
+                + Integer.toString(f.getLength()) + " "
+                + Util.byteArrayToHexString(f.getData()) + " >");
+        output.flush();
+    }
+
+    public void sendFrame(Frame f) {
+        output.print("< send "
+                + Integer.toHexString(f.getIdentifier()) + " "
+                + Integer.toString(f.getLength()) + " "
+                + Util.byteArrayToHexString(f.getData()) + " >");
+        output.flush();
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            if(Thread.interrupted())
+                return;
+
+            try {
+                String frame = getElement(input);
+
+                String[] fields = frame.split("\\s");
+
+                /* We received a frame */
+                if (fields[1].equals("frame")) {
+                    try {
+                        String dataString = "";
+                        for (int i = 3; i < fields.length; i++) {
+                            dataString += fields[i];
+                        }
+                        Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(dataString));
+                        FrameReceiver receiver = this.getReceiver();
+                        if (receiver != null) {
+                            receiver.newFrame(f);
+                        }
+
+                    } catch (Exception ex) {
+                        logger.log(Level.WARNING, "Could not properly deliver CAN frame", ex);
+                    }
+                } else if (fields[1].equals("error")) {
+                    logger.log(Level.WARNING, "Received error from socketcand: " + frame);
+                }
+            } catch(InterruptedException ex) {
+                logger.log(Level.WARNING, "Interrupted exception. Shutting down connection thread");
+                return;
+            } catch (IOException ex) {
+                logger.log(Level.WARNING, "IO exception.");
+                return;
+            }
+        }
+    }
 }

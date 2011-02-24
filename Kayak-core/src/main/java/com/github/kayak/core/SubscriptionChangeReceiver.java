@@ -18,7 +18,14 @@
 package com.github.kayak.core;
 
 public interface SubscriptionChangeReceiver {
-	public void subscribed(int id, Subscription s);
-	public void unsubscribed(int id, Subscription s);
-	public void subscriptionAllChanged(boolean all, Subscription s);
+
+    public void addSubscription(Subscription s);
+
+    public void subscribed(int id, Subscription s);
+
+    public void unsubscribed(int id, Subscription s);
+
+    public void subscriptionAllChanged(boolean all, Subscription s);
+
+    public void subscriptionTerminated(Subscription s);
 }
