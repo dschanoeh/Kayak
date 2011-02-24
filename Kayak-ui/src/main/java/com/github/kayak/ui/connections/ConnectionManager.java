@@ -21,21 +21,25 @@ package com.github.kayak.ui.connections;
 import com.github.kayak.core.BusURL;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.openide.util.Exceptions;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 public class ConnectionManager {
     private static ConnectionManager globalManager;
@@ -44,24 +48,75 @@ public class ConnectionManager {
     private ArrayList<BusURL> autoDiscovery;
     private Thread discoveryThread;
     private ArrayList<ConnectionListener> listeners;
-    private static InputOutput logOutput = IOProvider.getDefault().getIO("Connections", false);
+    private static final Logger logger = Logger.getLogger(ConnectionManager.class.getName());
     
     private Runnable discoveryRunnable = new Runnable() {
 
         @Override
         public void run() {
-            autoDiscovery.add(BusURL.fromString("socket://can0@127.0.0.1:28600"));
-            notifyListeners();
-            int i=0;
-            while(true) {
+            while (true) {
                 try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
+                    DatagramSocket socket = new DatagramSocket();
+                    InetSocketAddress address = new InetSocketAddress(42000);
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+
+                    socket.bind(address);
+
+                    while (true) {
+                        byte[] buffer = new byte[1024];
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+
+                        try {
+                            socket.receive(packet);
+                            String string = packet.getData().toString();
+
+
+                            String url = "";
+                            ArrayList<String> busses = new ArrayList<String>();
+
+                            StringReader reader = new StringReader(string);
+                            InputSource source = new InputSource(reader);
+                            Document doc = db.parse(source);
+
+                            Element root = doc.getDocumentElement();
+
+                            if (root.getNodeName().equals("CANBeacon")) {
+                                NodeList children = root.getChildNodes();
+
+                                for (int i = 0; i < children.getLength(); i++) {
+                                    Node child = children.item(i);
+
+                                    if (child.getNodeName().equals("URL")) {
+                                        url = child.getNodeValue();
+                                    } else if (child.getNodeName().equals("Bus")) {
+                                        busses.add(child.getAttributes().getNamedItem("name").getNodeValue());
+                                    }
+                                }
+                            }
+
+                            if (!url.equals("")) {
+                                for (String bus : busses) {
+                                    String newURL = "socket://" + bus + "@" + url.substring(6);
+                                    autoDiscovery.add(BusURL.fromString(newURL));
+                                }
+                            }
+
+
+                        } catch (Exception ex) {
+                            logger.log(Level.WARNING, "Malformed discovery beacon");
+                        }
+                    }
+
+
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, "Could not start auto discovery thread");
                 }
-                autoDiscovery.add(BusURL.fromString("socket://can0@129.0.0.1:"+Integer.toString(i)));
-                notifyListeners();
-                i++;
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException ex) {
+                    return;
+                }
             }
         }
     };
@@ -89,13 +144,13 @@ public class ConnectionManager {
         /* no duplicates */
         for(BusURL u : favourites) {
             if(u.equals(url)) {
-                logOutput.getErr().print("URL already in favourites!\n");
+                logger.log(Level.WARNING, "URL already in favourites!\n");
                 return;
             }
         }
 
         BusURL url2 = new BusURL(url.getHost(), url.getPort(), url.getName());
-        logOutput.getOut().print("adding favourite: " + url2.toString() + "\n");
+        logger.log(Level.INFO, "adding favourite: " + url2.toString() + "\n");
         favourites.add(url2);
         notifyListeners();
     }
@@ -175,7 +230,7 @@ public class ConnectionManager {
             }
 
         } catch (Exception ex) {
-            logOutput.getErr().write("Error while reading connections from file\n");
+            logger.log(Level.SEVERE, "Error while reading connections from file\n");
         }
     }
 
@@ -207,7 +262,7 @@ public class ConnectionManager {
             StreamResult result = new StreamResult(stream);
             transformer.transform(source, result);
         } catch (Exception ex) {
-            logOutput.getErr().write("Error while writing connections to file\n");
+            logger.log(Level.SEVERE, "Error while writing connections to file\n");
         }
     }
 }
