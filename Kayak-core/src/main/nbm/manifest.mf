@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+OpenIDE-Module-Localizing-Bundle: com/github/kayak/core/Bundle.properties
+OpenIDE-Module-Layer: com/github/kayak/core/layer.xml

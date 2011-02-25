@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module-Localizing-Bundle: com/github/kayak/kayak/Bundle.properties
+OpenIDE-Module-Layer: com/github/kayak/kayak/layer.xml
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
+OpenIDE-Module-Install: com/github/kayak/ui/ModuleLifecycleManager.class
