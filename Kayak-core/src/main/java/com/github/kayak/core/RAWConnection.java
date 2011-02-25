@@ -48,7 +48,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
     public RAWConnection(BusURL url) {
         this.host = url.getHost();
         this.port = url.getPort();
-        this.busName = url.getName();
+        this.busName = url.getBus();
 
     }
 

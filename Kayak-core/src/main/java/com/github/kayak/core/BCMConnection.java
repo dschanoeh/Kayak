@@ -48,7 +48,7 @@ public class BCMConnection extends SocketcandConnection implements Runnable {
     public BCMConnection(BusURL url) {
         this.host = url.getHost();
         this.port = url.getPort();
-        this.busName = url.getName();
+        this.busName = url.getBus();
     }
 
     public void open() {

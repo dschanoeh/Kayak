@@ -77,8 +77,9 @@ public class ConnectionManager {
                             }
                             String string = sb.toString();
 
-
-                            String url = "";
+                            String url = null;
+                            String description = null;
+                            String hostName = null;
                             ArrayList<String> busses = new ArrayList<String>();
 
                             StringReader reader = new StringReader(string);
@@ -88,6 +89,16 @@ public class ConnectionManager {
                             Element root = doc.getDocumentElement();
 
                             if (root.getNodeName().equals("CANBeacon")) {
+                                NamedNodeMap attributes = root.getAttributes();
+
+                                Node descriptionNode = attributes.getNamedItem("description");
+                                if(descriptionNode != null)
+                                    description = descriptionNode.getNodeValue();
+
+                                Node hostNameNode = attributes.getNamedItem("name");
+                                if(hostNameNode != null)
+                                    hostName = hostNameNode.getNodeValue();
+
                                 NodeList children = root.getChildNodes();
 
                                 for (int i = 0; i < children.getLength(); i++) {
@@ -101,11 +112,17 @@ public class ConnectionManager {
                                 }
                             }
 
-                            if (!url.equals("")) {
+                            if (url != null) {
                                 for (String bus : busses) {
                                     String newURL = "socket://" + bus + "@" + url.substring(6);
                                     BusURL busURL = BusURL.fromString(newURL);
                                     busURL.setTimestamp(System.currentTimeMillis());
+
+                                    if(hostName != null)
+                                        busURL.setHostName(hostName);
+
+                                    if(description != null)
+                                        busURL.setDescription(description);
 
                                     /* If the beacon is not in the list add it*/
                                     if(!autoDiscovery.contains(busURL)) {
@@ -176,7 +193,7 @@ public class ConnectionManager {
             }
         }
 
-        BusURL url2 = new BusURL(url.getHost(), url.getPort(), url.getName());
+        BusURL url2 = new BusURL(url.getHost(), url.getPort(), url.getBus());
         logger.log(Level.INFO, "adding favourite: " + url2.toString() + "\n");
         favourites.add(url2);
         notifyListeners();
@@ -275,7 +292,7 @@ public class ConnectionManager {
                     Element favourite = doc.createElement("Connection");
                     favourite.setAttribute("host", url.getHost());
                     favourite.setAttribute("port", Integer.toString(url.getPort()));
-                    favourite.setAttribute("name", url.getName());
+                    favourite.setAttribute("name", url.getBus());
                     favouritesElement.appendChild(favourite);
                 } catch (Exception ex) {
                 }

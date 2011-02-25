@@ -36,9 +36,27 @@ public class BusURL implements Transferable {
 
     public static final DataFlavor DATA_FLAVOR = new DataFlavor(BusURL.class, "BusURL");
     private String host;
-    private String name;
+    private String bus;
     private int port;
+    private String hostName;
+    private String description;
     private long timestamp;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
 
     public long getTimestamp() {
         return timestamp;
@@ -56,12 +74,12 @@ public class BusURL implements Transferable {
         this.host = host;
     }
 
-    public String getName() {
-        return name;
+    public String getBus() {
+        return bus;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setBus(String bus) {
+        this.bus = bus;
     }
 
     public int getPort() {
@@ -76,10 +94,10 @@ public class BusURL implements Transferable {
     private BusURL() {
     }
 
-    public BusURL(String host, int port, String name) {
+    public BusURL(String host, int port, String bus) {
         this.host = host;
         this.port = port;
-        this.name = name;
+        this.bus = bus;
     }
 
     /**
@@ -96,7 +114,7 @@ public class BusURL implements Transferable {
 
             b.setPort(Integer.parseInt(s.substring(portSeparator+1)));
             b.setHost(s.substring(at +1, portSeparator));
-            b.setName(s.substring(9,at));
+            b.setBus(s.substring(9,at));
 
             return b;
         } else {
@@ -115,7 +133,7 @@ public class BusURL implements Transferable {
     public int hashCode() {
         int hash = 7;
         hash = 47 * hash + (this.host != null ? this.host.hashCode() : 0);
-        hash = 47 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 47 * hash + (this.bus != null ? this.bus.hashCode() : 0);
         hash = 47 * hash + this.port;
         return hash;
     }
@@ -123,18 +141,23 @@ public class BusURL implements Transferable {
 
     @Override
     public String toString() {
-        if(host == null)
-            return "";
+        String s = "";
+        if(bus != null)
+            s += bus;
 
-        if(name != null) {
-            return name + " ( socket://" + host + ":" + Integer.toString(port) + " )";
-        } else {
-            return "socket://" + host + ":" + Integer.toString(port);
-        }
+        if(hostName != null)
+            s += "@" + hostName;
+        else
+            s += "@" + host + ":" + Integer.toString(port);
+
+        if(description != null)
+            s += " (" + description + ")";
+
+        return s;
     }
 
     public String toURLString() {
-        return  "socket://" + name + "@" + host + ":" + Integer.toString(port);
+        return  "socket://" + bus + "@" + host + ":" + Integer.toString(port);
     }
 
     @Override

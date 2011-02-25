@@ -147,7 +147,7 @@ public class BusURLNode extends AbstractNode {
 
             @Override
             public String getValue() throws IllegalAccessException, InvocationTargetException {
-                return url.getName();
+                return url.getBus();
             }
 
         };
