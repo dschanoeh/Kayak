@@ -38,6 +38,15 @@ public class BusURL implements Transferable {
     private String host;
     private String name;
     private int port;
+    private long timestamp;
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
 
     public String getHost() {
         return host;

@@ -1,23 +1,17 @@
 Kayak
 =====
 
-Kayak aims to be a Java framework and GUI for CAN data handling. It will include an
-abstract data model for different CAN hard- and software solutions.
-[SocketCAN](http://developer.berlios.de/projects/socketcan/) and IP will be used as an abstraction layer above the hardware.
-Platform independence is a goal and therefore all logic will be implemented in Java. To run the framework on a Windows client
-a socketCAN over ethernet protocol will be implemented.
- 
+Kayak is a application for CAN bus diagnosis and monitoring. Its main goals are a simple interface and platform independence.
+Kayak is implemented in pure Java and has no platform specific dependencies. It includes a complete CAN bus abstraction model that can be included in other applications that need do handle CAN frames.
+This is possible because [Socket CAN](http://developer.berlios.de/projects/socketcan/) and TCP/IP are used as an abstraction layer above the CAN controller hardware.
+The [socketcand](https://github.com/dschanoeh/socketcand) provides the bridge between the Socket CAN device on a linux machine and the TCP/IP socket of Kayak.
+To build Kayak follow the instructions in BUILD.md
+
 ### What is implemented yet:
 * abstract bus, receiver, sender - model
-* CAN logfile replay
-* logfile writing
-* basic .dbc file import
-
-### What is on the list to be implemented:
-* Saving and loading from an own format
-* Receiving and sending of CAN frames (via ethernet, socketCAN or other modules)
-* Parsing of frames and generation of data objects
-* A GUI to watch and control busses
+* .kcd bus description format
+* project and log file management
+* simple raw view of CAN frames
  
 ### Why the name Kayak?
 Because a kayak is a small, lightweight and versatile boat compared to a canoe. 

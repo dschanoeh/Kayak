@@ -26,6 +26,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -43,9 +45,9 @@ import org.xml.sax.InputSource;
 
 public class ConnectionManager {
     private static ConnectionManager globalManager;
-    private ArrayList<BusURL> favourites;
-    private ArrayList<BusURL> recent;
-    private ArrayList<BusURL> autoDiscovery;
+    private HashSet<BusURL> favourites;
+    private HashSet<BusURL> recent;
+    private HashSet<BusURL> autoDiscovery;
     private Thread discoveryThread;
     private ArrayList<ConnectionListener> listeners;
     private static final Logger logger = Logger.getLogger(ConnectionManager.class.getName());
@@ -56,12 +58,11 @@ public class ConnectionManager {
         public void run() {
             while (true) {
                 try {
-                    DatagramSocket socket = new DatagramSocket();
                     InetSocketAddress address = new InetSocketAddress(42000);
+                    DatagramSocket socket = new DatagramSocket(address);
+                    socket.setSoTimeout(1000);
                     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                     DocumentBuilder db = dbf.newDocumentBuilder();
-
-                    socket.bind(address);
 
                     while (true) {
                         byte[] buffer = new byte[1024];
@@ -69,7 +70,12 @@ public class ConnectionManager {
 
                         try {
                             socket.receive(packet);
-                            String string = packet.getData().toString();
+
+                            StringBuilder sb = new StringBuilder(packet.getLength());
+                            for(int i=0;i<packet.getLength();i++) {
+                                sb.append((char) buffer[i]);
+                            }
+                            String string = sb.toString();
 
 
                             String url = "";
@@ -88,7 +94,7 @@ public class ConnectionManager {
                                     Node child = children.item(i);
 
                                     if (child.getNodeName().equals("URL")) {
-                                        url = child.getNodeValue();
+                                        url = child.getTextContent();
                                     } else if (child.getNodeName().equals("Bus")) {
                                         busses.add(child.getAttributes().getNamedItem("name").getNodeValue());
                                     }
@@ -98,13 +104,34 @@ public class ConnectionManager {
                             if (!url.equals("")) {
                                 for (String bus : busses) {
                                     String newURL = "socket://" + bus + "@" + url.substring(6);
-                                    autoDiscovery.add(BusURL.fromString(newURL));
+                                    BusURL busURL = BusURL.fromString(newURL);
+                                    busURL.setTimestamp(System.currentTimeMillis());
+
+                                    /* If the beacon is not in the list add it*/
+                                    if(!autoDiscovery.contains(busURL)) {
+                                        autoDiscovery.add(busURL);
+                                        notifyListeners();
+                                    /* otherwise update timestamp */
+                                    } else {
+                                        for(BusURL old : autoDiscovery) {
+                                            if(old.equals(busURL)) {
+                                                old.setTimestamp(System.currentTimeMillis());
+                                            }
+                                        }
+                                    }
                                 }
                             }
-
-
                         } catch (Exception ex) {
                             logger.log(Level.WARNING, "Malformed discovery beacon");
+                        }
+
+                        /* Check if old beacons need to be removed from the list */
+                        long currentTime = System.currentTimeMillis();
+                        for(BusURL url : autoDiscovery) {
+                            if(url.getTimestamp() < (currentTime - 5000)) {
+                                autoDiscovery.remove(url);
+                                notifyListeners();
+                            }
                         }
                     }
 
@@ -121,15 +148,15 @@ public class ConnectionManager {
         }
     };
 
-    public ArrayList<BusURL> getAutoDiscovery() {
+    public Set<BusURL> getAutoDiscovery() {
         return autoDiscovery;
     }
 
-    public ArrayList<BusURL> getFavourites() {
+    public HashSet<BusURL> getFavourites() {
         return favourites;
     }
 
-    public ArrayList<BusURL> getRecent() {
+    public HashSet<BusURL> getRecent() {
         return recent;
     }
 
@@ -181,9 +208,9 @@ public class ConnectionManager {
     }
 
     private ConnectionManager() {
-        favourites = new ArrayList<BusURL>();
-        recent = new ArrayList<BusURL>();
-        autoDiscovery = new ArrayList<BusURL>();
+        favourites = new HashSet<BusURL>();
+        recent = new HashSet<BusURL>();
+        autoDiscovery = new HashSet<BusURL>();
 
         discoveryThread = new Thread(discoveryRunnable);
         discoveryThread.start();
