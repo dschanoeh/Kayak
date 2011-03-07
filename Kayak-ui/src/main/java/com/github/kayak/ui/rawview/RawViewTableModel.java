@@ -112,7 +112,9 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
 
             switch (columnIndex) {
                 case 0:
-                    return data.get(keys[rowIndex]).getTimestamp();
+                    long timestamp = data.get(keys[rowIndex]).getTimestamp();
+                    java.util.Formatter formatter = new java.util.Formatter();
+                    return formatter.format("%.3f",(double) timestamp/1000);
                 case 1:
                     return "0x" + Integer.toHexString(data.get(keys[rowIndex]).getIdentifier());
                 case 2:
@@ -159,7 +161,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
     public Class<?> getColumnClass(int columnIndex) {
         switch(columnIndex) {
             case 0:
-                return Long.class;
+                return String.class;
             case 1:
                 return String.class;
             case 2:
