@@ -29,6 +29,7 @@ import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.datatransfer.PasteType;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
@@ -66,27 +67,27 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
     protected Node[] createNodes(Folders key) {
         if (key == Folders.CONNECTION) {
 
-            AbstractNode node = new ConnectionFolderNode(Children.create(new ConnectionChildFactory(bus), false));
+            AbstractNode node = new ConnectionFolderNode(Children.create(new ConnectionChildFactory(bus), false), bus);
             node.setDisplayName("Connection");
             node.setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");
 
             return new Node[]{node};
         } else if (key == Folders.DESCRIPTION) {
 
-            AbstractNode node = new AbstractNode(Children.LEAF);
+            AbstractNode node = new AbstractNode(Children.LEAF, Lookups.fixed(bus));
             node.setDisplayName("Description");
 
             return new Node[]{node};
         } else if (key == Folders.INPUT) {
 
-            AbstractNode node = new LogFileFolderNode(Children.LEAF);
+            AbstractNode node = new LogFileFolderNode(Children.LEAF, bus);
             node.setDisplayName("Log input");
             node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/go-previous.png");
 
             return new Node[]{node};
         }else if (key == Folders.OUTPUT) {
 
-            AbstractNode node = new AbstractNode(Children.LEAF);
+            AbstractNode node = new AbstractNode(Children.LEAF, Lookups.fixed(bus));
             node.setDisplayName("Log output");
             node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/go-next.png");
 
@@ -98,8 +99,8 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
 
     private class ConnectionFolderNode extends AbstractNode {
 
-        public ConnectionFolderNode(Children children) {
-            super(children);
+        public ConnectionFolderNode(Children children, Bus bus) {
+            super(children, Lookups.fixed(bus));
         }
 
         @Override
@@ -126,8 +127,8 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
 
     private class LogFileFolderNode extends AbstractNode {
 
-        public LogFileFolderNode(Children children) {
-            super(children);
+        public LogFileFolderNode(Children children, Bus bus) {
+            super(children, Lookups.fixed(bus));
         }
 
         @Override
