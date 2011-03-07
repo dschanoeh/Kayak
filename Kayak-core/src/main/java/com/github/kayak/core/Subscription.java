@@ -57,9 +57,11 @@ public class Subscription {
      * @param id identifier
      */
     public void subscribe(int id) {
-        if (!ids.contains(id)) {
-            ids.add(id);
-            changeReceiver.subscribed(id, this);
+        synchronized(this) {
+            if (!ids.contains(id)) {
+                ids.add(id);
+                changeReceiver.subscribed(id, this);
+            }
         }
     }
 
@@ -70,10 +72,12 @@ public class Subscription {
      * @param to
      */
     public void subscribeRange(int from, int to) {
-        for (int i = from; i <= to; i++) {
-            if(!ids.contains(i)) {
-                ids.add(i);
-                changeReceiver.subscribed(i, this);
+        synchronized(this) {
+            for (int i = from; i <= to; i++) {
+                if(!ids.contains(i)) {
+                    ids.add(i);
+                    changeReceiver.subscribed(i, this);
+                }
             }
         }
     }
@@ -82,8 +86,12 @@ public class Subscription {
      * Remove all identifiers from the subscription.
      */
     public void clear() {
-        for (Integer id : ids) {
-            unsubscribe(id);
+        Integer[] identifiers = new Integer[0];
+        synchronized(this) {
+            identifiers = ids.toArray(new Integer[ids.size()]);
+        }
+        for (int i=0;i<identifiers.length;i++) {
+            unsubscribe(identifiers[i]);
         }
     }
 
@@ -92,9 +100,11 @@ public class Subscription {
      * @param id
      */
     public void unsubscribe(int id) {
-        if(ids.contains(id)) {
-            ids.remove(id);
-            changeReceiver.unsubscribed(id, this);
+        synchronized(this) {
+            if(ids.contains(id)) {
+                ids.remove(id);
+                changeReceiver.unsubscribed(id, this);
+            }
         }
     }
 
@@ -105,10 +115,12 @@ public class Subscription {
      * @param to
      */
     public void unsubscribeRange(int from, int to) {
-        for (int i = from; i <= to; i++) {
-            if(ids.contains(i)) {
-                ids.remove(i);
-                changeReceiver.unsubscribed(i, this);
+        synchronized(this) {
+            for (int i = from; i <= to; i++) {
+                if(ids.contains(i)) {
+                    ids.remove(i);
+                    changeReceiver.unsubscribed(i, this);
+                }
             }
         }
     }

@@ -29,13 +29,7 @@
         </repository>
     </repositories>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util</artifactId>
-            <version>RELEASE691</version>
-        </dependency>
-    </dependencies>
+    <dependencies></dependencies>
 
     <build>
         <plugins>
