@@ -53,12 +53,13 @@ public final class RawViewTopComponent extends TopComponent {
         jTextField1 = new javax.swing.JTextField();
         jCheckBox1 = new javax.swing.JCheckBox();
 
-        jTable1.setFont(new java.awt.Font("Terminus", 0, 14));
+        jTable1.setFont(new java.awt.Font("Terminus", 0, 14)); // NOI18N
         jTable1.setModel(model);
-        jTable1.getColumnModel().getColumn(0).setPreferredWidth(60);
-        jTable1.getColumnModel().getColumn(1).setPreferredWidth(25);
+        jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
+        jTable1.getColumnModel().getColumn(1).setPreferredWidth(30);
         jTable1.getColumnModel().getColumn(2).setPreferredWidth(20);
-        jTable1.getColumnModel().getColumn(3).setPreferredWidth(160);
+        jTable1.getColumnModel().getColumn(3).setPreferredWidth(15);
+        jTable1.getColumnModel().getColumn(4).setPreferredWidth(160);
         jScrollPane1.setViewportView(jTable1);
 
         jToolBar1.setRollover(true);
@@ -78,7 +79,7 @@ public final class RawViewTopComponent extends TopComponent {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -86,7 +87,7 @@ public final class RawViewTopComponent extends TopComponent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox1)
                 .addContainerGap())
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

@@ -16,7 +16,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jToolBar1" alignment="0" pref="400" max="32767" attributes="0"/>
+          <Component id="jToolBar1" alignment="0" pref="454" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -25,7 +25,7 @@
               <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="jScrollPane1" alignment="0" pref="400" max="32767" attributes="0"/>
+          <Component id="jScrollPane1" alignment="0" pref="454" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -62,7 +62,7 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jTable1.getColumnModel().getColumn(0).setPreferredWidth(60);&#xd;&#xa;jTable1.getColumnModel().getColumn(1).setPreferredWidth(25);&#xd;&#xa;jTable1.getColumnModel().getColumn(2).setPreferredWidth(20);&#xd;&#xa;jTable1.getColumnModel().getColumn(3).setPreferredWidth(160);"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);&#xd;&#xa;jTable1.getColumnModel().getColumn(1).setPreferredWidth(30);&#xd;&#xa;jTable1.getColumnModel().getColumn(2).setPreferredWidth(20);&#xd;&#xa;jTable1.getColumnModel().getColumn(3).setPreferredWidth(15);&#xd;&#xa;jTable1.getColumnModel().getColumn(4).setPreferredWidth(160);"/>
           </AuxValues>
         </Component>
       </SubComponents>

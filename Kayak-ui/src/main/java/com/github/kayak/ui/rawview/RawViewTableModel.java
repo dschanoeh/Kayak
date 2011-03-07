@@ -32,7 +32,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class RawViewTableModel extends AbstractTableModel implements FrameReceiver {
 
-    private TreeMap<Integer, Frame> data;
+    private TreeMap<Integer, FrameData> data;
     private final Set<Integer> refreshedRows = Collections.synchronizedSet(new HashSet<Integer>());
     private final Set<Integer> addedRows = Collections.synchronizedSet(new HashSet<Integer>());
     private Thread refreshThread;
@@ -71,7 +71,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
     };
 
     public RawViewTableModel() {
-        data = new TreeMap<Integer, Frame>();
+        data = new TreeMap<Integer, FrameData>();
 
         refreshThread = new Thread(refreshRunnable);
         refreshThread.start();
@@ -92,7 +92,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 5;
     }
 
     private int getRowForKey(int key) {
@@ -116,23 +116,36 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
                     java.util.Formatter formatter = new java.util.Formatter();
                     return formatter.format("%.3f",(double) timestamp/1000);
                 case 1:
-                    return "0x" + Integer.toHexString(data.get(keys[rowIndex]).getIdentifier());
+                    return data.get(keys[rowIndex]).getInterval();
                 case 2:
-                    return data.get(keys[rowIndex]).getData().length;
+                    return "0x" + Integer.toHexString(data.get(keys[rowIndex]).getIdentifier());
                 case 3:
-                    byte[] dat = data.get(keys[rowIndex]).getData();
+                    return data.get(keys[rowIndex]).getData().length;
+                case 4:
+                    FrameData frameData = data.get(keys[rowIndex]);
+                    byte[] dat = frameData.getData();
+                    int[] frequency = frameData.getFrequency();
+
                     String datString = com.github.kayak.core.Util.byteArrayToHexString(dat);
                     if (datString.length() % 2 != 0) {
                         datString = "0" + datString;
                     }
 
-                    String res = "";
+                    String res = "<html>";
                     for (int i = 0; i < datString.length(); i += 2) {
+                        res += "<font color=\"#";
+                        String s = Integer.toHexString(frequency[i/2]);
+                        if(s.length() == 1)
+                            s = "0" + s;
+                        res += s + "0000\">";
+
                         res += datString.substring(i, i + 2);
                         if (i != datString.length()) {
                             res += " ";
                         }
+                        res += "</font>";
                     }
+                    res += "</html>";
                     return res;
                 default:
                     return null;
@@ -145,12 +158,11 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
         synchronized(this) {
             int row = getRowForKey(frame.getIdentifier());
             if (row != -1) {
-                Frame old = data.get(frame.getIdentifier());
-                data.remove(frame.getIdentifier());
-                data.put(frame.getIdentifier(), frame);
+                FrameData old = data.get(frame.getIdentifier());
+                old.updateWith(frame);
                 refreshedRows.add(row);
             } else {
-                data.put(frame.getIdentifier(), frame);
+                data.put(frame.getIdentifier(), new FrameData(frame));
                 int newRow = getRowForKey(frame.getIdentifier());
                 addedRows.add(newRow);
             }
@@ -163,10 +175,12 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
             case 0:
                 return String.class;
             case 1:
-                return String.class;
-            case 2:
                 return Integer.class;
+            case 2:
+                return String.class;
             case 3:
+                return Integer.class;
+            case 4:
                 return String.class;
             default:
                 return null;
@@ -177,13 +191,15 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
     public String getColumnName(int column) {
         switch(column) {
             case 0:
-                return "Timestamp";
+                return "Timestamp [s]";
             case 1:
-                return "Identifier";
+                return "Interval [ms]";
             case 2:
-                return "DLC";
+                return "Identifier [hex]";
             case 3:
-                return "Data";
+                return "DLC";
+            case 4:
+                return "Data [hex]";
             default:
                 return null;
         }
