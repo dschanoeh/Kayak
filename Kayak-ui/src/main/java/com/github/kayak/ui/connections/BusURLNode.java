@@ -152,9 +152,29 @@ public class BusURLNode extends AbstractNode {
 
         };
 
+        Property description = new PropertySupport.ReadOnly<String>("Description", String.class, "Description", "Human readable description of the socketcand service") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return url.getDescription();
+            }
+
+        };
+
+        Property hostName = new PropertySupport.ReadOnly<String>("Host name", String.class, "Host name", "The name of the machine the socketcand is running on") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return url.getHostName();
+            }
+
+        };
+
         set.put(host);
         set.put(port);
         set.put(bus);
+        set.put(description);
+        set.put(hostName);
 
         s.put(set);
 
