@@ -172,11 +172,11 @@ public class ConnectionManager {
         return autoDiscovery;
     }
 
-    public HashSet<BusURL> getFavourites() {
+    public Set<BusURL> getFavourites() {
         return favourites;
     }
 
-    public HashSet<BusURL> getRecent() {
+    public Set<BusURL> getRecent() {
         return recent;
     }
 

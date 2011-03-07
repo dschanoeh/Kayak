@@ -6,6 +6,7 @@ package com.github.kayak.ui.connections;
 
 import com.github.kayak.core.BusURL;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;

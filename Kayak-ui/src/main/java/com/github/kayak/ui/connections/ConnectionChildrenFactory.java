@@ -24,7 +24,7 @@ import org.openide.nodes.Node;
 
 /**
  * Creates the children in a connection folder according to the given folder
- * type. The @link{ConnectionManager} is asked for the elements.
+ * type. The {@link ConnectionManager} is asked for the elements.
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ConnectionChildrenFactory extends Children.Keys<BusURL> implements ConnectionListener {

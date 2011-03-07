@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -93,7 +94,6 @@ public class BusURLNode extends AbstractNode {
         @Override
         public void actionPerformed(ActionEvent e) {
             Boolean result = url.checkConnection();
-
             if(!result)
                 setIconBaseWithExtension("org/freedesktop/tango/16x16/emblems/emblem-unreadable.png");
             else
@@ -117,7 +117,8 @@ public class BusURLNode extends AbstractNode {
             return new Action[] { new BookmarkConnectionAction(), new TestConnectionAction() };
         else if(type == Type.CONNECTED)
             return new Action[] {};
-        return new Action[] { new BookmarkConnectionAction(), new DeleteConnectionAction(), new TestConnectionAction() };
+        else
+            return new Action[] { new BookmarkConnectionAction(), new TestConnectionAction() };
     }
 
     @Override
