@@ -20,6 +20,7 @@ package com.github.kayak.ui.projects;
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.BusURL;
+import com.github.kayak.ui.connections.ConnectionManager;
 import com.github.kayak.ui.logfiles.LogFileBusTupel;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -111,8 +112,10 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
 
                     @Override
                     public Transferable paste() throws IOException {
-                        if(url.checkConnection())
+                        if(url.checkConnection()) {
                             bus.setConnection(url);
+                            ConnectionManager.getGlobalConnectionManager().addRecent(url);
+                        }
                         return null;
                     }
                 };
