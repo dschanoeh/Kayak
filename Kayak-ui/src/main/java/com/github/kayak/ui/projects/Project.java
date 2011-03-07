@@ -46,6 +46,7 @@ public class Project {
     public void addBus(Bus b) {
         busses.add(b);
         b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
+        TimeSourceManager.getGlobalTimeSource().register(b);
         notifyListeners();
     }
 
