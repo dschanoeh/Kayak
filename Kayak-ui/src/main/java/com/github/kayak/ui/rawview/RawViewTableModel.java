@@ -20,6 +20,9 @@ package com.github.kayak.ui.rawview;
 
 import com.github.kayak.core.Frame;
 import com.github.kayak.core.FrameReceiver;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeMap;
 import javax.swing.table.AbstractTableModel;
 
@@ -28,10 +31,50 @@ import javax.swing.table.AbstractTableModel;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class RawViewTableModel extends AbstractTableModel implements FrameReceiver {
-    TreeMap<Integer, Frame> data;
+
+    private TreeMap<Integer, Frame> data;
+    private final Set<Integer> refreshedRows = Collections.synchronizedSet(new HashSet<Integer>());
+    private final Set<Integer> addedRows = Collections.synchronizedSet(new HashSet<Integer>());
+    private Thread refreshThread;
+
+    private Runnable refreshRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            while (true) {
+                if (!refreshedRows.isEmpty()) {
+                    synchronized (refreshedRows) {
+                        for (Integer row : refreshedRows) {
+                            fireTableRowsUpdated(row, row);
+                        }
+                        refreshedRows.clear();
+                    }
+                }
+
+                if (!addedRows.isEmpty()) {
+                    synchronized (addedRows) {
+                        for (Integer row : addedRows) {
+                            fireTableRowsInserted(row, row);
+                        }
+                        addedRows.clear();
+                    }
+                }
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    return;
+                }
+            }
+        }
+
+    };
 
     public RawViewTableModel() {
         data = new TreeMap<Integer, Frame>();
+
+        refreshThread = new Thread(refreshRunnable);
+        refreshThread.start();
     }
 
     public void clear() {
@@ -103,11 +146,11 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
                 Frame old = data.get(frame.getIdentifier());
                 data.remove(frame.getIdentifier());
                 data.put(frame.getIdentifier(), frame);
-                fireTableRowsUpdated(row, row);
+                refreshedRows.add(row);
             } else {
                 data.put(frame.getIdentifier(), frame);
                 int newRow = getRowForKey(frame.getIdentifier());
-                fireTableRowsInserted(newRow, newRow);
+                addedRows.add(newRow);
             }
         }
     }

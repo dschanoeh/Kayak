@@ -53,7 +53,7 @@ public final class RawViewTopComponent extends TopComponent {
         jTextField1 = new javax.swing.JTextField();
         jCheckBox1 = new javax.swing.JCheckBox();
 
-        jTable1.setFont(new java.awt.Font("Terminus", 0, 14)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Terminus", 0, 14));
         jTable1.setModel(model);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(60);
         jTable1.getColumnModel().getColumn(1).setPreferredWidth(25);
@@ -103,30 +103,26 @@ public final class RawViewTopComponent extends TopComponent {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        String filterString = jTextField1.getText();
 
         if(jCheckBox1.isSelected()) {
-            subscription.clear();
             subscription.setSubscribeAll(Boolean.FALSE);
-            
-
+            model.clear();
+            String filterString = jTextField1.getText();
             String[] idStrings = filterString.split("\\s");
 
-            for(int i=0;i<idStrings.length;i++) {
+            for (int i = 0; i < idStrings.length; i++) {
                 try {
-                    if(idStrings[i].startsWith("0x")) {
+                    if (idStrings[i].matches("0x[a-fA-F0-9]+")) {
                         subscription.subscribe(Integer.parseInt(idStrings[i].substring(2), 16));
-                    } else {
+                    } else if (idStrings[i].matches("[a-fA-F0-9]+")) {
                         subscription.subscribe(Integer.parseInt(idStrings[i], 16));
                     }
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     logger.log(Level.WARNING, "Error while parsing filter string\n");
                 }
             }
-
-            model.clear();
-
         } else {
+            subscription.clear();
             subscription.setSubscribeAll(Boolean.TRUE);
         }
     }//GEN-LAST:event_jCheckBox1ActionPerformed
