@@ -149,8 +149,11 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
                 logger.log(Level.WARNING, "Interrupted exception. Shutting down connection thread", ex);
                 return;
             } catch (IOException ex) {
-                logger.log(Level.WARNING, "IO exception.");
-                return;
+                /*
+                 * A read from the socket may time out if there are very few frames.
+                 * this will cause an IOException. This is ok so we will ignore these
+                 * exceptions
+                 */
             }
         }
     }
