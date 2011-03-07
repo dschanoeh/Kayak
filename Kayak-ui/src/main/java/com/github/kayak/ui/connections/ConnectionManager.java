@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -139,7 +140,9 @@ public class ConnectionManager {
                                 }
                             }
                         } catch (Exception ex) {
-                            logger.log(Level.WARNING, "Malformed discovery beacon");
+                            if(!(ex instanceof SocketTimeoutException)) {
+                                logger.log(Level.WARNING, "Malformed discovery beacon");
+                            }
                         }
 
                         /* Check if old beacons need to be removed from the list */
