@@ -36,6 +36,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
     private final Set<Integer> refreshedRows = Collections.synchronizedSet(new HashSet<Integer>());
     private final Set<Integer> addedRows = Collections.synchronizedSet(new HashSet<Integer>());
     private Thread refreshThread;
+    private boolean colorize = false;
 
     private Runnable refreshRunnable = new Runnable() {
 
@@ -61,7 +62,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
                 }
 
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(200);
                 } catch (InterruptedException ex) {
                     return;
                 }
@@ -69,6 +70,14 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
         }
 
     };
+
+    public boolean isColorized() {
+        return colorize;
+    }
+
+    public void setColorized(boolean colorize) {
+        this.colorize = colorize;
+    }
 
     public RawViewTableModel() {
         data = new TreeMap<Integer, FrameData>();
@@ -131,22 +140,33 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
                         datString = "0" + datString;
                     }
 
-                    String res = "<html>";
-                    for (int i = 0; i < datString.length(); i += 2) {
-                        res += "<font color=\"#";
-                        String s = Integer.toHexString(frequency[i/2]);
-                        if(s.length() == 1)
-                            s = "0" + s;
-                        res += s + "0000\">";
+                    if(colorize) {
+                        String res = "<html>";
+                        for (int i = 0; i < datString.length(); i += 2) {
+                            res += "<font color=\"#";
+                            String s = Integer.toHexString(frequency[i/2]);
+                            if(s.length() == 1)
+                                s = "0" + s;
+                            res += s + "0000\">";
 
-                        res += datString.substring(i, i + 2);
-                        if (i != datString.length()) {
-                            res += " ";
+                            res += datString.substring(i, i + 2);
+                            if (i != datString.length()) {
+                                res += " ";
+                            }
+                            res += "</font>";
                         }
-                        res += "</font>";
+                        res += "</html>";
+                        return res;
+                    } else {
+                        String res = "";
+                        for (int i = 0; i < datString.length(); i += 2) {
+                            res += datString.substring(i, i + 2);
+                            if (i != datString.length()) {
+                                res += " ";
+                            }
+                        }
+                        return res;
                     }
-                    res += "</html>";
-                    return res;
                 default:
                     return null;
             }
