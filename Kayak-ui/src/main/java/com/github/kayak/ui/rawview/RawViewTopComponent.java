@@ -55,10 +55,11 @@ public final class RawViewTopComponent extends TopComponent {
 
         jTable1.setFont(new java.awt.Font("Terminus", 0, 14)); // NOI18N
         jTable1.setModel(model);
-        jTable1.getColumnModel().getColumn(0).setPreferredWidth(60);
-        jTable1.getColumnModel().getColumn(1).setPreferredWidth(25);
+        jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
+        jTable1.getColumnModel().getColumn(1).setPreferredWidth(30);
         jTable1.getColumnModel().getColumn(2).setPreferredWidth(20);
-        jTable1.getColumnModel().getColumn(3).setPreferredWidth(160);
+        jTable1.getColumnModel().getColumn(3).setPreferredWidth(15);
+        jTable1.getColumnModel().getColumn(4).setPreferredWidth(160);
         jScrollPane1.setViewportView(jTable1);
 
         jToolBar1.setRollover(true);
@@ -78,7 +79,7 @@ public final class RawViewTopComponent extends TopComponent {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -86,7 +87,7 @@ public final class RawViewTopComponent extends TopComponent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox1)
                 .addContainerGap())
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -103,30 +104,26 @@ public final class RawViewTopComponent extends TopComponent {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        String filterString = jTextField1.getText();
 
         if(jCheckBox1.isSelected()) {
-            subscription.clear();
             subscription.setSubscribeAll(Boolean.FALSE);
-            
-
+            model.clear();
+            String filterString = jTextField1.getText();
             String[] idStrings = filterString.split("\\s");
 
-            for(int i=0;i<idStrings.length;i++) {
+            for (int i = 0; i < idStrings.length; i++) {
                 try {
-                    if(idStrings[i].startsWith("0x")) {
+                    if (idStrings[i].matches("0x[a-fA-F0-9]+")) {
                         subscription.subscribe(Integer.parseInt(idStrings[i].substring(2), 16));
-                    } else {
+                    } else if (idStrings[i].matches("[a-fA-F0-9]+")) {
                         subscription.subscribe(Integer.parseInt(idStrings[i], 16));
                     }
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     logger.log(Level.WARNING, "Error while parsing filter string\n");
                 }
             }
-
-            model.clear();
-
         } else {
+            subscription.clear();
             subscription.setSubscribeAll(Boolean.TRUE);
         }
     }//GEN-LAST:event_jCheckBox1ActionPerformed

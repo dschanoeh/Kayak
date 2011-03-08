@@ -70,9 +70,8 @@ public class ConnectionNodeFactory extends ChildFactory {
                 default:
                     return null;
             }
-        } else if(key instanceof BusURL) {
-            
         }
+        
         return null;
     }
 

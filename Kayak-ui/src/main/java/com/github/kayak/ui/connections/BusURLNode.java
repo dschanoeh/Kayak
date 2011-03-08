@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -93,7 +94,6 @@ public class BusURLNode extends AbstractNode {
         @Override
         public void actionPerformed(ActionEvent e) {
             Boolean result = url.checkConnection();
-
             if(!result)
                 setIconBaseWithExtension("org/freedesktop/tango/16x16/emblems/emblem-unreadable.png");
             else
@@ -117,7 +117,8 @@ public class BusURLNode extends AbstractNode {
             return new Action[] { new BookmarkConnectionAction(), new TestConnectionAction() };
         else if(type == Type.CONNECTED)
             return new Action[] {};
-        return new Action[] { new BookmarkConnectionAction(), new DeleteConnectionAction(), new TestConnectionAction() };
+        else
+            return new Action[] { new BookmarkConnectionAction(), new TestConnectionAction() };
     }
 
     @Override
@@ -147,7 +148,25 @@ public class BusURLNode extends AbstractNode {
 
             @Override
             public String getValue() throws IllegalAccessException, InvocationTargetException {
-                return url.getName();
+                return url.getBus();
+            }
+
+        };
+
+        Property description = new PropertySupport.ReadOnly<String>("Description", String.class, "Description", "Human readable description of the socketcand service") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return url.getDescription();
+            }
+
+        };
+
+        Property hostName = new PropertySupport.ReadOnly<String>("Host name", String.class, "Host name", "The name of the machine the socketcand is running on") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return url.getHostName();
             }
 
         };
@@ -155,6 +174,8 @@ public class BusURLNode extends AbstractNode {
         set.put(host);
         set.put(port);
         set.put(bus);
+        set.put(description);
+        set.put(hostName);
 
         s.put(set);
 

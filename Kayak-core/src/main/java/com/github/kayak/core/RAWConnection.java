@@ -48,7 +48,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
     public RAWConnection(BusURL url) {
         this.host = url.getHost();
         this.port = url.getPort();
-        this.busName = url.getName();
+        this.busName = url.getBus();
 
     }
 
@@ -130,7 +130,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
                 if (fields[1].equals("frame")) {
                     try {
                         String dataString = "";
-                        for (int i = 3; i < fields.length; i++) {
+                        for (int i = 3; i < fields.length-1; i++) {
                             dataString += fields[i];
                         }
                         Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(dataString));
@@ -149,8 +149,11 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
                 logger.log(Level.WARNING, "Interrupted exception. Shutting down connection thread", ex);
                 return;
             } catch (IOException ex) {
-                logger.log(Level.WARNING, "IO exception.");
-                return;
+                /*
+                 * A read from the socket may time out if there are very few frames.
+                 * this will cause an IOException. This is ok so we will ignore these
+                 * exceptions
+                 */
             }
         }
     }

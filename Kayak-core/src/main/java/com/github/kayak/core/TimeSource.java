@@ -30,12 +30,11 @@ import java.util.ArrayList;
  */
 public class TimeSource {
 
-    private static final int MODE_STOP = 0;
-    private static final int MODE_PLAY = 1;
-    private static final int MODE_PAUSE = 2;
+    public static enum Mode { STOP, PLAY, PAUSE };
+
     private long reference;
     private long pauseReference;
-    private int mode = MODE_STOP;
+    private Mode mode = Mode.STOP;
     private ArrayList<TimeEventReceiver> receivers;
     
     public TimeSource() {
@@ -54,13 +53,13 @@ public class TimeSource {
      */
     public long getTime() {
         switch(mode) {
-            case MODE_PLAY:
+            case PLAY:
                 return System.currentTimeMillis() - reference;
             
-            case MODE_STOP:
+            case STOP:
                 return 0;
                     
-            case MODE_PAUSE:
+            case PAUSE:
                 return pauseReference;
                     
             default:
@@ -84,11 +83,16 @@ public class TimeSource {
      * If the TimeSource is not already running starts the time. If the
      */
     public void play() {
-        mode = MODE_PLAY;
-        
-        for(TimeEventReceiver receiver : receivers) {
-            if(receiver != null)
-                receiver.played();
+        if(mode == Mode.PLAY)
+            return;
+        else {
+            mode = Mode.PLAY;
+            reference = System.currentTimeMillis();
+
+            for(TimeEventReceiver receiver : receivers) {
+                if(receiver != null)
+                    receiver.played();
+            }
         }
     }
     
@@ -96,7 +100,7 @@ public class TimeSource {
      * Pauses the time.
      */
     public void pause() {
-        mode = MODE_PAUSE;
+        mode = Mode.PAUSE;
         
         pauseReference = System.currentTimeMillis() - reference;
         
@@ -107,7 +111,7 @@ public class TimeSource {
     }
     
     public void stop() {
-        mode = MODE_STOP;
+        mode = Mode.STOP;
         
         for(TimeEventReceiver receiver : receivers) {
             if(receiver != null)
