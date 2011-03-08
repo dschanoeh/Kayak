@@ -80,14 +80,19 @@ public class TimeSource {
     }
     
     /**
-     * If the TimeSource is not already running starts the time. If the
+     * If the TimeSource is not already running start the time. If the
+     * TimeSource was paused before continue with the paused Time.
      */
     public void play() {
         if(mode == Mode.PLAY)
             return;
         else {
+            if(mode == Mode.PAUSE)
+                reference = System.currentTimeMillis() - pauseReference;
+            else
+                reference = System.currentTimeMillis();
+
             mode = Mode.PLAY;
-            reference = System.currentTimeMillis();
 
             for(TimeEventReceiver receiver : receivers) {
                 if(receiver != null)
