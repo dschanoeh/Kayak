@@ -57,6 +57,7 @@
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
                         <cluster>kayak</cluster>
+                        <etcConfFile>${basedir}/kayak.conf</etcConfFile>
                     </configuration>
                 </plugin>
 
