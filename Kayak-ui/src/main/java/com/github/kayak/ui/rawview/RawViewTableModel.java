@@ -44,10 +44,26 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
         public void run() {
             while (true) {
                 if (!refreshedRows.isEmpty()) {
+                    Integer[] rows;
+
                     synchronized (refreshedRows) {
-                        for (Integer row : refreshedRows) {
-                            fireTableRowsUpdated(row, row);
+                        rows = refreshedRows.toArray(new Integer[refreshedRows.size()]);
+                    }
+
+                    java.util.Arrays.sort(rows);
+
+                    for (int i = 0; i < rows.length; i++) {
+                        int sequenceLength = 0;
+                        for (; sequenceLength < rows.length - i - 1; sequenceLength++) {
+                            if (rows[i + sequenceLength + 1] != rows[i + 1] + sequenceLength) {
+                                break;
+                            }
                         }
+                        fireTableRowsUpdated(rows[i], rows[i + sequenceLength]);
+                        i += sequenceLength;
+                    }
+                    
+                    synchronized (refreshedRows) {
                         refreshedRows.clear();
                     }
                 }

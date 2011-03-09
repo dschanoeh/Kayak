@@ -94,6 +94,7 @@ public final class RawViewTopComponent extends TopComponent {
 
         jTable1.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
         jTable1.setModel(model);
+        jTable1.setDoubleBuffered(true);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
         jTable1.getColumnModel().getColumn(1).setPreferredWidth(30);
         jTable1.getColumnModel().getColumn(2).setPreferredWidth(20);
