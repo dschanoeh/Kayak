@@ -85,6 +85,12 @@
             <artifactId>tango-icon-theme</artifactId>
             <version>0.8.90</version>
         </dependency>
+        <dependency>
+            <artifactId>org-openide-text</artifactId>
+            <groupId>org.netbeans.api</groupId>
+            <type>jar</type>
+            <version>RELEASE691</version>
+        </dependency>
     </dependencies>
 
     <build>

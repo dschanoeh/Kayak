@@ -2,53 +2,33 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.kayak.ui.connections;
+package com.github.kayak.ui.descriptions;
 
-import com.github.kayak.core.BusURL;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-import org.openide.util.ImageUtilities;
+//import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.explorer.ExplorerManager;
-import org.openide.explorer.ExplorerUtils;
-import org.openide.nodes.AbstractNode;
-import org.openide.nodes.Children;
-
 
 /**
  * Top component which displays something.
  */
-@ConvertAsProperties(dtd = "-//com.github.kayak.ui//Connections//EN",
+@ConvertAsProperties(dtd = "-//com.github.kayak.ui.descriptions//Descriptions//EN",
 autostore = false)
-public final class ConnectionsTopComponent extends TopComponent implements ExplorerManager.Provider {
+public final class DescriptionsTopComponent extends TopComponent {
 
-    private static ConnectionsTopComponent instance;
+    private static DescriptionsTopComponent instance;
     /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "com/github/kayak/ui/network-wireless.png";
-    private static final String PREFERRED_ID = "ConnectionsTopComponent";
+//    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
+    private static final String PREFERRED_ID = "DescriptionsTopComponent";
 
-    private ExplorerManager manager = new ExplorerManager();
-
-    private ConnectionManager connectionManager;
-
-    public ConnectionsTopComponent() {
+    public DescriptionsTopComponent() {
         initComponents();
-        setName(NbBundle.getMessage(ConnectionsTopComponent.class, "CTL_ConnectionsTopComponent"));
-        setToolTipText(NbBundle.getMessage(ConnectionsTopComponent.class, "HINT_ConnectionsTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        setName(NbBundle.getMessage(DescriptionsTopComponent.class, "CTL_DescriptionsTopComponent"));
+        setToolTipText(NbBundle.getMessage(DescriptionsTopComponent.class, "HINT_DescriptionsTopComponent"));
+//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
-       
-        connectionManager = ConnectionManager.getGlobalConnectionManager();
-        ConnectionNodeFactory factory = new ConnectionNodeFactory();
-
-        AbstractNode rootNode = new AbstractNode(Children.create(factory, true));
-
-        manager.setRootContext(rootNode);
-        associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
     }
 
     /** This method is called from within the constructor to
@@ -59,51 +39,46 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        beanTreeView1 = new org.openide.explorer.view.BeanTreeView();
-
-        beanTreeView1.setRootVisible(false);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(beanTreeView1, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+            .addGap(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(beanTreeView1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)
+            .addGap(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.openide.explorer.view.BeanTreeView beanTreeView1;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
-    public static synchronized ConnectionsTopComponent getDefault() {
+    public static synchronized DescriptionsTopComponent getDefault() {
         if (instance == null) {
-            instance = new ConnectionsTopComponent();
+            instance = new DescriptionsTopComponent();
         }
         return instance;
     }
 
     /**
-     * Obtain the ConnectionsTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the DescriptionsTopComponent instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized ConnectionsTopComponent findInstance() {
+    public static synchronized DescriptionsTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
-            Logger.getLogger(ConnectionsTopComponent.class.getName()).warning(
+            Logger.getLogger(DescriptionsTopComponent.class.getName()).warning(
                     "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
             return getDefault();
         }
-        if (win instanceof ConnectionsTopComponent) {
-            return (ConnectionsTopComponent) win;
+        if (win instanceof DescriptionsTopComponent) {
+            return (DescriptionsTopComponent) win;
         }
-        Logger.getLogger(ConnectionsTopComponent.class.getName()).warning(
+        Logger.getLogger(DescriptionsTopComponent.class.getName()).warning(
                 "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior.");
         return getDefault();
@@ -116,12 +91,12 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
 
     @Override
     public void componentOpened() {
-        
+        // TODO add custom code on component opening
     }
 
     @Override
     public void componentClosed() {
-        
+        // TODO add custom code on component closing
     }
 
     void writeProperties(java.util.Properties p) {
@@ -147,10 +122,5 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
     @Override
     protected String preferredID() {
         return PREFERRED_ID;
-    }
-
-    @Override
-    public ExplorerManager getExplorerManager() {
-        return manager;
     }
 }

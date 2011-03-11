@@ -49,40 +49,13 @@ public class BusURLNode extends AbstractNode {
         return type;
     }
 
-    @Override
-    public Transferable drag() throws IOException {
+    public BusURL getURL() {
         return url;
     }
 
-
-    private class BookmarkConnectionAction extends AbstractAction {
-
-        public BookmarkConnectionAction() {
-            putValue(NAME, "Bookmark");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if(type == BusURLNode.Type.DISCOVERY || type == BusURLNode.Type.RECENT) {
-                manager.addFavourite(url);
-            }
-        }
-    }
-
-    private class DeleteConnectionAction extends AbstractAction {
-
-        public DeleteConnectionAction() {
-            putValue(NAME, "Delete");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if(type == BusURLNode.Type.FAVOURITE) {
-                manager.removeFavourite(url);
-            } else if(type == BusURLNode.Type.RECENT) {
-                manager.removeRecent(url);
-            }
-        }
+    @Override
+    public Transferable drag() throws IOException {
+        return url;
     }
 
     private class TestConnectionAction extends AbstractAction {
@@ -112,13 +85,13 @@ public class BusURLNode extends AbstractNode {
     @Override
     public Action[] getActions(boolean popup) {
         if(type == Type.FAVOURITE)
-            return new Action[] { new DeleteConnectionAction(), new TestConnectionAction() };
+            return new Action[] { new DeleteConnectionAction(this), new TestConnectionAction() };
         else if(type == Type.DISCOVERY)
-            return new Action[] { new BookmarkConnectionAction(), new TestConnectionAction() };
+            return new Action[] { new BookmarkConnectionAction(this), new TestConnectionAction() };
         else if(type == Type.CONNECTED)
             return new Action[] {};
         else
-            return new Action[] { new BookmarkConnectionAction(), new TestConnectionAction() };
+            return new Action[] { new BookmarkConnectionAction(this), new TestConnectionAction() };
     }
 
     @Override

@@ -56,11 +56,45 @@
                 <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png"/>
             </file>
         </folder>
+        <folder name="Connections">
+            <file name="com-github-kayak-ui-connections-BookmarkConnectionAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.connections.Bundle#CTL_BookmarkConnection"/>
+                <attr name="injectable" stringvalue="com.github.kayak.ui.connections.BookmarkConnectionAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="com.github.kayak.ui.connections.BusURLNode"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/bookmark-new.png"/>
+            </file>
+            <file name="com-github-kayak-ui-connections-DeleteConnectionAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.connections.Bundle#CTL_DeleteConnectionAction"/>
+                <attr name="injectable" stringvalue="com.github.kayak.ui.connections.DeleteConnectionAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="com.github.kayak.ui.connections.BusURLNode"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/edit-delete.png"/>
+            </file>
+            <file name="com-github-kayak-ui-connections-NewConnectionAction.instance">
+                <attr name="delegate" newvalue="com.github.kayak.ui.connections.NewConnectionAction"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.connections.Bundle#CTL_NewConnectionAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/document-new.png"/>
+            </file>
+        </folder>
         <folder name="Window">
             <file name="com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.busconfiguration.BusConfigurationTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.busconfiguration.Bundle#CTL_BusConfigurationAction"/>
                 <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/categories/preferences-desktop.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+            <file name="com-github-kayak-ui-descriptions-DescriptionsAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.ui.descriptions.DescriptionsTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.descriptions.Bundle#CTL_DescriptionsAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
             <file name="com-github-kayak-ui-logfiles-LogFilesAction.instance">
@@ -114,6 +148,20 @@
                 <attr name="position" intvalue="0"/>
             </file>
         </folder>
+        <folder name="Connections">
+            <file name="com-github-kayak-ui-connections-NewConnectionAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Connections/com-github-kayak-ui-connections-NewConnectionAction.instance"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="com-github-kayak-ui-connections-BookmarkConnectionAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Connections/com-github-kayak-ui-connections-BookmarkConnectionAction.instance"/>
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="com-github-kayak-ui-connections-DeleteConnectionAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Connections/com-github-kayak-ui-connections-DeleteConnectionAction.instance"/>
+                <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
     </folder>
 
     <folder name="Menu">
@@ -148,6 +196,9 @@
             <file name="BusConfigurationAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance"/>
             </file>
+            <file name="DescriptionsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-descriptions-DescriptionsAction.instance"/>
+            </file>
             <file name="LogFilesAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-logfiles-LogFilesAction.instance"/>
             </file>
@@ -161,6 +212,17 @@
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-connections-ConnectionsAction.instance"/>
             </file>
         </folder>
+        <folder name="Connections">
+            <file name="com-github-kayak-ui-connections-NewConnectionAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Connections/com-github-kayak-ui-connections-NewConnectionAction.instance"/>
+            </file>
+            <file name="com-github-kayak-ui-connections-DeleteConnectionAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Connections/com-github-kayak-ui-connections-DeleteConnectionAction.instance"/>
+            </file>
+            <file name="com-github-kayak-ui-connections-BookmarkConnection.shadow">
+                <attr name="originalFile" stringvalue="Actions/Connections/com-github-kayak-ui-connections-BookmarkConnectionAction.instance"/>
+            </file>
+        </folder>
     </folder>
     <folder name="Shortcuts">
         <file name="D-N.shadow">
@@ -170,6 +232,7 @@
     <folder name="Windows2">
         <folder name="Components">
             <file name="BusConfigurationTopComponent.settings" url="BusConfigurationTopComponentSettings.xml"/>
+            <file name="DescriptionsTopComponent.settings" url="DescriptionsTopComponentSettings.xml"/>
             <file name="LogFilesTopComponent.settings" url="LogFilesTopComponentSettings.xml"/>
             <file name="ProjectsTopComponent.settings" url="ProjectsTopComponentSettings.xml"/>
             <file name="RawViewTopComponent.settings" url="RawViewTopComponentSettings.xml"/>
@@ -185,6 +248,7 @@
             </folder>
             <folder name="properties">
                 <file name="ConnectionsTopComponent.wstcref" url="ConnectionsTopComponentWstcref.xml"/>
+                <file name="DescriptionsTopComponent.wstcref" url="DescriptionsTopComponentWstcref.xml"/>
                 <file name="LogFilesTopComponent.wstcref" url="LogFilesTopComponentWstcref.xml"/>
             </folder>
         </folder>
