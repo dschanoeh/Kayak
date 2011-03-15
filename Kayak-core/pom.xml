@@ -41,6 +41,7 @@
                 <configuration>
                     <publicPackages>
                         <publicPackage>com.github.kayak.core</publicPackage>
+                        <publicPackage>com.github.kayak.core.description</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>
