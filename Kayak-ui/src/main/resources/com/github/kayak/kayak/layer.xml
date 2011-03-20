@@ -55,6 +55,17 @@
                 <attr name="type" stringvalue="com.github.kayak.core.Bus"/>
                 <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png"/>
             </file>
+
+            <file name="com-github-kayak-ui-statistics-OpenBusStatisticsAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.statistics.Bundle#CTL_BusStatisticsAction"/>
+                <attr name="injectable" stringvalue="com.github.kayak.ui.statistics.OpenBusStatisticsAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="com.github.kayak.core.Bus"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png"/>
+            </file>
         </folder>
         <folder name="Connections">
             <file name="com-github-kayak-ui-connections-BookmarkConnectionAction.instance">
@@ -145,7 +156,11 @@
         <folder name="Bus views">
             <file name="com-github-kayak-ui-rawview-OpenRawViewAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/BusViews/com-github-kayak-ui-rawview-OpenRawViewAction.instance"/>
-                <attr name="position" intvalue="0"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="com-github-kayak-ui-connections-OpenBusStatisticsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/BusViews/com-github-kayak-ui-statistics-OpenBusStatisticsAction.instance"/>
+                <attr name="position" intvalue="200"/>
             </file>
         </folder>
         <folder name="Connections">
@@ -191,6 +206,10 @@
                 <attr name="originalFile" stringvalue="Actions/BusViews/com-github-kayak-ui-rawview-OpenRawViewAction.instance"/>
                 <attr name="position" intvalue="100"/>
             </file>
+            <file name="com-github-kayak-ui-statistics-OpenBusStatisticsAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/BusViews/com-github-kayak-ui-statistics-OpenBusStatisticsAction.instance"/>
+                <attr name="position" intvalue="200"/>
+            </file>
         </folder>
         <folder name="Window">
             <file name="BusConfigurationAction.shadow">
@@ -232,6 +251,7 @@
     <folder name="Windows2">
         <folder name="Components">
             <file name="BusConfigurationTopComponent.settings" url="BusConfigurationTopComponentSettings.xml"/>
+            <file name="BusStatisticsTopComponent.settings" url="BusStatisticsTopComponentSettings.xml"/>
             <file name="DescriptionsTopComponent.settings" url="DescriptionsTopComponentSettings.xml"/>
             <file name="LogFilesTopComponent.settings" url="LogFilesTopComponentSettings.xml"/>
             <file name="ProjectsTopComponent.settings" url="ProjectsTopComponentSettings.xml"/>
@@ -247,6 +267,7 @@
                 <file name="ProjectsTopComponent.wstcref" url="ProjectsTopComponentWstcref.xml"/>
             </folder>
             <folder name="properties">
+                <file name="BusStatisticsTopComponent.wstcref" url="BusStatisticsTopComponentWstcref.xml"/>
                 <file name="ConnectionsTopComponent.wstcref" url="ConnectionsTopComponentWstcref.xml"/>
                 <file name="DescriptionsTopComponent.wstcref" url="DescriptionsTopComponentWstcref.xml"/>
                 <file name="LogFilesTopComponent.wstcref" url="LogFilesTopComponentWstcref.xml"/>

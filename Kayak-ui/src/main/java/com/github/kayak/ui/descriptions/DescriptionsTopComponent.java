@@ -10,18 +10,20 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 //import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.explorer.ExplorerManager;
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.descriptions//Descriptions//EN",
 autostore = false)
-public final class DescriptionsTopComponent extends TopComponent {
+public final class DescriptionsTopComponent extends TopComponent implements ExplorerManager.Provider {
 
     private static DescriptionsTopComponent instance;
     /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
     private static final String PREFERRED_ID = "DescriptionsTopComponent";
+    ExplorerManager manager = new ExplorerManager();
 
     public DescriptionsTopComponent() {
         initComponents();
@@ -39,19 +41,24 @@ public final class DescriptionsTopComponent extends TopComponent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        beanTreeView1 = new org.openide.explorer.view.BeanTreeView();
+
+        beanTreeView1.setRootVisible(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addComponent(beanTreeView1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addComponent(beanTreeView1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.openide.explorer.view.BeanTreeView beanTreeView1;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,
@@ -122,5 +129,10 @@ public final class DescriptionsTopComponent extends TopComponent {
     @Override
     protected String preferredID() {
         return PREFERRED_ID;
+    }
+
+    @Override
+    public ExplorerManager getExplorerManager() {
+        return manager;
     }
 }
