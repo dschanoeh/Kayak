@@ -39,11 +39,23 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
     private TimeSource timeSource;
     private RAWConnection rawConnection;
     private BCMConnection bcmConnection;
+    private ControlConnection controlConnection;
     private String name;
     private BusURL url;
     private ArrayList<BusChangeListener> listeners;
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
     private HashSet<Integer> subscribedIDs;
+    private ArrayList<StatisticsReceiver> statisticsReceivers;
+
+    private StatisticsReceiver statisticsReceiver = new StatisticsReceiver() {
+
+        @Override
+        public void statisticsUpdated(long rxBytes, long rxPackets, long tBytes, long tPackets) {
+            for(StatisticsReceiver s : statisticsReceivers) {
+                s.statisticsUpdated(rxBytes, rxPackets, tBytes, tPackets);
+            }
+        }
+    };
 
     public BusURL getConnection() {
         return url;
@@ -51,6 +63,33 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
 
     public String getName() {
         return name;
+    }
+
+    public void registerStatisticsReceiver(StatisticsReceiver receiver) {
+        if(!statisticsReceivers.contains(receiver))
+            statisticsReceivers.add(receiver);
+    }
+
+    public void removeStatisticsReceiver(StatisticsReceiver receiver) {
+            statisticsReceivers.remove(receiver);
+    }
+
+    public void enableStatistics(int interval) {
+        if(controlConnection == null && url != null) {
+            controlConnection = new ControlConnection(url);
+            controlConnection.open();
+        } else if(!controlConnection.isConnected()) {
+            controlConnection.open();
+        }
+
+        controlConnection.setStatisticsReceiver(statisticsReceiver);
+        controlConnection.requestStatistics(interval);
+    }
+
+    public void disableStatistics() {
+        if(controlConnection != null) {
+            controlConnection.disableStatistics();
+        }
     }
 
     public void setName(String name) {
@@ -97,6 +136,7 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         subscriptionsBCM = new ArrayList<Subscription>();
         listeners = new ArrayList<BusChangeListener>();
         subscribedIDs = new HashSet<Integer>();
+        statisticsReceivers = new ArrayList<StatisticsReceiver>();
     }
 
     @Override

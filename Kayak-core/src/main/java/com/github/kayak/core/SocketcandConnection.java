@@ -29,7 +29,7 @@ import java.net.SocketTimeoutException;
  *
  */
 public abstract class SocketcandConnection {
-	private static final int BUFFER_SIZE = 128;
+	private static final int BUFFER_SIZE = 512;
 	private char[] buffer = new char[BUFFER_SIZE];
 	private int bufferPosition=0;
 	protected String busName;

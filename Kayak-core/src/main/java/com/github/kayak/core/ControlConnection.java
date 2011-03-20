@@ -1,20 +1,8 @@
-/**
- * 	This file is part of Kayak.
- *
- *	Kayak is free software: you can redistribute it and/or modify
- *	it under the terms of the GNU Lesser General Public License as published by
- *	the Free Software Foundation, either version 3 of the License, or
- *	(at your option) any later version.
- *
- *	Kayak is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
- *
- *	You should have received a copy of the GNU Lesser General Public License
- *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
- *
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
+
 package com.github.kayak.core;
 
 import java.io.IOException;
@@ -26,26 +14,29 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A RAWConnection extends the {@link SocketcandConnection} and adds methods
- * that bring a socketcand in RAW mode. Frames are delivered asynchronously
- * through an own thread.
- * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  *
+ * @author dschanoeh
  */
-public class RAWConnection extends SocketcandConnection implements Runnable {
+public class ControlConnection extends SocketcandConnection implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(RAWConnection.class.getName());
+    private static final Logger logger = Logger.getLogger(ControlConnection.class.getName());
+
     private Socket socket;
     private PrintWriter output;
     private Thread thread;
     private InputStreamReader input;
     private Boolean connected = false;
+    private StatisticsReceiver statisticsReceiver;
 
-    public Boolean isConnected() {
-        return connected;
+    public void setStatisticsReceiver(StatisticsReceiver receiver) {
+        this.statisticsReceiver = receiver;
     }
 
-    public RAWConnection(BusURL url) {
+    public StatisticsReceiver getStatisticsReceiver() {
+        return statisticsReceiver;
+    }
+
+    public ControlConnection(BusURL url) {
         this.host = url.getHost();
         this.port = url.getPort();
         this.busName = url.getBus();
@@ -77,12 +68,12 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
                 logger.log(Level.SEVERE, "Could not open bus");
             }
 
-            output.print("< rawmode >");
+            output.print("< controlmode >");
             output.flush();
 
             ret = getElement(input);
             if (!ret.equals("< ok >")) {
-                logger.log(Level.SEVERE, "Could not switch to RAW mode.");
+                logger.log(Level.SEVERE, "Could not switch to control mode.");
             }
             socket.setSoTimeout(100);
 
@@ -90,10 +81,6 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
             logger.log(Level.SEVERE, "IOException while creating the socket.", e);
             return;
         }
-
-        /* Start worker thread for frame reception */
-        thread = new Thread(this);
-        thread.start();
 
         connected = true;
     }
@@ -113,6 +100,34 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
 
         connected = false;
     }
+    
+    public Boolean isConnected() {
+        return connected;
+    }
+
+    public void requestStatistics(int interval) {
+        if(this.isConnected()) {
+            output.write("< statistics " + Integer.toString(interval) + " >");
+            output.flush();
+
+            /* Start worker thread for frame reception */
+            thread = new Thread(this);
+            thread.start();
+        } else {
+            logger.log(Level.WARNING, "requested statistics while connection was not opened.");
+        }
+    }
+
+    public void disableStatistics() {
+        if(this.isConnected() && thread != null && thread.isAlive()) {
+            thread.interrupt();
+            try {
+                thread.join();
+            } catch (InterruptedException ex) {
+            }
+        }
+    }
+
 
     @Override
     public void run() {
@@ -126,16 +141,15 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
 
                 String[] fields = frame.split("\\s");
 
-                if (fields[1].equals("frame")) {
+                if (fields[1].equals("stat")) {
                     try {
-                        String dataString = "";
-                        for (int i = 3; i < fields.length-1; i++) {
-                            dataString += fields[i];
-                        }
-                        Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(dataString));
-                        FrameReceiver receiver = this.getReceiver();
-                        if (receiver != null) {
-                            receiver.newFrame(f);
+                        long rxBytes = Long.parseLong(fields[2]);
+                        long rxPackets = Long.parseLong(fields[3]);
+                        long txBytes = Long.parseLong(fields[4]);
+                        long txPackets = Long.parseLong(fields[5]);
+
+                        if(statisticsReceiver != null) {
+                            statisticsReceiver.statisticsUpdated(rxBytes, rxPackets, txBytes, txPackets);
                         }
 
                     } catch (Exception ex) {
@@ -156,4 +170,5 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
             }
         }
     }
+
 }
