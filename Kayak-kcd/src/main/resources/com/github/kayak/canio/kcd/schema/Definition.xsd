@@ -16,7 +16,7 @@
   along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
   
 --> 
-<xs:schema version="0.3" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema version="0.4" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="NetworkDefinition">
     <xs:annotation>
       <xs:documentation>Definition of one or more CAN bus networks in one file.</xs:documentation>
@@ -111,6 +111,30 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute name="name" use="required" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Human-readable name of the network message (e.g."OBD-Info").</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="length" use="optional" default="auto">
+        <xs:annotation>
+          <xs:documentation>Number of bytes available in the data field of the message (data length code). Default "auto"-calculates minimum length for the contained signals in the message.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="auto"/>
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="2"/>
+            <xs:enumeration value="3"/>
+            <xs:enumeration value="4"/>
+            <xs:enumeration value="5"/>
+            <xs:enumeration value="6"/>
+            <xs:enumeration value="7"/>
+            <xs:enumeration value="8"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="interval" use="optional" default="0">
         <xs:annotation>
           <xs:documentation>Repetition interval of a cyclic network message in milliseconds.</xs:documentation>
@@ -121,11 +145,6 @@
             <xs:maxInclusive value="60000"/>
           </xs:restriction>
         </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="name" use="required" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Human-readable name of the network message (e.g."OBD-Info").</xs:documentation>
-        </xs:annotation>
       </xs:attribute>
       <xs:attribute name="triggered" use="optional" type="xs:boolean" default="false">
         <xs:annotation>
@@ -223,22 +242,12 @@
             <xs:element ref="Value" minOccurs="0"/>
             <xs:element ref="LabelSet" minOccurs="0"/>
           </xs:sequence>
-          <!-- <xs:attribute default="0" name="min" type="xs:int"> -->
-          <!--  <xs:annotation> -->
-          <!-- <xs:documentation>Minimum value of the signal specified.</xs:documentation> -->
-          <!-- </xs:annotation> -->
-          <!-- </xs:attribute> -->
-          <!-- <xs:attribute default="1" name="max" type="xs:int"> -->
-          <!-- <xs:annotation> -->
-          <!-- <xs:documentation>Maximum value of the signal specified.</xs:documentation> -->
-          <!-- </xs:annotation> -->
-          <!-- </xs:attribute> -->
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="Notes">
+  <xs:element name="Notes" type="xs:string">
     <xs:annotation>
       <xs:documentation>Describes the purpose of the signal and/or comments on its usage.</xs:documentation>
     </xs:annotation>
