@@ -41,7 +41,7 @@ import org.junit.Test;
  */
 public class NetworkDefinitionTest {
 
-	private static String sample = "src/test/resources/can_definition_sample.xml";
+	private static String sample = "src/test/resources/can_definition_sample.kcd";
 	private static NetworkDefinition netdef = null;
 	private static Document doc = null;
 	private static Object object = null;
