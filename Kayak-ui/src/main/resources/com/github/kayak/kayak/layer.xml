@@ -64,7 +64,7 @@
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
                 <attr name="type" stringvalue="com.github.kayak.core.Bus"/>
-                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/apps/utilities-system-monitor.png"/>
             </file>
         </folder>
         <folder name="Connections">
@@ -181,6 +181,7 @@
 
     <folder name="Menu">
         <folder name="Time">
+            <attr name="position" intvalue="130"/>
             <file name="com-github-kayak-ui-time-PlayAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Time/com-github-kayak-ui-time-PlayAction.instance"/>
             </file>
@@ -192,6 +193,7 @@
             </file>
         </folder>
         <folder name="File">
+            <attr name="position" intvalue="0"/>
             <file name="com-github-kayak-ui-projects-NewProject.shadow">
                 <attr name="originalFile" stringvalue="Actions/File/com-github-kayak-ui-projects-NewProjectAction.instance"/>
                 <attr name="position" intvalue="100"/>
@@ -202,6 +204,7 @@
             </file>
         </folder>
         <folder name="Bus views">
+            <attr name="position" intvalue="110"/>
             <file name="com-github-kayak-ui-rawview-OpenRawViewAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/BusViews/com-github-kayak-ui-rawview-OpenRawViewAction.instance"/>
                 <attr name="position" intvalue="100"/>
@@ -232,6 +235,7 @@
             </file>
         </folder>
         <folder name="Connections">
+            <attr name="position" intvalue="120"/>
             <file name="com-github-kayak-ui-connections-NewConnectionAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Connections/com-github-kayak-ui-connections-NewConnectionAction.instance"/>
             </file>

@@ -44,24 +44,28 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
             @Override
             public void projectChanged() {
                 if(project.isOpened()) {
+                    setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
                     setChildren(Children.create(new ProjectChildFactory(project), true));
                 } else {
                     setChildren(Children.LEAF);
+                    setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
                 }
             }
         };
 
         public ProjectNode(Project project) {
             super(Children.LEAF);
+            setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
             
             this.project = project;
             project.addProjectChangeListener(changeListener);
             
             if(project.isOpened()) {
                 setChildren(Children.create(new ProjectChildFactory(project), true));
+                setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
             }
             super.setDisplayName(project.getName());
-            setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/package-x-generic.png");
+            
         }
 
         @Override
@@ -167,8 +171,6 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
                 }
                 
                 project.open();
-                
-                setChildren(Children.create(new ProjectChildFactory(project), true));
             }
 
         };
@@ -182,8 +184,6 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
             @Override
             public void actionPerformed(ActionEvent e) {                
                 project.close();
-                
-                setChildren(Children.LEAF);
             }
 
         };
