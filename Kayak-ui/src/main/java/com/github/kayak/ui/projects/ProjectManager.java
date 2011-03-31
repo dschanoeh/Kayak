@@ -44,6 +44,14 @@ public class ProjectManager {
     private static ProjectManager projectManagement;
     private ArrayList<Project> projects;
     private ArrayList<ProjectChangeListener> listeners;
+    
+    private ProjectChangeListener listener = new ProjectChangeListener() {
+
+        @Override
+        public void projectChanged() {
+            notifyListeners();
+        }
+    };
 
 
     public ArrayList<Project> getProjects() {
@@ -52,11 +60,13 @@ public class ProjectManager {
 
     public void addProject(Project e) {
         projects.add(e);
+        e.addProjectChangeListener(listener);
         notifyListeners();
     }
 
     public void removeProject(Project e) {
         projects.remove(e);
+        e.removeProjectChangeListener(listener);
         notifyListeners();
     }
 
@@ -103,6 +113,11 @@ public class ProjectManager {
                     Node nameNode = attributes.getNamedItem("name");
                     String name = nameNode.getNodeValue();
                     Project project = new Project(name);
+                    
+                    Node openedNode = attributes.getNamedItem("opened");
+                    boolean opened = Boolean.parseBoolean(openedNode.getNodeValue());
+                    if(opened)
+                        project.open();
 
                     NodeList busses = projects.item(i).getChildNodes();
 
@@ -151,6 +166,7 @@ public class ProjectManager {
             for(Project project : projects) {
                 Element projectElement = doc.createElement("Project");
                 projectElement.setAttribute("name", project.getName());
+                projectElement.setAttribute("opened", Boolean.toString(project.isOpened()));
                 root.appendChild(projectElement);
 
                 for(Bus bus : project.getBusses()) {

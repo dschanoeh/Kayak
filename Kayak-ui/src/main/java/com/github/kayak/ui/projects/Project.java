@@ -27,9 +27,37 @@ import java.util.ArrayList;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class Project {
+    
     private ArrayList<Bus> busses;
     private String name;
     private ArrayList<ProjectChangeListener> listeners;
+    private boolean opened = false;
+
+    public boolean isOpened() {
+        return opened;
+    }
+
+    public void open() {
+        this.opened = true;
+        
+        for(Bus b : busses) {
+            b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
+            TimeSourceManager.getGlobalTimeSource().register(b);
+        }
+        
+        notifyListeners();
+    }
+    
+    public void close() {
+        this.opened = false;
+        
+        for(Bus b : busses) {
+            b.setTimeSource(null);
+            TimeSourceManager.getGlobalTimeSource().deregister(b);
+        }
+        
+        notifyListeners();
+    }
 
     public void addProjectChangeListener(ProjectChangeListener listener) {
         listeners.add(listener);
@@ -45,13 +73,19 @@ public class Project {
 
     public void addBus(Bus b) {
         busses.add(b);
-        b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
-        TimeSourceManager.getGlobalTimeSource().register(b);
+        if(isOpened()) {
+            b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
+            TimeSourceManager.getGlobalTimeSource().register(b);
+        }
         notifyListeners();
     }
 
     public void removeBus(Bus b) {
         busses.remove(b);
+        if(isOpened()) {
+            b.setTimeSource(null);
+            TimeSourceManager.getGlobalTimeSource().deregister(b);
+        }
         notifyListeners();
     }
 
