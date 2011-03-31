@@ -28,13 +28,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.NbPreferences;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class LogFileManager {
-    private static Logger logger = Logger.getLogger(LogFileManager.class.getCanonicalName());
+    
+    private static final Logger logger = Logger.getLogger(LogFileManager.class.getCanonicalName());
     private static LogFileManager manager;
 
     private HashMap<String,ArrayList<LogFile>> platformList;
@@ -52,7 +54,8 @@ public class LogFileManager {
     }
 
     public LogFileManager() {
-        logFolder = FileUtil.toFileObject(new File("D:\\replays\\"));
+        String homeFolder = System.getProperty("user.home");
+        logFolder = FileUtil.toFileObject(new File(NbPreferences.forModule(LogFileManager.class).get("Log file directory", homeFolder + "/kayak/log/")));
 
         logFileDir = new ArrayList<LogFile>();
         platformList = new HashMap<String,ArrayList<LogFile>>();

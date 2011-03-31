@@ -36,6 +36,10 @@ public class TimeSource {
     private long pauseReference;
     private Mode mode = Mode.STOP;
     private ArrayList<TimeEventReceiver> receivers;
+
+    public Mode getMode() {
+        return mode;
+    }
     
     public TimeSource() {
         reference = System.currentTimeMillis();

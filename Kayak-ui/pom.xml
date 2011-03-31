@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>${netbeans.version}</version>
+            <version>RELEASE691</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -89,6 +89,11 @@
             <artifactId>org-openide-text</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
+            <version>RELEASE691</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-options-api</artifactId>
             <version>RELEASE691</version>
         </dependency>
     </dependencies>

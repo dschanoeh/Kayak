@@ -20,25 +20,52 @@ package com.github.kayak.ui;
 
 import com.github.kayak.ui.connections.ConnectionManager;
 import com.github.kayak.ui.projects.ProjectManager;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.modules.ModuleInstall;
 import org.openide.util.Exceptions;
+import org.openide.util.NbPreferences;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ModuleLifecycleManager extends ModuleInstall {
+    
+    private static final Logger logger = Logger.getLogger(ModuleLifecycleManager.class.getCanonicalName());
 
     @Override
     public void restored() {
         readConnections();
         readProjects();
+        
+        /* make sure that the required folders exist */
+        String homeFolder = System.getProperty("user.home");
+        
+        String logDir = NbPreferences.forModule(ModuleLifecycleManager.class).get("Log file directory", homeFolder + "/kayak/log/");
+        File logDirFile = new File(logDir);
+        if(!logDirFile.exists()) {
+            logger.log(Level.INFO, "Log dir does not exist. creating...");
+            if(!logDirFile.mkdirs()) {
+                logger.log(Level.SEVERE, "Could not create directory!");
+            }
+        }
+        
+        String descriptionDir = NbPreferences.forModule(ModuleLifecycleManager.class).get("Bus description directory", homeFolder + "/kayak/descriptions/");
+        File descriptionDirFile = new File(descriptionDir);
+        if(!descriptionDirFile.exists()) {
+            logger.log(Level.INFO, "Bus description dir does not exist. creating...");
+            if(!descriptionDirFile.mkdirs()) {
+                logger.log(Level.SEVERE, "Could not create directory!");
+            }
+        }
     }
 
     @Override
