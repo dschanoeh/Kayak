@@ -128,6 +128,9 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(project.isOpened())
+                    project.close();
+                
                 ProjectManager.getGlobalProjectManager().removeProject(project);
             }
 
