@@ -126,6 +126,11 @@
                 <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/devices/network-wireless.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
+            <file name="com-github-kayak-ui-startpage-StartPageAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.ui.startpage.StartPageTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.ui.startpage.Bundle#CTL_StartPageAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
         </folder>
     </folder>
     <folder name="Toolbars">
@@ -233,6 +238,9 @@
             <file name="ConnectionsAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-connections-ConnectionsAction.instance"/>
             </file>
+            <file name="StartPageAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-startpage-StartPageAction.instance"/>
+            </file>
         </folder>
         <folder name="Connections">
             <attr name="position" intvalue="120"/>
@@ -261,11 +269,13 @@
             <file name="ProjectsTopComponent.settings" url="ProjectsTopComponentSettings.xml"/>
             <file name="RawViewTopComponent.settings" url="RawViewTopComponentSettings.xml"/>
             <file name="ConnectionsTopComponent.settings" url="ConnectionsTopComponentSettings.xml"/>
+            <file name="StartPageTopComponent.settings" url="StartPageTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
             <folder name="editor">
                 <file name="BusConfigurationTopComponent.wstcref" url="BusConfigurationTopComponentWstcref.xml"/>
                 <file name="RawViewTopComponent.wstcref" url="RawViewTopComponentWstcref.xml"/>
+                <file name="StartPageTopComponent.wstcref" url="StartPageTopComponentWstcref.xml"/>
             </folder>
             <folder name="explorer">
                 <file name="ProjectsTopComponent.wstcref" url="ProjectsTopComponentWstcref.xml"/>
