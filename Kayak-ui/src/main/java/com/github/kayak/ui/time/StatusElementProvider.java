@@ -19,8 +19,13 @@ package com.github.kayak.ui.time;
 
 import com.github.kayak.core.TimeEventReceiver;
 import com.github.kayak.core.TimeSource;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.LayoutManager;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import org.openide.awt.StatusLineElementProvider;
 
 /**
@@ -34,6 +39,7 @@ public class StatusElementProvider implements StatusLineElementProvider {
     private TimeSource source;
     private TimeSource.Mode mode;
     private JLabel label;
+    private JPanel panel;
     private Thread thread;
     
     private TimeEventReceiver receiver = new TimeEventReceiver() {
@@ -57,17 +63,23 @@ public class StatusElementProvider implements StatusLineElementProvider {
     private Runnable myRunnable = new Runnable() {
 
         @Override
-        public void run() {
+        public void run() {            
             while(true) {
                 switch(mode) {
                     case PAUSE:
-                        label.setText("Time paused (" + Long.toString(source.getTime()) + ")");
+                        label.setText("Time paused (" + String.format("%.3f",(double) source.getTime()/1000) + ")");
+                        panel.setBackground(Color.YELLOW);
+                        label.setForeground(Color.BLACK);
                         break;
                     case PLAY:
-                        label.setText("Time running (" + Long.toString(source.getTime()) + ")");
+                        label.setText("Time running (" + String.format("%.3f",(double) source.getTime()/1000) + ")");
+                        panel.setBackground(Color.GREEN);
+                        label.setForeground(Color.BLACK);
                         break;
                     case STOP:
-                        label.setText("Time stopped (" + Long.toString(source.getTime()) + ")");
+                        label.setText("Time stopped (" + String.format("%.3f",(double) source.getTime()/1000) + ")");
+                        panel.setBackground(javax.swing.UIManager.getColor("Panel.background"));
+                        label.setForeground(javax.swing.UIManager.getColor("Label.foreground"));
                         break;
                 }
                 
@@ -81,7 +93,9 @@ public class StatusElementProvider implements StatusLineElementProvider {
     };
     
     public StatusElementProvider() {
+        panel = new JPanel();  
         label = new JLabel();
+        panel.add(label);
         source = TimeSourceManager.getGlobalTimeSource();
         mode = source.getMode();
         source.register(receiver);
@@ -93,6 +107,6 @@ public class StatusElementProvider implements StatusLineElementProvider {
     
     @Override
     public Component getStatusLineElement() {
-        return label;
+        return panel;
     }
 }
