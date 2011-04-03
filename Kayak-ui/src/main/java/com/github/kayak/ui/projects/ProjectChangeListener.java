@@ -10,5 +10,14 @@ package com.github.kayak.ui.projects;
  * @author dsi9mjn
  */
 public interface ProjectChangeListener {
-    public void projectChanged();
+
+    public void projectNameChanged();
+
+    public void projectClosed();
+
+    public void projectOpened();
+
+    public void projectDeleted();
+
+    public void projectBussesChanged();
 }

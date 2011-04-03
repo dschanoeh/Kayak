@@ -19,7 +19,6 @@
 package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.Bus;
-import com.github.kayak.core.BusChangeListener;
 import java.util.List;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
@@ -28,12 +27,41 @@ import org.openide.nodes.Node;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class ProjectChildFactory extends ChildFactory<Bus> implements ProjectChangeListener, BusChangeListener {
+public class ProjectChildFactory extends ChildFactory<Bus> {
+    
     private Project project;
+
+    private ProjectChangeListener listener = new ProjectChangeListener() {
+
+        @Override
+        public void projectNameChanged() {
+
+        }
+
+        @Override
+        public void projectClosed() {
+
+        }
+
+        @Override
+        public void projectOpened() {
+
+        }
+
+        @Override
+        public void projectDeleted() {
+
+        }
+
+        @Override
+        public void projectBussesChanged() {
+            refresh(true);
+        }
+    };
 
     public ProjectChildFactory(Project project) {
         this.project = project;
-        project.addProjectChangeListener(this);
+        project.addProjectChangeListener(listener);
     }
 
     @Override
@@ -49,17 +77,4 @@ public class ProjectChildFactory extends ChildFactory<Bus> implements ProjectCha
         return new Node[] {busNode};
     }
 
-    @Override
-    public void projectChanged() {
-        refresh(true);
-    }
-
-    @Override
-    public void connectionChanged() {
-    }
-
-    @Override
-    public void nameChanged() {
-        refresh(true);
-    }
 }

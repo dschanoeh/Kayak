@@ -96,6 +96,20 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         this.name = name;
         notifyListenersName();
     }
+    
+    /**
+     * Shall be called if the bus is removed. This will inform all components
+     * using the bus that it will not be present any more. Also all connections
+     * are terminated.
+     */
+    public void destroy() {
+        disconnect();
+        
+        for(BusChangeListener listener : listeners) {
+            if(listener != null)
+                listener.destroyed();
+        }
+    }
 
     private FrameReceiver rawReceiver = new FrameReceiver() {
 
@@ -279,13 +293,15 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
 
     private void notifyListenersConnection() {
         for(BusChangeListener listener : listeners) {
-            listener.connectionChanged();
+            if(listener != null)
+                listener.connectionChanged();
         }
     }
 
     private void notifyListenersName() {
         for(BusChangeListener listener : listeners) {
-            listener.nameChanged();
+            if(listener != null)
+                listener.nameChanged();
         }
     }
 

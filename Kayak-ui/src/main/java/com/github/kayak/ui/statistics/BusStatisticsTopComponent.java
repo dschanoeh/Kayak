@@ -19,6 +19,7 @@
 package com.github.kayak.ui.statistics;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.core.BusChangeListener;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -40,8 +41,25 @@ public final class BusStatisticsTopComponent extends TopComponent {
     private static final String PREFERRED_ID = "BusStatisticsTopComponent";
 
     private StatisticsTableModel model = new StatisticsTableModel();
-    
+    private Bus bus;
 
+    private BusChangeListener listener = new BusChangeListener() {
+
+        @Override
+        public void connectionChanged() {
+
+        }
+
+        @Override
+        public void nameChanged() {
+            setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.getName());
+        }
+
+        @Override
+        public void destroyed() {
+            close();
+        }
+    };
 
     public BusStatisticsTopComponent() {
         initComponents();
@@ -108,6 +126,9 @@ public final class BusStatisticsTopComponent extends TopComponent {
     }
 
     public void setBus(Bus bus) {
+        this.bus = bus;
+        bus.addBusChangeListener(listener);
+
         bus.registerStatisticsReceiver(model);
         bus.enableStatistics(model.getInterval());
 

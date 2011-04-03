@@ -42,14 +42,30 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
         private ProjectChangeListener changeListener = new ProjectChangeListener() {
 
             @Override
-            public void projectChanged() {
-                if(project.isOpened()) {
-                    setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
-                    setChildren(Children.create(new ProjectChildFactory(project), true));
-                } else {
-                    setChildren(Children.LEAF);
-                    setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
-                }
+            public void projectNameChanged() {
+                
+            }
+
+            @Override
+            public void projectClosed() {
+                setChildren(Children.LEAF);
+                setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
+            }
+
+            @Override
+            public void projectDeleted() {
+                
+            }
+
+            @Override
+            public void projectBussesChanged() {
+                
+            }
+
+            @Override
+            public void projectOpened() {
+                setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
+                setChildren(Children.create(new ProjectChildFactory(project), true));
             }
         };
 
@@ -165,12 +181,7 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                for(Project p : ProjectManager.getGlobalProjectManager().getProjects()) {
-                    if(p.isOpened())
-                        p.close();
-                }
-                
-                project.open();
+                ProjectManager.getGlobalProjectManager().openProject(project);
             }
 
         };
@@ -183,7 +194,7 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
 
             @Override
             public void actionPerformed(ActionEvent e) {                
-                project.close();
+                ProjectManager.getGlobalProjectManager().closeProject(project);
             }
 
         };

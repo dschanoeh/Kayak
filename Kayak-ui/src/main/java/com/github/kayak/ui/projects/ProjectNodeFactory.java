@@ -27,12 +27,13 @@ import org.openide.nodes.Node;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ProjectNodeFactory extends ChildFactory<Project> {
+
     private ProjectManager manager = ProjectManager.getGlobalProjectManager();
     
-    private ProjectChangeListener listener = new ProjectChangeListener() {
+    private ProjectManagementListener listener = new ProjectManagementListener() {
 
         @Override
-        public void projectChanged() {
+        public void projectsUpdated() {
             refresh(true);
         }
     };

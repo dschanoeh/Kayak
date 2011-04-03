@@ -36,17 +36,25 @@ import org.openide.util.lookup.Lookups;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> implements BusChangeListener {
+public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
 
-    @Override
-    public void connectionChanged() {
-        addNotify();
-    }
+    private BusChangeListener listener = new BusChangeListener() {
 
-    @Override
-    public void nameChanged() {
-        
-    }
+        @Override
+        public void connectionChanged() {
+            addNotify();
+        }
+
+        @Override
+        public void nameChanged() {
+            
+        }
+
+        @Override
+        public void destroyed() {
+            
+        }
+    };  
 
     public enum Folders {
         CONNECTION, DESCRIPTION, INPUT, OUTPUT;
@@ -56,7 +64,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> impl
     public BusChildFactory(Bus bus) {
         this.bus = bus;
 
-        bus.addBusChangeListener(this);
+        bus.addBusChangeListener(listener);
     }
 
     @Override

@@ -48,6 +48,11 @@ public class ConnectionChildFactory extends ChildFactory<BusURL> {
         public void nameChanged() {
             
         }
+
+        @Override
+        public void destroyed() {
+            
+        }
     };
 
     public ConnectionChildFactory(Bus bus) {

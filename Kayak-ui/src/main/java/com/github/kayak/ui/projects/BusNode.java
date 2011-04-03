@@ -85,6 +85,7 @@ public class BusNode extends AbstractNode {
 
             if(result == JOptionPane.YES_OPTION) {
                 project.removeBus(bus);
+                bus.destroy();
             }
 
         }
