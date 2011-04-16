@@ -89,6 +89,7 @@
         <module>Kayak-ui</module>
         <module>Kayak-kcd</module>
         <module>Kayak-core</module>
+        <module>Kayak-logging</module>
     </modules>
 
     <reporting>

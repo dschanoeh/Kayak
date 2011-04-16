@@ -149,6 +149,17 @@ public class LogFile {
         return logFile;
     }
 
+    public static LogFile create(String filename, boolean gzipped) {
+        LogFile logFile;
+        try {
+            logFile = new LogFile(null, gzipped, true);
+        } catch(Exception ex) {
+            return null;
+        }
+
+        return logFile;
+    }
+
     private void parseHeader() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(getInputStream()));
 
