@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.0//EN" "http://www.netbeans.org/dtds/filesystem-1_0.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Window">
+            <file name="com-github-kayak-logging-LogFilesAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.logging.LogFilesTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.logging.Bundle#CTL_LogFilesAction"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/apps/accessories-text-editor.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+            <file name="com-github-kayak-logging-LogOutputAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.logging.output.LogOutputTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.logging.output.Bundle#CTL_LogOutputAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="Window">
+            <file name="LogFilesAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-logging-LogFilesAction.instance"/>
+            </file>
+            <file name="LogOutputAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-logging-LogOutputAction.instance"/>
+            </file>
+        </folder>
+    </folder>
+
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="LogFilesTopComponent.settings" url="LogFilesTopComponentSettings.xml"/>
+            <file name="LogOutputTopComponent.settings" url="LogOutputTopComponentSettings.xml"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="properties">
+                <file name="LogFilesTopComponent.wstcref" url="LogFilesTopComponentWstcref.xml"/>
+                <file name="LogOutputTopComponent.wstcref" url="LogOutputTopComponentWstcref.xml"/>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>
