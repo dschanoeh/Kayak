@@ -108,12 +108,7 @@
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.descriptions.Bundle#CTL_DescriptionsAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
-            <file name="com-github-kayak-ui-logfiles-LogFilesAction.instance">
-                <attr name="component" methodvalue="com.github.kayak.ui.logfiles.LogFilesTopComponent.findInstance"/>
-                <attr name="displayName" bundlevalue="com.github.kayak.ui.logfiles.Bundle#CTL_LogFilesAction"/>
-                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/apps/accessories-text-editor.png"/>
-                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
-            </file>
+            
             <file name="com-github-kayak-ui-projects-ProjectsAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.projects.ProjectsTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_ProjectsAction"/>
@@ -226,9 +221,6 @@
             <file name="DescriptionsAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-descriptions-DescriptionsAction.instance"/>
             </file>
-            <file name="LogFilesAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-logfiles-LogFilesAction.instance"/>
-            </file>
             <file name="ProjectsAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-projects-ProjectsAction.instance"/>
             </file>
@@ -265,7 +257,6 @@
             <file name="BusConfigurationTopComponent.settings" url="BusConfigurationTopComponentSettings.xml"/>
             <file name="BusStatisticsTopComponent.settings" url="BusStatisticsTopComponentSettings.xml"/>
             <file name="DescriptionsTopComponent.settings" url="DescriptionsTopComponentSettings.xml"/>
-            <file name="LogFilesTopComponent.settings" url="LogFilesTopComponentSettings.xml"/>
             <file name="ProjectsTopComponent.settings" url="ProjectsTopComponentSettings.xml"/>
             <file name="RawViewTopComponent.settings" url="RawViewTopComponentSettings.xml"/>
             <file name="ConnectionsTopComponent.settings" url="ConnectionsTopComponentSettings.xml"/>
@@ -284,7 +275,6 @@
                 <file name="BusStatisticsTopComponent.wstcref" url="BusStatisticsTopComponentWstcref.xml"/>
                 <file name="ConnectionsTopComponent.wstcref" url="ConnectionsTopComponentWstcref.xml"/>
                 <file name="DescriptionsTopComponent.wstcref" url="DescriptionsTopComponentWstcref.xml"/>
-                <file name="LogFilesTopComponent.wstcref" url="LogFilesTopComponentWstcref.xml"/>
             </folder>
         </folder>
     </folder>
