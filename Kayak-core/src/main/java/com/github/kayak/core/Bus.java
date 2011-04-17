@@ -270,6 +270,7 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
             bcmConnection.sendFrame(frame);
         /* If no BCM connection is present we have to do loopback locally */
         } else {
+            frame.setTimestamp(timeSource.getTime());
             deliverBCMFrame(frame);
             deliverRAWFrame(frame);
         }
