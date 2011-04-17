@@ -1,6 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 	This file is part of Kayak.
+ *
+ *	Kayak is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	Kayak is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package com.github.kayak.core;
 
@@ -16,7 +29,7 @@ import java.util.zip.GZIPInputStream;
 
 /**
  *
- * @author dschanoeh
+ * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class LogFileReplay {
 
@@ -30,6 +43,15 @@ public class LogFileReplay {
     private boolean loop;
     private long timeOffset;
     private HashMap<String, Bus> busses;
+    private boolean infiniteReplay;
+
+    public boolean isInfiniteReplay() {
+        return infiniteReplay;
+    }
+
+    public void setInfiniteReplay(boolean infiniteReplay) {
+        this.infiniteReplay = infiniteReplay;
+    }
 
     public TimeSource getTimeSource() {
         return timeSource;
@@ -45,10 +67,20 @@ public class LogFileReplay {
 
     }
 
+    /**
+     * Connect a bus to the {@link LogFileReplay}. Every log entry with 'name'
+     * will be sent to the corresponding bus.
+     * @param name Name in the log file
+     * @param bus Bus that will be connected to this name
+     */
     public void setBus(String name, Bus bus) {
         busses.put(name, bus);
     }
 
+    /**
+     * Create a new {@link LogFileReplay} with a specific {@link LogFile}.
+     * @param logFile
+     */
     public LogFileReplay(LogFile logFile) {
         this.logFile = logFile;
 
@@ -169,6 +201,7 @@ public class LogFileReplay {
             }
         }
     };
+
     private TimeEventReceiver timeEventReceiver = new TimeEventReceiver() {
 
         @Override
@@ -183,12 +216,12 @@ public class LogFileReplay {
                 seekToBeginning();
             }
 
-            if (thread == null) {
+            if (thread == null || !thread.isAlive()) {
                 thread = new Thread(myRunnable);
-            }
-
-            if(!thread.isAlive())
                 thread.start();
+            } else {
+                thread.interrupt();
+            }
 
             mode = mode.PLAY;
         }
