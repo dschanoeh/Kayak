@@ -19,11 +19,15 @@
 package com.github.kayak.logging;
 
 import com.github.kayak.core.LogFile;
+import com.github.kayak.logging.input.LogInputTopComponent;
+import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
+import org.openide.util.HelpCtx;
+import org.openide.util.actions.SystemAction;
 
 
 /**
@@ -41,6 +45,16 @@ public class LogFileNode extends AbstractNode {
         this.setShortDescription(logFile.getFileName());
 
         this.setIconBaseWithExtension("org/freedesktop/tango/16x16/apps/accessories-text-editor.png");
+    }
+
+    @Override
+    public SystemAction[] getActions() {
+        return new SystemAction[] { openAction };
+    }
+
+    @Override
+    public SystemAction getDefaultAction() {
+        return openAction;
     }
 
     @Override
@@ -83,15 +97,47 @@ public class LogFileNode extends AbstractNode {
             }
 
         };
+
+        Property length = new PropertySupport.ReadOnly<String>("Length", String.class, "Length", "Length of the file in milliseconds") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                return String.valueOf(logFile.getLength() / 1000) + "." + String.valueOf(logFile.getLength() % 1000);
+            }
+
+        };
         
         set.put(platform);
         set.put(fileName);
         set.put(compressed);
         set.put(description);
+        set.put(length);
 
         s.put(set);
 
         return s;
     }
+
+    SystemAction openAction = new SystemAction() {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            LogInputTopComponent tc = new LogInputTopComponent();
+            tc.setLogFile(logFile);
+            tc.open();
+            tc.requestActive();
+
+        }
+
+        @Override
+        public String getName() {
+            return "open";
+        }
+
+        @Override
+        public HelpCtx getHelpCtx() {
+            return HelpCtx.DEFAULT_HELP;
+        }
+    };
 
 }

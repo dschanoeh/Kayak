@@ -15,7 +15,6 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 package com.github.kayak.core;
 
 import java.io.BufferedReader;
@@ -42,20 +41,36 @@ public class LogFile {
     private Boolean compressed;
     private File file;
     private InputStream inputStream;
-    private OutputStream outputStream;
     private boolean write;
     private String description;
     private String platform;
-    private HashMap<String,String> deviceAlias;
+    private HashMap<String, String> deviceAlias;
+    private long length;
+
+    public long getLength() {
+        return length;
+    }
+
+    public long getSize() {
+        return file.length();
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public String getAlias(String s) {
+        return deviceAlias.get(s);
+    }
 
     public ArrayList<String> getBusses() {
         ArrayList<String> busNames = new ArrayList<String>();
         Set<String> keys = deviceAlias.keySet();
 
-        for(String bus : keys) {
+        for (String bus : keys) {
             busNames.add(deviceAlias.get(bus));
         }
-        
+
         return busNames;
 
     }
@@ -84,20 +99,6 @@ public class LogFile {
         return !write;
     }
 
-    public InputStream getInputStream() {
-        if(!write)
-            return inputStream;
-
-        return null;
-    }
-
-    public OutputStream getOutputStream() {
-        if(write)
-            return outputStream;
-
-        return null;
-    }
-
     private LogFile(File file, Boolean compressed, Boolean write) throws FileNotFoundException, IOException {
         this.file = file;
         this.compressed = compressed;
@@ -112,34 +113,29 @@ public class LogFile {
             } else {
                 inputStream = new FileInputStream(file);
             }
-        } else {
-            if(compressed) {
-                outputStream = new GZIPOutputStream(new FileOutputStream(file));
-            } else {
-                outputStream = new FileOutputStream(file);
-            }
         }
 
         parseHeader();
     }
 
     public static LogFile fromFile(File file) {
-        if(!file.canRead())
+        if (!file.canRead()) {
             return null;
+        }
 
         String filename = file.getPath();
         LogFile logFile;
 
-        if(filename.endsWith(".log.gz")) {
+        if (filename.endsWith(".log.gz")) {
             try {
                 logFile = new LogFile(file, true, false);
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 return null;
             }
-        } else if(filename.endsWith(".log")) {
+        } else if (filename.endsWith(".log")) {
             try {
                 logFile = new LogFile(file, false, false);
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 return null;
             }
         } else {
@@ -153,7 +149,7 @@ public class LogFile {
         LogFile logFile;
         try {
             logFile = new LogFile(null, gzipped, true);
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             return null;
         }
 
@@ -161,49 +157,57 @@ public class LogFile {
     }
 
     private void parseHeader() {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        try {
+            while (true) {
 
-        while(true) {
-            try {
                 String line = reader.readLine();
 
-                if(line.startsWith("DESCRIPTION")) {
-                    if(line.matches("DESCRIPTION \"[a-zA-Z0-9\\s]+\"")) {
+                if (line.startsWith("DESCRIPTION")) {
+                    if (line.matches("DESCRIPTION \"[a-zA-Z0-9\\s]+\"")) {
                         int start = line.indexOf('\"') + 1;
                         int stop = line.lastIndexOf("\"");
                         description = line.substring(start, stop);
                     }
-                } else if(line.startsWith("PLATFORM")) {
+                } else if (line.startsWith("PLATFORM")) {
                     //if(line.matches("PLATFORM \"[A-Z0-9]+\"")) {
-                        int start = line.indexOf(' ') + 1;
-                        platform = line.substring(start);
-                   // }
-                } else if(line.startsWith("DEVICE_ALIAS")) {
-                    if(line.matches("DEVICE_ALIAS [A-Za-z0-9]+ [a-z0-9]{1,16}")) {
+                    int start = line.indexOf(' ') + 1;
+                    platform = line.substring(start);
+                    // }
+                } else if (line.startsWith("DEVICE_ALIAS")) {
+                    if (line.matches("DEVICE_ALIAS [A-Za-z0-9]+ [a-z0-9]{1,16}")) {
                         int start = line.indexOf(' ') + 1;
                         int stop = line.lastIndexOf(' ');
                         String alias = line.substring(start, stop);
-                        String bus = line.substring(stop+1);
+                        String bus = line.substring(stop + 1);
                         deviceAlias.put(bus, alias);
                     }
-                /*
-                 * All lines that are not recognized and not pure whitespace cause
-                 * the header parsing to abort.
-                 */
+                    /*
+                     * All lines that are not recognized and not pure whitespace cause
+                     * the header parsing to abort.
+                     */
                 } else {
-                    if(!line.matches("\\s")) {
-                        if(description.equals(""))
+                    if (!line.matches("\\s")) {
+                        if (description.equals("")) {
                             description = file.getName();
-                        if(platform.equals(""))
+                        }
+                        if (platform.equals("")) {
                             platform = "No platform";
-                        return;
+                        }
+                        break;
                     }
                 }
-            } catch (IOException ex) {
-                return;
             }
-
+        } catch (IOException ex) {
+            return;
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception ex) {
+            }
+            ;
         }
-    }
 
+        /* TODO: get length of file */
+    }
 }

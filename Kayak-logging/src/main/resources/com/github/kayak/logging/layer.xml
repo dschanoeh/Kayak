@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.0//EN" "http://www.netbeans.org/dtds/filesystem-1_0.dtd">
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
     <folder name="Actions">
         <folder name="Window">
@@ -30,11 +30,13 @@
     <folder name="Windows2">
         <folder name="Components">
             <file name="LogFilesTopComponent.settings" url="LogFilesTopComponentSettings.xml"/>
+            <file name="LogInputTopComponent.settings" url="LogInputTopComponentSettings.xml"/>
             <file name="LogOutputTopComponent.settings" url="LogOutputTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
             <folder name="properties">
                 <file name="LogFilesTopComponent.wstcref" url="LogFilesTopComponentWstcref.xml"/>
+                <file name="LogInputTopComponent.wstcref" url="LogInputTopComponentWstcref.xml"/>
                 <file name="LogOutputTopComponent.wstcref" url="LogOutputTopComponentWstcref.xml"/>
             </folder>
         </folder>
