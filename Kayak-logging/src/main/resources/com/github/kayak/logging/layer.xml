@@ -14,6 +14,11 @@
                 <attr name="displayName" bundlevalue="com.github.kayak.logging.output.Bundle#CTL_LogOutputAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
+            <file name="com-github-kayak-logging-snapshots-SnapshotBufferAction.instance">
+                <attr name="component" methodvalue="com.github.kayak.logging.snapshots.SnapshotBufferTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="com.github.kayak.logging.snapshots.Bundle#CTL_SnapshotBufferAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
         </folder>
     </folder>
     <folder name="Menu">
@@ -24,6 +29,9 @@
             <file name="LogOutputAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-logging-LogOutputAction.instance"/>
             </file>
+            <file name="SnapshotBufferAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-logging-snapshots-SnapshotBufferAction.instance"/>
+            </file>
         </folder>
     </folder>
 
@@ -32,12 +40,16 @@
             <file name="LogFilesTopComponent.settings" url="LogFilesTopComponentSettings.xml"/>
             <file name="LogInputTopComponent.settings" url="LogInputTopComponentSettings.xml"/>
             <file name="LogOutputTopComponent.settings" url="LogOutputTopComponentSettings.xml"/>
+            <file name="SnapshotBufferTopComponent.settings" url="SnapshotBufferTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
             <folder name="properties">
                 <file name="LogFilesTopComponent.wstcref" url="LogFilesTopComponentWstcref.xml"/>
                 <file name="LogInputTopComponent.wstcref" url="LogInputTopComponentWstcref.xml"/>
                 <file name="LogOutputTopComponent.wstcref" url="LogOutputTopComponentWstcref.xml"/>
+            </folder>
+            <folder name="rightSlidingSide">
+                <file name="SnapshotBufferTopComponent.wstcref" url="SnapshotBufferTopComponentWstcref.xml"/>
             </folder>
         </folder>
     </folder>

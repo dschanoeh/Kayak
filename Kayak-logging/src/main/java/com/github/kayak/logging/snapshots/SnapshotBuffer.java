@@ -46,6 +46,33 @@ public class SnapshotBuffer {
     private TimeSource timeSource;
     private ArrayList<Bus> busses;
     private ArrayList<Subscription> subscriptions;
+    private String name;
+    private String platform;
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
 
     private FrameReceiver receiver = new FrameReceiver() {
 
@@ -71,8 +98,10 @@ public class SnapshotBuffer {
                         } catch (InterruptedException ex) {}
 
                         for(Subscription s : subscriptions) {
-                            s.setMuted(true);
+                            s.Terminate();
                         }
+                        subscriptions.clear();
+                        busses.clear();
                     }
                 }
                 long currentTime = TimeSourceManager.getGlobalTimeSource().getTime();

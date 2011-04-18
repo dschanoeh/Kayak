@@ -46,6 +46,9 @@ public class ProjectManager {
     private Project openedProject;
     private ArrayList<ProjectManagementListener> listeners;
 
+    public Project getOpenedProject() {
+        return openedProject;
+    }
 
     public ArrayList<Project> getProjects() {
         return projects;
