@@ -52,7 +52,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>nbm-maven-plugin</artifactId>
-                    <version>3.2</version>
+                    <version>3.5</version>
                     <extensions>true</extensions>
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
@@ -65,7 +65,7 @@
                     <!-- netbeans modules in 6.9+ are 1.6 compatible -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.3</version>
+                    <version>2.3.2</version>
                     <configuration>
                         <source>1.6</source>
                         <target>1.6</target>
@@ -108,7 +108,7 @@
 
 
     <properties>
-        <netbeans.version>RELEASE691</netbeans.version>
+        <netbeans.version>RELEASE70</netbeans.version>
         <brandingToken>kayak</brandingToken>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
