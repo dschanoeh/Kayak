@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mode PUBLIC
+ "-//NetBeans//DTD Mode Properties 2.3//EN"
+ "http://www.netbeans.org/dtds/mode-properties2_3.dtd">
+<mode version="2.1">
+    <name unique="management" />
+    <kind type="view" />
+    <state type="joined" />
+    <constraints>
+        <path orientation="horizontal" number="60" weight="0.7" />
+        <path orientation="vertical" number="40" weight="0.7" />
+        <path orientation="horizontal" number="80" weight="0.3" />
+        <path orientation="vertical" number="80" weight="0.5" />
+    </constraints>
+    <relative-bounds x="20" y="22" width="32" height="50" />
+    <empty-behavior permanent="true" />
+</mode>

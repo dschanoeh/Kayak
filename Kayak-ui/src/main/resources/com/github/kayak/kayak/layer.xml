@@ -272,6 +272,8 @@
             <file name="StartPageTopComponent.settings" url="StartPageTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
+            <file name="management.wsmode" url="management.wsmode"/>
+           <!--<file name="statistics.wsmode" url="statistics.wsmode"/>-->
             <folder name="editor">
                 <file name="BusConfigurationTopComponent.wstcref" url="BusConfigurationTopComponentWstcref.xml"/>
                 <file name="RawViewTopComponent.wstcref" url="RawViewTopComponentWstcref.xml"/>
@@ -280,12 +282,15 @@
             <folder name="explorer">
                 <file name="ProjectsTopComponent.wstcref" url="ProjectsTopComponentWstcref.xml"/>
             </folder>
-            <folder name="properties">
-                <file name="BusStatisticsTopComponent.wstcref" url="BusStatisticsTopComponentWstcref.xml"/>
+
+            <folder name="management">
                 <file name="ConnectionsTopComponent.wstcref" url="ConnectionsTopComponentWstcref.xml"/>
                 <file name="DescriptionsTopComponent.wstcref" url="DescriptionsTopComponentWstcref.xml"/>
                 <file name="LogFilesTopComponent.wstcref" url="LogFilesTopComponentWstcref.xml"/>
             </folder>
+            <!--<folder name="statistics">
+                <file name="BusStatisticsTopComponent.wstcref" url="BusStatisticsTopComponentWstcref.xml"/>
+            </folder>-->
         </folder>
     </folder>
 </filesystem>
