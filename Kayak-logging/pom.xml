@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>RELEASE691</version>
+            <version>RELEASE70</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -49,37 +49,37 @@
             <artifactId>org-openide-util-lookup</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE691</version>
+            <version>RELEASE70</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-windows</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE691</version>
+            <version>RELEASE70</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-awt</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE691</version>
+            <version>RELEASE70</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-nodes</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE691</version>
+            <version>RELEASE70</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-explorer</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE691</version>
+            <version>RELEASE70</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-filesystems</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE691</version>
+            <version>RELEASE70</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-settings</artifactId>
-            <version>RELEASE691</version>
+            <version>RELEASE70</version>
         </dependency>
     </dependencies>
 
@@ -98,7 +98,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.5</version>
                 <extensions>true</extensions>
             </plugin>
 
@@ -106,7 +106,7 @@
                 <!-- netbeans modules in 6.9+ are 1.6 compatible -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
