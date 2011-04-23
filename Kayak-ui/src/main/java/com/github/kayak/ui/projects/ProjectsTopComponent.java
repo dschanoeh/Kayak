@@ -14,7 +14,6 @@ import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-import org.openide.util.lookup.Lookups;
 
 /**
  * Top component which displays something.
@@ -25,7 +24,6 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
 
     private static ProjectsTopComponent instance;
     private ExplorerManager manager = new ExplorerManager();
-    /** path to the icon used by the component and its open action */
     static final String ICON_PATH = "com/github/kayak/ui/projects/package-x-generic.png";
     private static final String PREFERRED_ID = "ProjectsTopComponent";
 

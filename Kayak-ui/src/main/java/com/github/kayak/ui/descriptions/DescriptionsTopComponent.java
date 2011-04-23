@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
+import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.explorer.ExplorerManager;
 
@@ -21,7 +21,7 @@ public final class DescriptionsTopComponent extends TopComponent implements Expl
 
     private static DescriptionsTopComponent instance;
     /** path to the icon used by the component and its open action */
-//    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
+    static final String ICON_PATH = "org/freedesktop/tango/16x16/mimetypes/text-x-generic.png";
     private static final String PREFERRED_ID = "DescriptionsTopComponent";
     ExplorerManager manager = new ExplorerManager();
 
@@ -29,7 +29,7 @@ public final class DescriptionsTopComponent extends TopComponent implements Expl
         initComponents();
         setName(NbBundle.getMessage(DescriptionsTopComponent.class, "CTL_DescriptionsTopComponent"));
         setToolTipText(NbBundle.getMessage(DescriptionsTopComponent.class, "HINT_DescriptionsTopComponent"));
-//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
     }
 

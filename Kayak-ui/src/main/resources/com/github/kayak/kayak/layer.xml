@@ -107,6 +107,7 @@
                 <attr name="component" methodvalue="com.github.kayak.ui.descriptions.DescriptionsTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.ui.descriptions.Bundle#CTL_DescriptionsAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png"/>
             </file>
             <file name="com-github-kayak-ui-logfiles-LogFilesAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.logfiles.LogFilesTopComponent.findInstance"/>
