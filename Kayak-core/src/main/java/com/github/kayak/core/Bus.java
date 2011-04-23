@@ -42,7 +42,7 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
     private ControlConnection controlConnection;
     private String name;
     private BusURL url;
-    private ArrayList<BusChangeListener> listeners;
+    private final ArrayList<BusChangeListener> listeners;
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
     private HashSet<Integer> subscribedIDs;
     private ArrayList<StatisticsReceiver> statisticsReceivers;
@@ -104,10 +104,11 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
      */
     public void destroy() {
         disconnect();
-        
-        for(BusChangeListener listener : listeners) {
-            if(listener != null)
-                listener.destroyed();
+        synchronized(listeners) {
+            for(BusChangeListener listener : listeners) {
+                if(listener != null)
+                    listener.destroyed();
+            }
         }
     }
 
@@ -218,11 +219,15 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
      * about changes to the bus like added connections etc.
      */
     public void addBusChangeListener(BusChangeListener listener) {
-        listeners.add(listener);
+        synchronized(listeners) {
+            listeners.add(listener);
+        }
     }
 
     public void removeBusChangeListener(BusChangeListener listener) {
-        listeners.remove(listener);
+        synchronized(listeners) {
+            listeners.remove(listener);
+        }
     }
 
     /**
@@ -293,16 +298,20 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
     }
 
     private void notifyListenersConnection() {
-        for(BusChangeListener listener : listeners) {
-            if(listener != null)
-                listener.connectionChanged();
+        synchronized(listeners) {
+            for(BusChangeListener listener : listeners) {
+                if(listener != null)
+                    listener.connectionChanged();
+            }
         }
     }
 
     private void notifyListenersName() {
-        for(BusChangeListener listener : listeners) {
-            if(listener != null)
-                listener.nameChanged();
+        synchronized(listeners) {
+            for(BusChangeListener listener : listeners) {
+                if(listener != null)
+                    listener.nameChanged();
+            }
         }
     }
 
