@@ -22,10 +22,10 @@ import com.github.kayak.core.Frame;
 import com.github.kayak.core.FrameReceiver;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.core.TimeSource;
+import com.github.kayak.logging.options.Options;
 import com.github.kayak.ui.projects.Project;
 import java.io.IOException;
 import java.util.ArrayList;
-import com.github.kayak.core.TimeSource.Mode;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManagementListener;
 import com.github.kayak.ui.projects.ProjectManager;
@@ -52,12 +52,12 @@ public class SnapshotBuffer {
     
     private static final Logger logger = Logger.getLogger(SnapshotBuffer.class.getCanonicalName());
 
-    private int depth = 5000;
+    private static final int depth = Options.getSnapshotBufferDepth();
+    private static final int finish = Options.getSnapshotBufferFinish();
     private final ArrayList<Frame> frames;
     private Thread cleanupThread;
     private int stopTimeout = 0;
     private boolean stopRequest = false;
-    private Mode mode;
     private ArrayList<Bus> busses;
     private ArrayList<Subscription> subscriptions;
     private String name;
@@ -160,23 +160,18 @@ public class SnapshotBuffer {
         @Override
         public void run() {
             while (!stopRequest) {
+                
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(finish);
                 } catch (InterruptedException e) {
                     if (stopRequest) {
-                        try {
-                            Thread.sleep(stopTimeout);
-                        } catch (InterruptedException ex) {
-                            logger.log(Level.WARNING, "Snapshot buffer interrupted while waiting.", ex);
-                        }
-
-                        for(Subscription s : subscriptions) {
-                            s.Terminate();
-                        }
-                        subscriptions.clear();
-                        busses.clear();
+                        cleanup();
+                        return;
+                    } else {
+                        logger.log(Level.WARNING, "Snapshot buffer interrupted without stop request");
                     }
                 }
+                
                 long currentTime = ts.getTime();
                 synchronized (frames) {
                     Frame[] frameArray = new Frame[0];
@@ -188,17 +183,28 @@ public class SnapshotBuffer {
                     }
                 }
             }
+            
+            cleanup();
+        }
+        
+        private void cleanup() {
+            try {
+                Thread.sleep(stopTimeout);
+            } catch (InterruptedException ex) {
+                logger.log(Level.INFO, "Snapshot buffer interrupted while waiting.", ex);
+            }
+
+            for (Subscription s : subscriptions) {
+                s.Terminate();
+            }
+            subscriptions.clear();
+            busses.clear();
+            return;
         }
     };
 
     public int getDepth() {
         return depth;
-    }
-
-    public void setDepth(int depth) {
-        if (depth > 0) {
-            this.depth = depth;
-        }
     }
 
     public SnapshotBuffer() {
@@ -233,6 +239,7 @@ public class SnapshotBuffer {
 
         stopRequest = false;
         cleanupThread = new Thread(cleanupRunnable);
+        cleanupThread.setName("Snapshot buffer thread");
         cleanupThread.start();
     }
 

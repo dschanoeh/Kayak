@@ -18,7 +18,7 @@
 package com.github.kayak.logging.snapshots;
 
 import com.github.kayak.core.Bus;
-import com.github.kayak.logging.LogFileManager;
+import com.github.kayak.logging.options.Options;
 import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectManager;
 import java.io.File;
@@ -36,7 +36,6 @@ import org.openide.windows.WindowManager;
 import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.NbPreferences;
 
 /**
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
@@ -219,8 +218,7 @@ public final class SnapshotBufferTopComponent extends TopComponent {
                 buffer.setDescription("");
                 buffer.setPlatform("NO_PLATFORM");
 
-                String homeFolder = System.getProperty("user.home");
-                FileObject logFolder = FileUtil.toFileObject(new File(NbPreferences.forModule(LogFileManager.class).get("Log file directory", homeFolder + "/kayak/log/")));
+                FileObject logFolder = FileUtil.toFileObject(new File(Options.getLogFilesFolder()));
                 try {
                     FileObject fo = logFolder.createData(buffer.getName() + ".log");
                     buffer.writeToFile(fo);

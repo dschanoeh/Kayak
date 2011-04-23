@@ -19,6 +19,7 @@
 package com.github.kayak.logging;
 
 import com.github.kayak.core.LogFile;
+import com.github.kayak.logging.options.Options;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -28,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.NbPreferences;
 
 /**
  *
@@ -54,8 +54,7 @@ public class LogFileManager {
     }
 
     public LogFileManager() {
-        String homeFolder = System.getProperty("user.home");
-        logFolder = FileUtil.toFileObject(new File(NbPreferences.forModule(LogFileManager.class).get("Log file directory", homeFolder + "/kayak/log/")));
+        logFolder = FileUtil.toFileObject(new File(Options.getLogFilesFolder()));
 
         logFileDir = new ArrayList<LogFile>();
         platformList = new HashMap<String,ArrayList<LogFile>>();
