@@ -4,10 +4,7 @@
  */
 package com.github.kayak.ui.connections;
 
-import com.github.kayak.core.BusURL;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -27,7 +24,6 @@ autostore = false)
 public final class ConnectionsTopComponent extends TopComponent implements ExplorerManager.Provider {
 
     private static ConnectionsTopComponent instance;
-    /** path to the icon used by the component and its open action */
     static final String ICON_PATH = "com/github/kayak/ui/network-wireless.png";
     private static final String PREFERRED_ID = "ConnectionsTopComponent";
 

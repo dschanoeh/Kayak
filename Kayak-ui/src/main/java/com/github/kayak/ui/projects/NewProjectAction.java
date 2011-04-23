@@ -7,7 +7,17 @@ package com.github.kayak.ui.projects;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
 
+@ActionID(id = "com.github.kayak.ui.projects.NewProjectAction", category = "File")
+@ActionRegistration(iconInMenu = true, displayName = "#CTL_NewProject", iconBase = "org/freedesktop/tango/16x16/mimetypes/package-x-generic.png")
+@ActionReferences(value = {
+    @ActionReference(path = "Shortcuts", name = "D-N"),
+    @ActionReference(path = "Toolbars/File", name = "com-github-kayak-ui-projects-NewProject", position = 100),
+    @ActionReference(path = "Menu/File", name = "com-github-kayak-ui-projects-NewProject", position = 100)})
 public final class NewProjectAction implements ActionListener {
 
     @Override
