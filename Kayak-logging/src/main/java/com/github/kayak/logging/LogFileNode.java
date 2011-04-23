@@ -21,14 +21,24 @@ package com.github.kayak.logging;
 import com.github.kayak.core.LogFile;
 import com.github.kayak.logging.input.LogInputTopComponent;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.GZIPOutputStream;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JOptionPane;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
-import org.openide.util.HelpCtx;
-import org.openide.util.actions.SystemAction;
-
+import org.openide.util.Exceptions;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
@@ -36,10 +46,12 @@ import org.openide.util.actions.SystemAction;
  */
 public class LogFileNode extends AbstractNode {
     
+    private static final Logger logger = Logger.getLogger(LogFileNode.class.getCanonicalName());
     private LogFile logFile;
+    private static final LogFileManager manager = LogFileManager.getGlobalLogFileManager();
 
     public LogFileNode(LogFile logFile) {
-        super(Children.create(new BusNodeFactory(logFile), true));
+        super(Children.LEAF, Lookups.singleton(logFile));
         this.logFile = logFile;
         this.setDisplayName(logFile.getDescription());
         this.setShortDescription(logFile.getFileName());
@@ -48,13 +60,18 @@ public class LogFileNode extends AbstractNode {
     }
 
     @Override
-    public SystemAction[] getActions() {
-        return new SystemAction[] { openAction };
-    }
-
-    @Override
-    public SystemAction getDefaultAction() {
-        return openAction;
+    public Action[] getActions(boolean foo) {
+        ArrayList<Action> actions = new ArrayList<Action>();
+        
+        actions.add(new OpenAction());
+        actions.add(new DeleteAction());
+        if(!logFile.getCompressed())
+            actions.add(new CompressAction());
+        
+        if(!manager.getFavouries().contains(logFile))
+            actions.add(new BookmarkAction());
+            
+        return actions.toArray(new Action[0]);
     }
 
     @Override
@@ -62,11 +79,16 @@ public class LogFileNode extends AbstractNode {
         Sheet s = super.createSheet();
         Sheet.Set set = s.createPropertiesSet();
 
-        Property platform = new PropertySupport.ReadOnly<String>("Platform", String.class, "Platform", "Platform that was specified in the log file") {
+        Property platform = new PropertySupport.ReadWrite<String>("Platform", String.class, "Platform", "Platform that was specified in the log file") {
 
             @Override
             public String getValue() throws IllegalAccessException, InvocationTargetException {
                 return logFile.getPlatform();
+            }
+
+            @Override
+            public void setValue(String t) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
 
         };
@@ -89,11 +111,16 @@ public class LogFileNode extends AbstractNode {
 
         };
 
-        Property description = new PropertySupport.ReadOnly<String>("Description", String.class, "Description", "Description that was defined in the log file") {
+        Property description = new PropertySupport.ReadWrite<String>("Description", String.class, "Description", "Description that was defined in the log file") {
 
             @Override
             public String getValue() throws IllegalAccessException, InvocationTargetException {
                 return logFile.getDescription();
+            }
+
+            @Override
+            public void setValue(String t) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
 
         };
@@ -118,7 +145,11 @@ public class LogFileNode extends AbstractNode {
         return s;
     }
 
-    SystemAction openAction = new SystemAction() {
+    private class OpenAction extends AbstractAction {
+        
+        public OpenAction() {
+            putValue (NAME, "Open");
+        }
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -126,17 +157,88 @@ public class LogFileNode extends AbstractNode {
             tc.setLogFile(logFile);
             tc.open();
             tc.requestActive();
-
+        }
+    };
+    
+    private class DeleteAction extends AbstractAction {
+        
+        public DeleteAction() {
+            putValue (NAME, "Delete...");
         }
 
         @Override
-        public String getName() {
-            return "open";
+        public void actionPerformed(ActionEvent e) {
+            LogFile lf = getLookup().lookup (LogFile.class);
+            
+            if(lf != null) {
+                int res = JOptionPane.showConfirmDialog(null, "", "Are you sure?", JOptionPane.YES_NO_OPTION);
+                
+                if(res == JOptionPane.YES_OPTION) {
+                    File f = lf.getFile();
+                    f.delete();
+                    try {
+                        destroy();
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    LogFileManager.getGlobalLogFileManager().removeLogFile(lf);
+                }
+            }
+
+        }
+    };
+    
+    private class CompressAction extends AbstractAction {
+        
+        public CompressAction() {
+            putValue (NAME, "Compress");
         }
 
         @Override
-        public HelpCtx getHelpCtx() {
-            return HelpCtx.DEFAULT_HELP;
+        public void actionPerformed(ActionEvent e) {
+            LogFile lf = getLookup().lookup(LogFile.class);
+
+            if (lf != null) {
+                File f = lf.getFile();
+
+                try {
+
+                    File newFile = new File(f.getAbsolutePath() + ".gz");
+                    GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(newFile));
+                    FileInputStream in = new FileInputStream(f);
+
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                    in.close();
+
+                    out.finish();
+                    out.close();
+                    f.delete();
+                    LogFileManager.getGlobalLogFileManager().removeLogFile(lf);
+                    LogFileManager.getGlobalLogFileManager().addLogFile(LogFile.fromFile(newFile));
+                } catch (IOException ex) {
+                    logger.log(Level.WARNING, "Could not compress log file");
+                }
+            }
+        }
+    };
+    
+    private class BookmarkAction extends AbstractAction {
+        
+        public BookmarkAction() {
+            putValue (NAME, "Bookmark");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            LogFile lf = getLookup().lookup(LogFile.class);
+
+            if (lf != null) {
+                manager.addFavourite(lf);
+            }
         }
     };
 

@@ -216,7 +216,7 @@ public final class SnapshotBufferTopComponent extends TopComponent {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
                 buffer.setName(sdf.format(cal.getTime()));
                 buffer.setDescription("");
-                buffer.setPlatform("NO_PLATFORM");
+                buffer.setPlatform("SNAPSHOTS");
 
                 FileObject logFolder = FileUtil.toFileObject(new File(Options.getLogFilesFolder()));
                 try {

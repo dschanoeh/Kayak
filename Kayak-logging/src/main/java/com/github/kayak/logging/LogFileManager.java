@@ -22,8 +22,10 @@ import com.github.kayak.core.LogFile;
 import com.github.kayak.logging.options.Options;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +43,8 @@ public class LogFileManager {
 
     private HashMap<String,ArrayList<LogFile>> platformList;
     private TreeSet<String> platforms;
+    private ArrayList<LogFileManagementChangeListener> listeners = new ArrayList<LogFileManagementChangeListener>();
+    private ArrayList<LogFile> favourites = new ArrayList<LogFile>();
 
     public TreeSet<String> getPlatforms() {
         return platforms;
@@ -51,6 +55,14 @@ public class LogFileManager {
 
     public String getLogFolder() {
         return logFolder.getPath();
+    }
+    
+    public void addListener(LogFileManagementChangeListener listener) {
+        listeners.add(listener);
+    }
+    
+    public void removeListener(LogFileManagementChangeListener listener) {
+        listeners.remove(listener);
     }
 
     public LogFileManager() {
@@ -101,12 +113,68 @@ public class LogFileManager {
             }
         }
     }
+    
+    public void removeLogFile(LogFile file) {
+        if(platforms.contains(file.getPlatform())) {
+            platformList.get(file.getPlatform()).remove(file);
+            
+            for(LogFileManagementChangeListener listener : listeners) {
+                listener.logFilesForPlatformChanged(file.getPlatform());
+            }
+            
+            if (favourites.contains(file)) {
+                favourites.remove(file);
+
+                for (LogFileManagementChangeListener listener : listeners) {
+                    listener.favouritesChanged();
+                }
+            }
+        }
+    }
+    
+    public void addLogFile(LogFile file) {
+        if (platforms.contains(file.getPlatform())) {
+            platformList.get(file.getPlatform()).add(file);
+        } else {
+            ArrayList<LogFile> platform = new ArrayList<LogFile>();
+            platform.add(file);
+            platformList.put(file.getPlatform(), platform);
+            platforms.add(file.getPlatform());
+            for(LogFileManagementChangeListener listener : listeners) {
+                listener.platformsChanged();
+            }
+        }
+        
+        for(LogFileManagementChangeListener listener : listeners) {
+            listener.logFilesForPlatformChanged(file.getPlatform());
+        }
+    }
 
     public ArrayList<LogFile> getFilesForPlatform(String platform) {
         if(platforms.contains(platform)) {
             return platformList.get(platform);
         } else
             return null;
+    }
+    
+    public void addFavourite(LogFile file) {
+        favourites.add(file);
+        
+        for(LogFileManagementChangeListener listener : listeners) {
+            listener.favouritesChanged();
+        }
+    }
+    
+    public void removeFavourite(LogFile file) {
+        favourites.remove(file);
+        
+        for(LogFileManagementChangeListener listener : listeners) {
+            listener.favouritesChanged();
+        }
+    }
+    
+    public List<LogFile> getFavouries() {
+        return Collections.unmodifiableList(favourites);
     }
 
 }

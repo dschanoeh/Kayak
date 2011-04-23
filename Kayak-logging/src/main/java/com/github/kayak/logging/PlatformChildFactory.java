@@ -29,15 +29,37 @@ import org.openide.nodes.Node;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class PlatformChildFactory extends ChildFactory<LogFile> {
+    
     private String platform;
+    private LogFileManager manager = LogFileManager.getGlobalLogFileManager();
+    
+    private LogFileManagementChangeListener listener = new LogFileManagementChangeListener() {
+
+        @Override
+        public void logFilesForPlatformChanged(String p) {
+            if(platform.equals(p))
+                refresh(true);
+        }
+
+        @Override
+        public void platformsChanged() {
+            
+        }
+        
+        @Override
+        public void favouritesChanged() {
+            
+        }
+    };
 
     public PlatformChildFactory(String platform) {
         this.platform = platform;
+        LogFileManager.getGlobalLogFileManager().addListener(listener);
     }
 
     @Override
     protected boolean createKeys(List<LogFile> toPopulate) {
-        ArrayList<LogFile> logFiles = LogFileManager.getGlobalLogFileManager().getFilesForPlatform(platform);
+        ArrayList<LogFile> logFiles = manager.getFilesForPlatform(platform);
         toPopulate.addAll(logFiles);
 
         return true;

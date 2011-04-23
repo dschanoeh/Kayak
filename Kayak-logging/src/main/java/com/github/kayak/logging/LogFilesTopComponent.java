@@ -4,8 +4,6 @@
  */
 package com.github.kayak.logging;
 
-import com.github.kayak.core.LogFile;
-import java.io.File;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -29,6 +27,7 @@ public final class LogFilesTopComponent extends TopComponent implements Explorer
     static final String ICON_PATH = "com/github/kayak/ui/logfiles/accessories-text-editor.png";
     private static final String PREFERRED_ID = "LogFilesTopComponent";
     private ExplorerManager manager = new ExplorerManager();
+    private LogFilesNodeFactory factory = new LogFilesNodeFactory();
 
     public LogFilesTopComponent() {
         initComponents();
@@ -36,7 +35,7 @@ public final class LogFilesTopComponent extends TopComponent implements Explorer
         setToolTipText(NbBundle.getMessage(LogFilesTopComponent.class, "HINT_LogFilesTopComponent"));
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
-        AbstractNode rootNode = new AbstractNode(Children.create(new LogFilesNodeFactory(), true));
+        AbstractNode rootNode = new AbstractNode(Children.create(factory, true));
         manager.setRootContext(rootNode);
         associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
     }

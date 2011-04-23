@@ -31,6 +31,24 @@ import org.openide.nodes.Node;
 public class LogFilesNodeFactory extends ChildFactory<LogFilesNodeFactory.Folders> {
 
     public static enum Folders { DIRECTORY, FAVOURTIES };
+    
+    private LogFileManagementChangeListener listener = new LogFileManagementChangeListener() {
+
+        @Override
+        public void logFilesForPlatformChanged(String platform) {
+            
+        }
+
+        @Override
+        public void platformsChanged() {
+            refresh(true);
+        }
+        
+        @Override
+        public void favouritesChanged() {
+            
+        }
+    };
 
     @Override
     protected boolean createKeys(List<Folders> toPopulate) {
@@ -47,7 +65,7 @@ public class LogFilesNodeFactory extends ChildFactory<LogFilesNodeFactory.Folder
             node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
             return new Node[] {node};
         } else if(key == Folders.FAVOURTIES) {
-            AbstractNode node = new AbstractNode(Children.LEAF);
+            AbstractNode node = new AbstractNode(Children.create(new LogFavouritesFactory(), true));
             node.setDisplayName("Favourites");
             return new Node[] {node};
         }
