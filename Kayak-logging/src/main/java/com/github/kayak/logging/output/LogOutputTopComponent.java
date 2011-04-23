@@ -6,27 +6,23 @@ package com.github.kayak.logging.output;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.ui.ModuleLifecycleManager;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
+import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.explorer.ExplorerManager;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 /**
@@ -37,8 +33,7 @@ autostore = false)
 public final class LogOutputTopComponent extends TopComponent implements ExplorerManager.Provider {
 
     private static LogOutputTopComponent instance;
-    /** path to the icon used by the component and its open action */
-//    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
+    static final String ICON_PATH = "org/freedesktop/tango/16x16/actions/go-next.png";
     private static final String PREFERRED_ID = "LogOutputTopComponent";
     private ExplorerManager manager;
     private ArrayList<Bus> busses;
@@ -94,7 +89,7 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
         initComponents();
         setName(NbBundle.getMessage(LogOutputTopComponent.class, "CTL_LogOutputTopComponent"));
         setToolTipText(NbBundle.getMessage(LogOutputTopComponent.class, "HINT_LogOutputTopComponent"));
-//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
 

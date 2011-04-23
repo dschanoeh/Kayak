@@ -13,6 +13,7 @@
                 <attr name="component" methodvalue="com.github.kayak.logging.output.LogOutputTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="com.github.kayak.logging.output.Bundle#CTL_LogOutputAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/go-next.png"/> 
             </file>
             <file name="com-github-kayak-logging-snapshots-SnapshotBufferAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.logging.snapshots.SnapshotBufferTopComponent.findInstance"/>

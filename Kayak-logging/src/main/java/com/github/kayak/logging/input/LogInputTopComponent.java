@@ -20,6 +20,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.util.ImageUtilities;
 
 /**
  * Top component which displays something.
@@ -29,8 +30,8 @@ autostore = false)
 public final class LogInputTopComponent extends TopComponent implements BusDropTargetAdapter.BusDropReceiver {
 
     private static LogInputTopComponent instance;
-    /** path to the icon used by the component and its open action */
-//    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
+    
+    static final String ICON_PATH = "org/freedesktop/tango/16x16/actions/go-previous.png";
     private static final String PREFERRED_ID = "LogInputTopComponent";
     private LogFile logFile;
     private JLabel[] labels;
@@ -44,7 +45,7 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
         initComponents();
         setName(NbBundle.getMessage(LogInputTopComponent.class, "CTL_LogInputTopComponent"));
         setToolTipText(NbBundle.getMessage(LogInputTopComponent.class, "HINT_LogInputTopComponent"));
-//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
     }
 
