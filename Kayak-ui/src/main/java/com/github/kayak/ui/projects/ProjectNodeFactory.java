@@ -36,6 +36,10 @@ public class ProjectNodeFactory extends ChildFactory<Project> {
         public void projectsUpdated() {
             refresh(true);
         }
+
+        @Override
+        public void openProjectChanged(Project p) {
+        }
     };
 
     @Override

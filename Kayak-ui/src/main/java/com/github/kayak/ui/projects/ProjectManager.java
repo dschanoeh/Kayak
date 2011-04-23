@@ -73,6 +73,10 @@ public class ProjectManager {
 
         p.open();
         openedProject = p;
+        
+        for(ProjectManagementListener l : listeners) {
+            l.openProjectChanged(p);
+        }
     }
 
     public void closeProject(Project p) {
@@ -80,6 +84,9 @@ public class ProjectManager {
             return;
 
         openedProject.close();
+        for(ProjectManagementListener l : listeners) {
+            l.openProjectChanged(null);
+        }
     }
 
     public void addListener(ProjectManagementListener listener) {

@@ -77,7 +77,9 @@ public class Project {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
             TimeSourceManager.getGlobalTimeSource().register(b);
         }
-        notifyListenersBussesChanged();
+        for(ProjectChangeListener listener : listeners) {
+            listener.projectBusAdded(b);
+        }
     }
 
     public void removeBus(Bus b) {
@@ -86,7 +88,9 @@ public class Project {
             b.setTimeSource(null);
             TimeSourceManager.getGlobalTimeSource().deregister(b);
         }
-        notifyListenersBussesChanged();
+        for(ProjectChangeListener listener : listeners) {
+            listener.projectBusRemoved(b);
+        }
     }
 
     public String getName() {
@@ -115,18 +119,6 @@ public class Project {
         ProjectChangeListener[] listenerArray = listeners.toArray(new ProjectChangeListener[listeners.size()]);
         for(ProjectChangeListener listener : listenerArray) {
             listener.projectOpened();
-        }
-    }
-
-    private void notifyListenersDeleted() {
-        for(ProjectChangeListener listener : listeners) {
-            listener.projectDeleted();
-        }
-    }
-
-    private void notifyListenersBussesChanged() {
-        for(ProjectChangeListener listener : listeners) {
-            listener.projectBussesChanged();
         }
     }
 

@@ -37,166 +37,158 @@ import org.openide.util.datatransfer.PasteType;
  */
 public class ProjectNode extends AbstractNode implements NewBusCookie {
 
-        private Project project;
-        
-        private ProjectChangeListener changeListener = new ProjectChangeListener() {
+    private Project project;
+    private ProjectChangeListener changeListener = new ProjectChangeListener() {
 
-            @Override
-            public void projectNameChanged() {
-                
-            }
+        @Override
+        public void projectNameChanged() {
+        }
 
-            @Override
-            public void projectClosed() {
-                setChildren(Children.LEAF);
-                setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
-            }
-
-            @Override
-            public void projectDeleted() {
-                
-            }
-
-            @Override
-            public void projectBussesChanged() {
-                
-            }
-
-            @Override
-            public void projectOpened() {
-                setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
-                setChildren(Children.create(new ProjectChildFactory(project), true));
-            }
-        };
-
-        public ProjectNode(Project project) {
-            super(Children.LEAF);
+        @Override
+        public void projectClosed() {
+            setChildren(Children.LEAF);
             setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
+        }
+
+        @Override
+        public void projectOpened() {
+            setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
+            setChildren(Children.create(new ProjectChildFactory(project), true));
+        }
+
+        @Override
+        public void projectBusAdded(Bus bus) {
             
-            this.project = project;
-            project.addProjectChangeListener(changeListener);
-            
-            if(project.isOpened()) {
-                setChildren(Children.create(new ProjectChildFactory(project), true));
-                setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
-            }
-            super.setDisplayName(project.getName());
+        }
+
+        @Override
+        public void projectBusRemoved(Bus bus) {
             
         }
+    };
 
-        @Override
-        public PasteType getDropType(Transferable t, int action, int index) {
-            try {
-                final BusURL url = (BusURL) t.getTransferData(BusURL.DATA_FLAVOR);
-                return new PasteType() {
+    public ProjectNode(Project project) {
+        super(Children.LEAF);
+        setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
 
-                    @Override
-                    public Transferable paste() throws IOException {
-                        if(url.checkConnection()) {
-                            String name = JOptionPane.showInputDialog("Please give a name for the Bus", url.getBus());
+        this.project = project;
+        project.addProjectChangeListener(changeListener);
 
-                            if(name != null) {
-                                Bus b = new Bus();
-                                b.setName(name);
-                                project.addBus(b);
-                                b.setConnection(url);
-                                ConnectionManager.getGlobalConnectionManager().addRecent(url);
-                            }
-                        }
-                        return null;
-                    }
-                };
-            } catch (UnsupportedFlavorException ex) {
-
-            } catch (IOException ex) {
-
-            }
-            return null;
+        if (project.isOpened()) {
+            setChildren(Children.create(new ProjectChildFactory(project), true));
+            setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
         }
-
-        @Override
-        public void addNewBus() {
-            String name = JOptionPane.showInputDialog("Please give a name for the Bus", "newBus");
-
-            if(name != null) {
-                Bus b = new Bus();
-                b.setName(name);
-                project.addBus(b);
-            }
-        }
-
-        @Override
-        public void setDisplayName(String s) {
-            super.setDisplayName(s);
-            project.setName(s);
-        }
-
-        @Override
-        public Action[] getActions(boolean popup) {
-            if(project.isOpened()) {
-                return new Action[] { new RenameAction(), new DeleteAction(), new CloseAction() };
-            } else {
-                return new Action[] { new RenameAction(), new DeleteAction(), new OpenAction() };
-            }
-        }
-
-        private class DeleteAction extends AbstractAction {
-
-            public DeleteAction() {
-                putValue(NAME, "Delete");
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(project.isOpened())
-                    project.close();
-                
-                ProjectManager.getGlobalProjectManager().removeProject(project);
-            }
-
-        };
-
-        private class RenameAction extends AbstractAction {
-
-            public RenameAction() {
-                putValue(NAME, "Rename...");
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String name = JOptionPane.showInputDialog("Please give a new name for the bus", project.getName());
-
-                if (name != null) {
-                    setDisplayName(name);
-                }
-            }
-
-        };
-        
-        private class OpenAction extends AbstractAction {
-
-            public OpenAction() {
-                putValue(NAME, "Open");
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ProjectManager.getGlobalProjectManager().openProject(project);
-            }
-
-        };
-        
-        private class CloseAction extends AbstractAction {
-
-            public CloseAction() {
-                putValue(NAME, "Close");
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {                
-                ProjectManager.getGlobalProjectManager().closeProject(project);
-            }
-
-        };
+        super.setDisplayName(project.getName());
 
     }
+
+    @Override
+    public PasteType getDropType(Transferable t, int action, int index) {
+        try {
+            final BusURL url = (BusURL) t.getTransferData(BusURL.DATA_FLAVOR);
+            return new PasteType() {
+
+                @Override
+                public Transferable paste() throws IOException {
+                    if (url.checkConnection()) {
+                        String name = JOptionPane.showInputDialog("Please give a name for the Bus", url.getBus());
+
+                        if (name != null) {
+                            Bus b = new Bus();
+                            b.setName(name);
+                            project.addBus(b);
+                            b.setConnection(url);
+                            ConnectionManager.getGlobalConnectionManager().addRecent(url);
+                        }
+                    }
+                    return null;
+                }
+            };
+        } catch (UnsupportedFlavorException ex) {
+        } catch (IOException ex) {
+        }
+        return null;
+    }
+
+    @Override
+    public void addNewBus() {
+        String name = JOptionPane.showInputDialog("Please give a name for the Bus", "newBus");
+
+        if (name != null) {
+            Bus b = new Bus();
+            b.setName(name);
+            project.addBus(b);
+        }
+    }
+
+    @Override
+    public void setDisplayName(String s) {
+        super.setDisplayName(s);
+        project.setName(s);
+    }
+
+    @Override
+    public Action[] getActions(boolean popup) {
+        if (project.isOpened()) {
+            return new Action[]{new RenameAction(), new DeleteAction(), new CloseAction()};
+        } else {
+            return new Action[]{new RenameAction(), new DeleteAction(), new OpenAction()};
+        }
+    }
+
+    private class DeleteAction extends AbstractAction {
+
+        public DeleteAction() {
+            putValue(NAME, "Delete");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (project.isOpened()) {
+                project.close();
+            }
+
+            ProjectManager.getGlobalProjectManager().removeProject(project);
+        }
+    };
+
+    private class RenameAction extends AbstractAction {
+
+        public RenameAction() {
+            putValue(NAME, "Rename...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String name = JOptionPane.showInputDialog("Please give a new name for the bus", project.getName());
+
+            if (name != null) {
+                setDisplayName(name);
+            }
+        }
+    };
+
+    private class OpenAction extends AbstractAction {
+
+        public OpenAction() {
+            putValue(NAME, "Open");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ProjectManager.getGlobalProjectManager().openProject(project);
+        }
+    };
+
+    private class CloseAction extends AbstractAction {
+
+        public CloseAction() {
+            putValue(NAME, "Close");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ProjectManager.getGlobalProjectManager().closeProject(project);
+        }
+    };
+}
