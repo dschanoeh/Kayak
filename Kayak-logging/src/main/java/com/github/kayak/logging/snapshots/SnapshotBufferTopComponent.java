@@ -1,57 +1,69 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 	This file is part of Kayak.
+ *	
+ *	Kayak is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *	
+ *	Kayak is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *	
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
+ *	
  */
 package com.github.kayak.logging.snapshots;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.logging.LogFileManager;
 import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectManager;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ListModel;
-import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
+import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.NbPreferences;
 
 /**
- * Top component which displays something.
+ * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.logging.snapshots//SnapshotBuffer//EN",
 autostore = false)
 public final class SnapshotBufferTopComponent extends TopComponent {
+    
+    private static final Logger logger = Logger.getLogger(SnapshotBufferTopComponent.class.getCanonicalName());
 
     private static SnapshotBufferTopComponent instance;
     /** path to the icon used by the component and its open action */
-//    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
+    static final String ICON_PATH = "org/freedesktop/tango/16x16/devices/camera-photo.png";
     private static final String PREFERRED_ID = "SnapshotBufferTopComponent";
-    private SnapshotBuffer currentBuffer;
-    private ArrayList<SnapshotBuffer> savedBuffers = new ArrayList<SnapshotBuffer>();
-    private ArrayList<ListDataListener> listListeners = new ArrayList<ListDataListener>();
-
-    private ListModel listModel = new ListModel() {
-
-        @Override
-        public int getSize() {
-            return savedBuffers.size();
-        }
+    private SnapshotBuffer currentBuffer;    
+    private SnapshotModel snapshots = new SnapshotModel();
+    
+    private ListSelectionListener selectionListener = new ListSelectionListener() {
 
         @Override
-        public Object getElementAt(int index) {
-            return savedBuffers.get(index).getName();
-        }
-
-        @Override
-        public void addListDataListener(ListDataListener l) {
-            listListeners.add(l);
-        }
-
-        @Override
-        public void removeListDataListener(ListDataListener l) {
-            listListeners.remove(l);
+        public void valueChanged(ListSelectionEvent e) {
+            int i = e.getFirstIndex();
+            
+            SnapshotBuffer s = (SnapshotBuffer) snapshots.getElementAt(i);
+            jTextField1.setText(s.getName());
+            jTextField2.setText(s.getPlatform());
+            jTextField3.setText(s.getDescription());
         }
     };
 
@@ -59,8 +71,9 @@ public final class SnapshotBufferTopComponent extends TopComponent {
         initComponents();
         setName(NbBundle.getMessage(SnapshotBufferTopComponent.class, "CTL_SnapshotBufferTopComponent"));
         setToolTipText(NbBundle.getMessage(SnapshotBufferTopComponent.class, "HINT_SnapshotBufferTopComponent"));
-//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
+        jList1.addListSelectionListener(selectionListener);
     }
 
     /** This method is called from within the constructor to
@@ -82,6 +95,7 @@ public final class SnapshotBufferTopComponent extends TopComponent {
         jTextField2 = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jTextField3 = new javax.swing.JTextField();
+        jToggleButton1 = new javax.swing.JToggleButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(SnapshotBufferTopComponent.class, "SnapshotBufferTopComponent.jButton1.text")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -91,8 +105,13 @@ public final class SnapshotBufferTopComponent extends TopComponent {
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(SnapshotBufferTopComponent.class, "SnapshotBufferTopComponent.jButton2.text")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
-        jList1.setModel(listModel);
+        jList1.setModel(snapshots);
         jScrollPane1.setViewportView(jList1);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(SnapshotBufferTopComponent.class, "SnapshotBufferTopComponent.jPanel1.border.title"))); // NOI18N
@@ -109,6 +128,13 @@ public final class SnapshotBufferTopComponent extends TopComponent {
 
         jTextField3.setText(org.openide.util.NbBundle.getMessage(SnapshotBufferTopComponent.class, "SnapshotBufferTopComponent.jTextField2.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(jToggleButton1, org.openide.util.NbBundle.getMessage(SnapshotBufferTopComponent.class, "SnapshotBufferTopComponent.jToggleButton1.text")); // NOI18N
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -118,17 +144,15 @@ public final class SnapshotBufferTopComponent extends TopComponent {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))
+                    .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
+                    .addComponent(jLabel3)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addComponent(jToggleButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -144,6 +168,8 @@ public final class SnapshotBufferTopComponent extends TopComponent {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToggleButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -151,15 +177,15 @@ public final class SnapshotBufferTopComponent extends TopComponent {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE))
+                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -169,7 +195,7 @@ public final class SnapshotBufferTopComponent extends TopComponent {
                     .addComponent(jButton1)
                     .addComponent(jButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -177,13 +203,53 @@ public final class SnapshotBufferTopComponent extends TopComponent {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        SnapshotBuffer buffer = currentBuffer;
-        newCurrentBuffer();
-        savedBuffers.add(buffer);
-        /*for(ListDataListener listener : listListeners) {
-            listener.contentsChanged(new ListDataEvent(buffer, WIDTH, WIDTH, WIDTH));
-        }*/
+        final SnapshotBuffer buffer = currentBuffer;
+
+        newCurrentBuffer();        
+        jButton1.setEnabled(false);
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                buffer.stopBuffering(3000);
+
+                Calendar cal = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+                buffer.setName(sdf.format(cal.getTime()));
+                buffer.setDescription("");
+                buffer.setPlatform("NO_PLATFORM");
+
+                String homeFolder = System.getProperty("user.home");
+                FileObject logFolder = FileUtil.toFileObject(new File(NbPreferences.forModule(LogFileManager.class).get("Log file directory", homeFolder + "/kayak/log/")));
+                try {
+                    FileObject fo = logFolder.createData(buffer.getName() + ".log");
+                    buffer.writeToFile(fo);
+                } catch (IOException ex) {
+                    logger.log(Level.WARNING, "could not save snapshot to file", ex);
+                }
+
+                snapshots.addSnapshot(buffer);
+                jButton1.setEnabled(true);
+            }
+        };
+
+        Thread t = new Thread(r);
+        t.start();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        int i = jList1.getSelectedIndex();
+        SnapshotBuffer s = (SnapshotBuffer) snapshots.getElementAt(i);
+        snapshots.removeSnapshot(s);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        int i = jList1.getSelectedIndex();
+        SnapshotBuffer s = (SnapshotBuffer) snapshots.getElementAt(i);
+        s.setName(jTextField1.getText());
+        s.setPlatform(jTextField2.getText());
+        s.setDescription(jTextField3.getText());
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -197,6 +263,7 @@ public final class SnapshotBufferTopComponent extends TopComponent {
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
+    private javax.swing.JToggleButton jToggleButton1;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,
@@ -232,8 +299,8 @@ public final class SnapshotBufferTopComponent extends TopComponent {
     private void newCurrentBuffer() {
         currentBuffer = new SnapshotBuffer();
         Project p = ProjectManager.getGlobalProjectManager().getOpenedProject();
-        if(p != null) {
-            for(Bus b : p.getBusses()) {
+        if (p != null) {
+            for (Bus b : p.getBusses()) {
                 currentBuffer.connectBus(b);
             }
         }

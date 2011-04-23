@@ -6,11 +6,15 @@ package com.github.kayak.logging.output;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.ui.ModuleLifecycleManager;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -22,6 +26,7 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.explorer.ExplorerManager;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 /**
@@ -38,6 +43,44 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
     private ExplorerManager manager;
     private ArrayList<Bus> busses;
     private BusNodeFactory factory;
+    
+    private DropTargetListener dropListener = new DropTargetListener() {
+
+        @Override
+        public void dragEnter(DropTargetDragEvent dtde) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void dragOver(DropTargetDragEvent dtde) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void dropActionChanged(DropTargetDragEvent dtde) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void dragExit(DropTargetEvent dte) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void drop(DropTargetDropEvent dtde) {
+         
+         /*       try {
+                    BusNode node = (BusNode) dtde.getTransferable().getTransferData(BusNode.);
+                    
+                } catch (UnsupportedFlavorException ex) {
+                    Exceptions.printStackTrace(ex);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }*/
+        
+            
+        }
+    };
 
     private NotifyDelete notify = new NotifyDelete() {
 
@@ -62,32 +105,8 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
         AbstractNode rootNode = new AbstractNode(Children.create(factory, true));
         manager.setRootContext(rootNode);
 
-        /*DropTarget dt = new DropTarget(beanTreeView1, new DropTargetAdapter() {
-
-            @Override
-            public void dragEnter(DropTargetDragEvent dtde) {
-                if (!dtde.isDataFlavorSupported(
-                        com.github.kayak.ui.projects.BusNode.DATA_FLAVOR)) {
-                    dtde.rejectDrag();
-                }
-            }
-
-            public void drop(DropTargetDropEvent dtde) {
-                try {
-                    com.github.kayak.ui.projects.BusNode n = (com.github.kayak.ui.projects.BusNode) dtde.getTransferable().
-                            getTransferData(com.github.kayak.ui.projects.BusNode.DATA_FLAVOR);
-
-                    busses.add(n.getBus());
-                    factory.update();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    dtde.rejectDrop();
-                }
-            }
-        });
-
-        beanTreeView1.setDropTarget(dt);*/
+        DropTarget dt = new DropTarget(jList1, dropListener);
+        jList1.setDropTarget(dt);
 
     }
 
@@ -108,6 +127,8 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
         jLabel4 = new javax.swing.JLabel();
         jTextField3 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
 
         setPreferredSize(new java.awt.Dimension(300, 336));
 
@@ -134,6 +155,13 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(LogOutputTopComponent.class, "LogOutputTopComponent.jButton1.text")); // NOI18N
 
+        jList1.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(jList1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -152,11 +180,13 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
                             .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2))
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(166, 166, 166)
-                        .addComponent(jButton1)))
+                    .addComponent(jLabel1))
                 .addContainerGap())
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(119, 119, 119)
+                .addComponent(jButton1)
+                .addContainerGap(121, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -176,8 +206,11 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 166, Short.MAX_VALUE)
-                .addComponent(jButton1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -205,6 +238,8 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JList jList1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;

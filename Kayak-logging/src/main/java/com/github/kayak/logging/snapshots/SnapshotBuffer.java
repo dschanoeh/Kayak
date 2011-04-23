@@ -17,12 +17,27 @@
  */
 package com.github.kayak.logging.snapshots;
 
+import com.github.kayak.core.Bus;
+import com.github.kayak.core.Frame;
+import com.github.kayak.core.FrameReceiver;
+import com.github.kayak.core.Subscription;
+import com.github.kayak.core.TimeSource;
+import com.github.kayak.ui.projects.Project;
+import java.io.IOException;
 import java.util.ArrayList;
-
-import com.github.kayak.core.*;
 import com.github.kayak.core.TimeSource.Mode;
+import com.github.kayak.ui.projects.ProjectChangeListener;
+import com.github.kayak.ui.projects.ProjectManagementListener;
+import com.github.kayak.ui.projects.ProjectManager;
 import com.github.kayak.ui.time.TimeSourceManager;
-import java.io.File;
+import java.io.BufferedWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.openide.filesystems.FileObject;
+import org.openide.util.Exceptions;
 
 /**
  * A SnapshotBuffer can be connected to a {@link Bus} and then buffers
@@ -34,21 +49,76 @@ import java.io.File;
  *
  */
 public class SnapshotBuffer {
+    
+    private static final Logger logger = Logger.getLogger(SnapshotBuffer.class.getCanonicalName());
 
     private int depth = 5000;
-    private Subscription subscription;
     private final ArrayList<Frame> frames;
     private Thread cleanupThread;
     private Thread replayThread;
     private int stopTimeout = 0;
     private boolean stopRequest = false;
     private Mode mode;
-    private TimeSource timeSource;
     private ArrayList<Bus> busses;
     private ArrayList<Subscription> subscriptions;
     private String name;
     private String platform;
     private String description;
+    private Project currentProject;
+    private String path;
+    private boolean wasWritten = false;
+    
+    private ProjectManagementListener managementListener = new ProjectManagementListener() {
+
+        @Override
+        public void projectsUpdated() {
+            
+        }
+
+        @Override
+        public void openProjectChanged(Project p) {
+            logger.log(Level.INFO, "Switching snapshot buffer to new project");
+            if(currentProject != null)
+                currentProject.removeProjectChangeListener(projectListener);
+            
+            p.addProjectChangeListener(projectListener);
+        }
+    };
+    
+    private ProjectChangeListener projectListener = new ProjectChangeListener() {
+
+        @Override
+        public void projectNameChanged() {
+            
+        }
+
+        @Override
+        public void projectClosed() {
+            currentProject.removeProjectChangeListener(projectListener);
+            
+            for(Subscription s : subscriptions) {
+                s.Terminate();
+            }
+            
+            busses.clear();
+            subscriptions.clear();
+        }
+
+        @Override
+        public void projectOpened() {
+
+        }
+
+        @Override
+        public void projectBusAdded(Bus bus) {
+            
+        }
+
+        @Override
+        public void projectBusRemoved(Bus bus) {
+            busses.remove(bus);
+        }
+    };
 
     public String getDescription() {
         return description;
@@ -85,6 +155,8 @@ public class SnapshotBuffer {
     };
 
     private Runnable cleanupRunnable = new Runnable() {
+        
+        private TimeSource ts = TimeSourceManager.getGlobalTimeSource();
 
         @Override
         public void run() {
@@ -95,7 +167,9 @@ public class SnapshotBuffer {
                     if (stopRequest) {
                         try {
                             Thread.sleep(stopTimeout);
-                        } catch (InterruptedException ex) {}
+                        } catch (InterruptedException ex) {
+                            logger.log(Level.WARNING, "Snapshot buffer interrupted while waiting.", ex);
+                        }
 
                         for(Subscription s : subscriptions) {
                             s.Terminate();
@@ -104,9 +178,11 @@ public class SnapshotBuffer {
                         busses.clear();
                     }
                 }
-                long currentTime = TimeSourceManager.getGlobalTimeSource().getTime();
+                long currentTime = ts.getTime();
                 synchronized (frames) {
-                    for (Frame f : frames) {
+                    Frame[] frameArray = new Frame[0];
+                    frameArray = frames.toArray(frameArray);
+                    for (Frame f : frameArray) {
                         if (f.getTimestamp() < currentTime - depth) {
                             frames.remove(f);
                         }
@@ -130,6 +206,11 @@ public class SnapshotBuffer {
         frames = new ArrayList<Frame>(500);
         busses = new ArrayList<Bus>();
         subscriptions = new ArrayList<Subscription>();
+        
+        ProjectManager.getGlobalProjectManager().addListener(managementListener);
+        currentProject = ProjectManager.getGlobalProjectManager().getOpenedProject();
+        if(currentProject != null)
+            currentProject.addProjectChangeListener(projectListener);
     }
 
     public void connectBus(Bus bus) {
@@ -165,11 +246,56 @@ public class SnapshotBuffer {
         stopRequest = true;
 
         if (cleanupThread != null && cleanupThread.isAlive()) {
-            replayThread.interrupt();
+            try {
+                cleanupThread.join();
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, "was not able to stop cleanup thread!", ex);
+            }
         }
+        
+        for(Subscription s : subscriptions) {
+            s.Terminate();
+        }
+        subscriptions.clear();
+        busses.clear();
     }
 
-    public void writeToFile(File f) {
-
+    public void writeToFile(FileObject fo) {
+        path = fo.getPath();
+        OutputStream os = null;
+        try {
+            os = fo.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(os);            
+            BufferedWriter out = new BufferedWriter(osw);
+            out.write("PLATFORM " + platform + "\n");
+            out.write("DESCRIPTION \"" + description + "\"\n");
+            out.write("DEVICE_ALIAS");
+            
+            for(Frame frame : frames) {
+                out.write(frame.toString() + "\n");
+            }
+            out.close();
+            wasWritten = true;
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            try {
+                os.close();
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+        
+        wasWritten = true;
     }
+
+    @Override
+    public String toString() {
+        if(name != null)
+            return name;
+        else
+            return super.toString();
+    }
+    
+    
 }
