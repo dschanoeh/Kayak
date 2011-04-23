@@ -76,26 +76,30 @@ public class LogFileManager {
         logFileDir.clear();
         platforms.clear();
 
-        if(logFolder.isFolder()) {
-           Enumeration<? extends FileObject> children = logFolder.getChildren(true);
+        if (logFolder.isFolder()) {
+            Enumeration<? extends FileObject> children = logFolder.getChildren(true);
 
-           while(children.hasMoreElements()) {
-               FileObject file = children.nextElement();
+            while (children.hasMoreElements()) {
+                FileObject file = children.nextElement();
 
-               if(file.getNameExt().endsWith(".log")|| file.getNameExt().endsWith(".log.gz")) {
-                   LogFile logFile = LogFile.fromFile(FileUtil.toFile(file));
+                if (file.getNameExt().endsWith(".log") || file.getNameExt().endsWith(".log.gz")) {
+                    try {
+                        LogFile logFile = LogFile.fromFile(FileUtil.toFile(file));
 
-                   if(platformList.containsKey(logFile.getPlatform())) {
-                       ArrayList<LogFile> platform = platformList.get(logFile.getPlatform());
-                       platform.add(logFile);
-                   } else {
-                       ArrayList<LogFile> platform = new ArrayList<LogFile>();
-                       platform.add(logFile);
-                       platformList.put(logFile.getPlatform(), platform);
-                       platforms.add(logFile.getPlatform());
-                   }
-               }
-           }
+                        if (platformList.containsKey(logFile.getPlatform())) {
+                            ArrayList<LogFile> platform = platformList.get(logFile.getPlatform());
+                            platform.add(logFile);
+                        } else {
+                            ArrayList<LogFile> platform = new ArrayList<LogFile>();
+                            platform.add(logFile);
+                            platformList.put(logFile.getPlatform(), platform);
+                            platforms.add(logFile.getPlatform());
+                        }
+                    } catch (Exception ex) {
+                        logger.log(Level.WARNING, "Found malformed log file: {0}. Ignoring...", file.getName());
+                    }
+                }
+            }
         }
     }
 
