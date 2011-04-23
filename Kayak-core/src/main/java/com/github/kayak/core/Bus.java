@@ -118,6 +118,7 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
                 f.setTimestamp(timeSource.getTime());
+                f.setBusName(name);
                 deliverRAWFrame(f);
             }
         }
@@ -129,6 +130,7 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
                 f.setTimestamp(timeSource.getTime());
+                f.setBusName(name);
                 deliverBCMFrame(f);
             }
         }

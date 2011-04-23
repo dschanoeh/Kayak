@@ -33,7 +33,7 @@ import com.github.kayak.ui.time.TimeSourceManager;
 import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.URI;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.filesystems.FileObject;
@@ -55,7 +55,6 @@ public class SnapshotBuffer {
     private int depth = 5000;
     private final ArrayList<Frame> frames;
     private Thread cleanupThread;
-    private Thread replayThread;
     private int stopTimeout = 0;
     private boolean stopRequest = false;
     private Mode mode;
@@ -269,10 +268,17 @@ public class SnapshotBuffer {
             BufferedWriter out = new BufferedWriter(osw);
             out.write("PLATFORM " + platform + "\n");
             out.write("DESCRIPTION \"" + description + "\"\n");
-            out.write("DEVICE_ALIAS");
+            
+            HashSet<String> busNames = new HashSet<String>();
+            for(Frame frame : frames) {
+                busNames.add(frame.getBusName());
+            }
+            for(String name : busNames) {
+                out.write("DEVICE_ALIAS " + name + " " + name + "\n");
+            }
             
             for(Frame frame : frames) {
-                out.write(frame.toString() + "\n");
+                out.write(frame.toLogFileNotation());
             }
             out.close();
             wasWritten = true;
