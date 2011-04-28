@@ -49,6 +49,10 @@ public class LogFileNode extends AbstractNode {
     private static final Logger logger = Logger.getLogger(LogFileNode.class.getCanonicalName());
     private LogFile logFile;
     private static final LogFileManager manager = LogFileManager.getGlobalLogFileManager();
+    
+    private void setText(String text) {
+        this.setDisplayName(text);
+    }
 
     public LogFileNode(LogFile logFile) {
         super(Children.LEAF, Lookups.singleton(logFile));
@@ -77,7 +81,7 @@ public class LogFileNode extends AbstractNode {
     @Override
     protected Sheet createSheet() {
         Sheet s = super.createSheet();
-        Sheet.Set set = s.createPropertiesSet();
+        Sheet.Set set = Sheet.createPropertiesSet();
 
         Property platform = new PropertySupport.ReadWrite<String>("Platform", String.class, "Platform", "Platform that was specified in the log file") {
 
@@ -88,7 +92,15 @@ public class LogFileNode extends AbstractNode {
 
             @Override
             public void setValue(String t) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-                throw new UnsupportedOperationException("Not supported yet.");
+                try {
+                    LogFileManager.getGlobalLogFileManager().removeLogFile(logFile);
+                    logFile.setPlatform(t);
+                    LogFileManager.getGlobalLogFileManager().addLogFile(logFile);                    
+                } catch(IllegalArgumentException ex) {
+                    throw(ex);
+                } catch(Exception ex) {
+                    logger.log(Level.WARNING, "Could not change value of log file", ex);
+                }
             }
 
         };
@@ -120,9 +132,16 @@ public class LogFileNode extends AbstractNode {
 
             @Override
             public void setValue(String t) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-                throw new UnsupportedOperationException("Not supported yet.");
+                try {
+                    logFile.setDescription(t);
+                    setText(t);
+                } catch(IllegalArgumentException ex) {
+                    throw(ex);
+                } catch(Exception ex) {
+                    logger.log(Level.WARNING, "Could not change value of log file", ex);
+                }
             }
-
+            
         };
 
         Property length = new PropertySupport.ReadOnly<String>("Length", String.class, "Length", "Length of the file in milliseconds") {

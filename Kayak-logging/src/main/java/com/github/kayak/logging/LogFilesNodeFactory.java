@@ -31,24 +31,6 @@ import org.openide.nodes.Node;
 public class LogFilesNodeFactory extends ChildFactory<LogFilesNodeFactory.Folders> {
 
     public static enum Folders { DIRECTORY, FAVOURTIES };
-    
-    private LogFileManagementChangeListener listener = new LogFileManagementChangeListener() {
-
-        @Override
-        public void logFilesForPlatformChanged(String platform) {
-            
-        }
-
-        @Override
-        public void platformsChanged() {
-            refresh(true);
-        }
-        
-        @Override
-        public void favouritesChanged() {
-            
-        }
-    };
 
     @Override
     protected boolean createKeys(List<Folders> toPopulate) {

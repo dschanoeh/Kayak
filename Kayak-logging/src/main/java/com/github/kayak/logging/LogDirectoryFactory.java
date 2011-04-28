@@ -30,8 +30,27 @@ import org.openide.nodes.Node;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class LogDirectoryFactory extends ChildFactory<String> {
+    
+    private LogFileManagementChangeListener listener = new LogFileManagementChangeListener() {
+
+        @Override
+        public void logFilesForPlatformChanged(String platform) {
+            
+        }
+
+        @Override
+        public void platformsChanged() {
+            refresh(true);
+        }
+        
+        @Override
+        public void favouritesChanged() {
+            
+        }
+    };
 
     public LogDirectoryFactory() {
+        LogFileManager.getGlobalLogFileManager().addListener(listener);
     }
 
     @Override
