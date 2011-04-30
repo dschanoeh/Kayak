@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +32,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -52,6 +52,12 @@ public class LogFile {
     private String platform;
     private HashMap<String, String> deviceAlias;
     private long length;
+    
+    public static final Pattern platformPattern = Pattern.compile("[A-Z0-9_]+");
+    public static final Pattern descriptionPattern = Pattern.compile("[a-zA-Z0-9\\s]+");
+    public static final Pattern descriptionLinePattern = Pattern.compile("DESCRIPTION \"[a-zA-Z0-9\\s]+\"");
+    public static final Pattern platformLinePattern = Pattern.compile("PLATFORM [A-Z0-9_]+");
+    public static final Pattern deviceAliasLinePattern = Pattern.compile("DEVICE_ALIAS [A-Za-z0-9]+ [a-z0-9]{1,16}");
 
     public long getLength() {
         return length;
@@ -106,9 +112,8 @@ public class LogFile {
     }
     
     public void setPlatform(String platform) throws FileNotFoundException, IOException {
-        
-        if(!platform.matches("[A-Z0-9_]+"))
-            throw new IllegalArgumentException("Platform must match [A-Z0-9_]+");
+        if(!platformPattern.matcher(platform).matches())
+            throw new IllegalArgumentException("Platform must match " + platformPattern.pattern());
 
         File tempFile = new File(file.getAbsolutePath() + ".tmp");
         BufferedReader br;
@@ -160,9 +165,8 @@ public class LogFile {
     }
     
     public void setDescription(String description) throws FileNotFoundException, IOException {
-        
-        if(!description.matches("[a-zA-Z0-9\\s]+"))
-            throw new IllegalArgumentException("Description must match [a-zA-Z0-9\\s]+");
+        if(!descriptionPattern.matcher(description).matches())
+            throw new IllegalArgumentException("Description must match " + descriptionPattern.pattern());
 
         File tempFile = new File(file.getAbsolutePath() + ".tmp");
         BufferedReader br;
@@ -278,18 +282,18 @@ public class LogFile {
                 String line = reader.readLine();
 
                 if (line.startsWith("DESCRIPTION")) {
-                    if (line.matches("DESCRIPTION \"[a-zA-Z0-9\\s]+\"")) {
+                    if (descriptionLinePattern.matcher(line).matches()) {
                         int start = line.indexOf('\"') + 1;
                         int stop = line.lastIndexOf("\"");
                         description = line.substring(start, stop);
                     }
                 } else if (line.startsWith("PLATFORM")) {
-                    if(line.matches("PLATFORM [A-Z0-9_]+")) {
+                    if(platformLinePattern.matcher(line).matches()) {
                         int start = line.indexOf(' ') + 1;
                         platform = line.substring(start);
                     }
                 } else if (line.startsWith("DEVICE_ALIAS")) {
-                    if (line.matches("DEVICE_ALIAS [A-Za-z0-9]+ [a-z0-9]{1,16}")) {
+                    if (deviceAliasLinePattern.matcher(line).matches()) {
                         int start = line.indexOf(' ') + 1;
                         int stop = line.lastIndexOf(' ');
                         String alias = line.substring(start, stop);
