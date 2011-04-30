@@ -8,7 +8,6 @@ import com.github.kayak.core.Bus;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
-import javax.swing.JTextField;
 
 /**
  *

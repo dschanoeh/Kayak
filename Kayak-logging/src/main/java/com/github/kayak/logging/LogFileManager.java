@@ -111,10 +111,6 @@ public class LogFileManager {
                     }
                 }
             }
-            
-            for(LogFileManagementChangeListener listener : listeners) {
-                listener.platformsChanged();
-            }
         }
     }
     

@@ -62,7 +62,7 @@ public class LogDirectoryFactory extends ChildFactory<String> {
 
     @Override
     protected Node[] createNodesForKey(String key) {
-        AbstractNode node = new AbstractNode(Children.create(new PlatformChildFactory(key), true));
+        AbstractNode node = new AbstractNode(Children.create(new PlatformChildFactory(key), false));
         node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
         node.setDisplayName(key);
 

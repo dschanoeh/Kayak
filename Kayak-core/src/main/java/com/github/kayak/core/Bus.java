@@ -57,6 +57,14 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         }
     };
 
+    @Override
+    public String toString() {
+        if(name == null)
+            return super.toString();
+        else
+            return name;
+    }
+
     public BusURL getConnection() {
         return url;
     }

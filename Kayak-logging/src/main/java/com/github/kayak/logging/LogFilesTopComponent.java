@@ -35,7 +35,7 @@ public final class LogFilesTopComponent extends TopComponent implements Explorer
         setToolTipText(NbBundle.getMessage(LogFilesTopComponent.class, "HINT_LogFilesTopComponent"));
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
-        AbstractNode rootNode = new AbstractNode(Children.create(factory, true));
+        AbstractNode rootNode = new AbstractNode(Children.create(factory, false));
         manager.setRootContext(rootNode);
         associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
     }
@@ -119,7 +119,7 @@ public final class LogFilesTopComponent extends TopComponent implements Explorer
 
     @Override
     public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_ALWAYS;
+        return TopComponent.PERSISTENCE_NEVER;
     }
 
     @Override
