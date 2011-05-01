@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -143,6 +144,28 @@ public class LogFileNode extends AbstractNode {
             }
             
         };
+        
+        Property size = new PropertySupport.ReadOnly<String>("Size", String.class, "Size", "Size of the file") {
+
+            private final double BASE = 1024, KB = BASE, MB = KB * BASE, GB = MB * BASE;
+            private final DecimalFormat df = new DecimalFormat("#.##");
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                long size = logFile.getSize();
+
+                if (size >= GB) {
+                    return df.format(size / GB) + " GB";
+                }
+                if (size >= MB) {
+                    return df.format(size / MB) + " MB";
+                }
+                if (size >= KB) {
+                    return df.format(size / KB) + " KB";
+                }
+                return "" + (int) size + " bytes";
+            }
+        };
 
         Property length = new PropertySupport.ReadOnly<String>("Length", String.class, "Length", "Length of the file in milliseconds") {
 
@@ -157,6 +180,7 @@ public class LogFileNode extends AbstractNode {
         set.put(fileName);
         set.put(compressed);
         set.put(description);
+        set.put(size);
         set.put(length);
 
         s.put(set);
