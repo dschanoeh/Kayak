@@ -95,7 +95,7 @@ public class LogFileManager {
 
                 if (file.getNameExt().endsWith(".log") || file.getNameExt().endsWith(".log.gz")) {
                     try {
-                        LogFile logFile = LogFile.fromFile(FileUtil.toFile(file));
+                        LogFile logFile = new LogFile(FileUtil.toFile(file));
 
                         if (platformList.containsKey(logFile.getPlatform())) {
                             ArrayList<LogFile> platform = platformList.get(logFile.getPlatform());

@@ -37,7 +37,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- *
+ * Represents an already existing log file. On creation the file is parsed and
+ * the relevant content is available as properties.
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class LogFile {
@@ -47,7 +48,6 @@ public class LogFile {
     private Boolean compressed;
     private File file;
     private InputStream inputStream;
-    private boolean write;
     private String description;
     private String platform;
     private HashMap<String, String> deviceAlias;
@@ -101,14 +101,6 @@ public class LogFile {
 
     public String getFileName() {
         return file.getName();
-    }
-
-    public Boolean hasWriteAccess() {
-        return write;
-    }
-
-    public Boolean hasReadAccess() {
-        return !write;
     }
     
     public void setPlatform(String platform) throws FileNotFoundException, IOException {
@@ -217,61 +209,22 @@ public class LogFile {
         this.description = description;
     }
 
-    private LogFile(File file, Boolean compressed, Boolean write) throws FileNotFoundException, IOException {
+    public LogFile(File file) throws FileNotFoundException, IOException {
         this.file = file;
-        this.compressed = compressed;
-        this.write = write;
         this.platform = "";
         this.description = "";
         deviceAlias = new HashMap<String, String>();
+        String filename = file.getPath();
 
-        if (!write) {
-            if (compressed) {
-                inputStream = new GZIPInputStream(new FileInputStream(file));
-            } else {
-                inputStream = new FileInputStream(file);
-            }
+        if (filename.endsWith(".log.gz")) {
+            compressed = true;
+            inputStream = new GZIPInputStream(new FileInputStream(file));
+        } else {
+            compressed = false;
+            inputStream = new FileInputStream(file);
         }
 
         parseHeader();
-    }
-
-    public static LogFile fromFile(File file) {
-        if (!file.canRead()) {
-            return null;
-        }
-
-        String filename = file.getPath();
-        LogFile logFile;
-
-        if (filename.endsWith(".log.gz")) {
-            try {
-                logFile = new LogFile(file, true, false);
-            } catch (Exception ex) {
-                return null;
-            }
-        } else if (filename.endsWith(".log")) {
-            try {
-                logFile = new LogFile(file, false, false);
-            } catch (Exception ex) {
-                return null;
-            }
-        } else {
-            return null;
-        }
-
-        return logFile;
-    }
-
-    public static LogFile create(String filename, boolean gzipped) {
-        LogFile logFile;
-        try {
-            logFile = new LogFile(null, gzipped, true);
-        } catch (Exception ex) {
-            return null;
-        }
-
-        return logFile;
     }
 
     private void parseHeader() {

@@ -261,7 +261,7 @@ public class LogFileNode extends AbstractNode {
                     out.close();
                     f.delete();
                     LogFileManager.getGlobalLogFileManager().removeLogFile(lf);
-                    LogFileManager.getGlobalLogFileManager().addLogFile(LogFile.fromFile(newFile));
+                    LogFileManager.getGlobalLogFileManager().addLogFile(new LogFile(newFile));
                 } catch (IOException ex) {
                     logger.log(Level.WARNING, "Could not compress log file");
                 }
