@@ -44,8 +44,7 @@ public class Project {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
             TimeSourceManager.getGlobalTimeSource().register(b);
         }
-        
-        notifyListeners();
+        notifyListenersOpened();
     }
     
     public void close() {
@@ -54,9 +53,10 @@ public class Project {
         for(Bus b : busses) {
             b.setTimeSource(null);
             TimeSourceManager.getGlobalTimeSource().deregister(b);
+            b.destroy();
         }
         
-        notifyListeners();
+        notifyListenersClosed();
     }
 
     public void addProjectChangeListener(ProjectChangeListener listener) {
@@ -77,7 +77,7 @@ public class Project {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
             TimeSourceManager.getGlobalTimeSource().register(b);
         }
-        notifyListeners();
+        notifyListenersBussesChanged();
     }
 
     public void removeBus(Bus b) {
@@ -86,7 +86,7 @@ public class Project {
             b.setTimeSource(null);
             TimeSourceManager.getGlobalTimeSource().deregister(b);
         }
-        notifyListeners();
+        notifyListenersBussesChanged();
     }
 
     public String getName() {
@@ -95,11 +95,38 @@ public class Project {
 
      public void setName(String name) {
         this.name = name;
+        notifyListenersName();
     }
 
-    private void notifyListeners() {
+    private void notifyListenersName() {
         for(ProjectChangeListener listener : listeners) {
-            listener.projectChanged();
+            listener.projectNameChanged();
+        }
+    }
+
+    private void notifyListenersClosed() {
+        ProjectChangeListener[] listenerArray = listeners.toArray(new ProjectChangeListener[listeners.size()]);
+        for(ProjectChangeListener listener : listenerArray) {
+            listener.projectClosed();
+        }
+    }
+
+    private void notifyListenersOpened() {
+        ProjectChangeListener[] listenerArray = listeners.toArray(new ProjectChangeListener[listeners.size()]);
+        for(ProjectChangeListener listener : listenerArray) {
+            listener.projectOpened();
+        }
+    }
+
+    private void notifyListenersDeleted() {
+        for(ProjectChangeListener listener : listeners) {
+            listener.projectDeleted();
+        }
+    }
+
+    private void notifyListenersBussesChanged() {
+        for(ProjectChangeListener listener : listeners) {
+            listener.projectBussesChanged();
         }
     }
 

@@ -12,4 +12,5 @@ package com.github.kayak.core;
 public interface BusChangeListener {
     public void connectionChanged();
     public void nameChanged();
+    public void destroyed();
 }

@@ -5,6 +5,7 @@
 package com.github.kayak.ui.rawview;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.Subscription;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +30,24 @@ public final class RawViewTopComponent extends TopComponent {
     private Bus bus;
     private Subscription subscription;
     private RawViewTableModel model;
+    
+    private BusChangeListener listener = new BusChangeListener() {
+
+        @Override
+        public void connectionChanged() {
+            
+        }
+
+        @Override
+        public void nameChanged() {
+            setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent") + " - " + bus.getName());
+        }
+
+        @Override
+        public void destroyed() {
+            close();
+        }
+    };
 
     public RawViewTopComponent() {
         model = new RawViewTableModel();
@@ -192,6 +211,7 @@ public final class RawViewTopComponent extends TopComponent {
     public void setBus(Bus bus) {
         this.bus = bus;
         setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent") + " - " + bus.getName());
+        bus.addBusChangeListener(listener);
 
         subscription = new Subscription(model, bus);
         subscription.setSubscribeAll(Boolean.TRUE);

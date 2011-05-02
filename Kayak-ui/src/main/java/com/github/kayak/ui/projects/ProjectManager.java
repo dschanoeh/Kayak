@@ -43,15 +43,8 @@ public class ProjectManager {
 
     private static ProjectManager projectManagement;
     private ArrayList<Project> projects;
-    private ArrayList<ProjectChangeListener> listeners;
-    
-    private ProjectChangeListener listener = new ProjectChangeListener() {
-
-        @Override
-        public void projectChanged() {
-            notifyListeners();
-        }
-    };
+    private Project openedProject;
+    private ArrayList<ProjectManagementListener> listeners;
 
 
     public ArrayList<Project> getProjects() {
@@ -60,33 +53,49 @@ public class ProjectManager {
 
     public void addProject(Project e) {
         projects.add(e);
-        e.addProjectChangeListener(listener);
         notifyListeners();
     }
 
     public void removeProject(Project e) {
         projects.remove(e);
-        e.removeProjectChangeListener(listener);
         notifyListeners();
     }
 
-    public void addListener(ProjectChangeListener listener) {
+    public void openProject(Project p) {
+        if(!projects.contains(p) || p == openedProject)
+            return;
+
+        if(openedProject != null)
+            openedProject.close();
+
+        p.open();
+        openedProject = p;
+    }
+
+    public void closeProject(Project p) {
+        if(!projects.contains(p) || p != openedProject)
+            return;
+
+        openedProject.close();
+    }
+
+    public void addListener(ProjectManagementListener listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(ProjectChangeListener listener) {
+    public void removeListener(ProjectManagementListener listener) {
         listeners.remove(listener);
     }
 
     private void notifyListeners() {
-        for(ProjectChangeListener listener : listeners) {
-            listener.projectChanged();
+        for(ProjectManagementListener listener : listeners) {
+            listener.projectsUpdated();
         }
     }
 
     public ProjectManager() {
         projects = new ArrayList<Project>();
-        listeners = new ArrayList<ProjectChangeListener>();
+        listeners = new ArrayList<ProjectManagementListener>();
     }
 
     public static ProjectManager getGlobalProjectManager() {
@@ -117,7 +126,7 @@ public class ProjectManager {
                     Node openedNode = attributes.getNamedItem("opened");
                     boolean opened = Boolean.parseBoolean(openedNode.getNodeValue());
                     if(opened)
-                        project.open();
+                        openProject(project);
 
                     NodeList busses = projects.item(i).getChildNodes();
 
