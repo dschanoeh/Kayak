@@ -42,7 +42,6 @@ public class Project {
         
         for(Bus b : busses) {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
-            TimeSourceManager.getGlobalTimeSource().register(b);
         }
         notifyListenersOpened();
     }
@@ -52,7 +51,6 @@ public class Project {
         
         for(Bus b : busses) {
             b.setTimeSource(null);
-            TimeSourceManager.getGlobalTimeSource().deregister(b);
             b.destroy();
         }
         
@@ -75,7 +73,6 @@ public class Project {
         busses.add(b);
         if(isOpened()) {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
-            TimeSourceManager.getGlobalTimeSource().register(b);
         }
         notifyListenersBussesChanged();
     }
@@ -84,7 +81,6 @@ public class Project {
         busses.remove(b);
         if(isOpened()) {
             b.setTimeSource(null);
-            TimeSourceManager.getGlobalTimeSource().deregister(b);
         }
         notifyListenersBussesChanged();
     }

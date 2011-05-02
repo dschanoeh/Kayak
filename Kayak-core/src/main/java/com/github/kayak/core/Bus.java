@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  *
  */
-public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
+public class Bus implements SubscriptionChangeReceiver {
 
     private static final Logger logger = Logger.getLogger(Bus.class.getName());
     private ArrayList<Subscription> subscriptionsRAW;
@@ -54,6 +54,41 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
             for(StatisticsReceiver s : statisticsReceivers) {
                 s.statisticsUpdated(rxBytes, rxPackets, tBytes, tPackets);
             }
+        }
+    };
+    
+    private TimeEventReceiver timeReceiver = new TimeEventReceiver() {
+
+        @Override
+        public void paused() {
+            mode = TimeSource.Mode.PAUSE;
+        }
+
+        /**
+         * Time is started. Connections are opened if they are required
+         */
+        @Override
+        public void played() {
+            mode = TimeSource.Mode.PLAY;
+
+            if (!subscriptionsBCM.isEmpty()) {
+                openBCMConnection();
+            }
+
+            if (!subscriptionsRAW.isEmpty()) {
+                openRAWConnection();
+            }
+        }
+
+        @Override
+        public void stopped() {
+            mode = TimeSource.Mode.STOP;
+
+            if(bcmConnection != null && bcmConnection.isConnected())
+                bcmConnection.close();
+
+            if(rawConnection != null && rawConnection.isConnected())
+                rawConnection.close();
         }
     };
 
@@ -142,7 +177,13 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
      * the message flow on the bus (play, pause, timestamps...)
      */
     public void setTimeSource(TimeSource timeSource) {
+        if(this.timeSource != null)
+            this.timeSource.deregister(timeReceiver);
+        
         this.timeSource = timeSource;
+        
+        if(timeSource != null)
+            timeSource.register(timeReceiver);
     }
 
     public Bus() {
@@ -152,6 +193,7 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         subscribedIDs = new HashSet<Integer>();
         statisticsReceivers = new ArrayList<StatisticsReceiver>();
     }
+
 
     @Override
     public void addSubscription(Subscription s) {
@@ -166,6 +208,75 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         }
     }
 
+    @Override
+    public void subscribed(int id, Subscription s) {
+        if (subscriptionsBCM.contains(s)) {
+            /* Check if the ID was already subscribed in any subscription */
+            if(!subscribedIDs.contains(id)) {
+                subscribedIDs.add(id);
+                if (bcmConnection != null && bcmConnection.isConnected()) {
+                    bcmConnection.subscribeTo(id, 0, 0);
+                } else {
+                    logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+                }
+            }
+        }
+    }
+
+    @Override
+    public void unsubscribed(int id, Subscription s) {
+        if(subscriptionsBCM.contains(s)) {
+            safeUnsubscribe(id);
+        }
+    }
+
+    @Override
+    public void subscriptionAllChanged(boolean all, Subscription s) {
+        /* BCM subscription switched to RAW subscription */
+        if (all == true) {
+            subscriptionsBCM.remove(s);
+            if(!subscriptionsRAW.contains(s))
+                subscriptionsRAW.add(s);
+
+            Set<Integer> ids = s.getAllIdentifiers();
+            for(Integer identifier : ids) {
+                safeUnsubscribe(identifier);
+            }
+
+            if(mode == TimeSource.Mode.PLAY) {
+                openRAWConnection();
+            }
+        /* RAW subscription switched to BCM subscription */
+        } else {
+            subscriptionsRAW.remove(s);
+            if(!subscriptionsBCM.contains(s))
+                subscriptionsBCM.add(s);
+
+            if(subscriptionsRAW.isEmpty() && rawConnection != null && rawConnection.isConnected()) {
+                logger.log(Level.INFO, "No more raw subscriptions. Closing connection.");
+                rawConnection.close();
+            }
+
+            /* Make sure BCM connection is opened */
+            if(mode == TimeSource.Mode.PLAY) {
+                openBCMConnection();
+
+                for(Integer identifier : s.getAllIdentifiers()) {
+                    bcmConnection.subscribeTo(identifier, 0, 0);
+                }
+            }
+
+            for(Integer identifier : s.getAllIdentifiers()) {
+                subscribedIDs.add(identifier);
+            }
+        }
+    }
+
+    @Override
+    public void subscriptionTerminated(Subscription s) {
+        removeSubscription(s);
+    }
+    
     /**
      * Try to unsubscribe from the identifier. First all other subscriptions
      * are checked if they subscribe to this identifier. If so nothing will
@@ -305,70 +416,6 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         }
     }
 
-    @Override
-    public void subscribed(int id, Subscription s) {
-        if (subscriptionsBCM.contains(s)) {
-            /* Check if the ID was already subscribed in any subscription */
-            if(!subscribedIDs.contains(id)) {
-                subscribedIDs.add(id);
-                if (bcmConnection != null && bcmConnection.isConnected()) {
-                    bcmConnection.subscribeTo(id, 0, 0);
-                } else {
-                    logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
-                }
-            }
-        }
-    }
-
-    @Override
-    public void unsubscribed(int id, Subscription s) {
-        if(subscriptionsBCM.contains(s)) {
-            safeUnsubscribe(id);
-        }
-    }
-
-    @Override
-    public void subscriptionAllChanged(boolean all, Subscription s) {
-        /* BCM subscription switched to RAW subscription */
-        if (all == true) {
-            subscriptionsBCM.remove(s);
-            if(!subscriptionsRAW.contains(s))
-                subscriptionsRAW.add(s);
-
-            Set<Integer> ids = s.getAllIdentifiers();
-            for(Integer identifier : ids) {
-                safeUnsubscribe(identifier);
-            }
-
-            if(mode == TimeSource.Mode.PLAY) {
-                openRAWConnection();
-            }
-        /* RAW subscription switched to BCM subscription */
-        } else {
-            subscriptionsRAW.remove(s);
-            if(!subscriptionsBCM.contains(s))
-                subscriptionsBCM.add(s);
-
-            if(subscriptionsRAW.isEmpty() && rawConnection != null && rawConnection.isConnected()) {
-                logger.log(Level.INFO, "No more raw subscriptions. Closing connection.");
-                rawConnection.close();
-            }
-
-            /* Make sure BCM connection is opened */
-            if(mode == TimeSource.Mode.PLAY) {
-                openBCMConnection();
-                
-                for(Integer identifier : s.getAllIdentifiers()) {
-                    bcmConnection.subscribeTo(identifier, 0, 0);
-                }
-            }
-            
-            for(Integer identifier : s.getAllIdentifiers()) {
-                subscribedIDs.add(identifier);
-            }
-        }
-    }
-
     /**
      * Checks if the BCM connection exists and is connected. If not tries
      * to create a new one and/or connects it. If there are subscriptions
@@ -422,41 +469,5 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
             rawConnection.open();
         }
     }
-
-    @Override
-    public void subscriptionTerminated(Subscription s) {
-        removeSubscription(s);
-    }
-
-    @Override
-    public void paused() {
-        mode = TimeSource.Mode.PAUSE;
-    }
-
-    /**
-     * Time is started. Connections are opened if they are required
-     */
-    @Override
-    public void played() {
-        mode = TimeSource.Mode.PLAY;
-
-        if (!subscriptionsBCM.isEmpty()) {
-            openBCMConnection();
-        }
-
-        if (!subscriptionsRAW.isEmpty()) {
-            openRAWConnection();
-        }
-    }
-
-    @Override
-    public void stopped() {
-        mode = TimeSource.Mode.STOP;
-
-        if(bcmConnection != null && bcmConnection.isConnected())
-            bcmConnection.close();
-
-        if(rawConnection != null && rawConnection.isConnected())
-            rawConnection.close();
-    }
+    
 }
