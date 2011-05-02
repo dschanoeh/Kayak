@@ -17,9 +17,12 @@
  */
 package com.github.kayak.core;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.SocketTimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This abstract class provides some common methods that are necessary for
@@ -29,98 +32,86 @@ import java.net.SocketTimeoutException;
  *
  */
 public abstract class SocketcandConnection {
-	private static final int BUFFER_SIZE = 512;
-	private char[] buffer = new char[BUFFER_SIZE];
-	private int bufferPosition=0;
-	protected String busName;
-	protected int port;
-	protected String host;
-	private FrameReceiver receiver;
 
-	public FrameReceiver getReceiver() {
-		return receiver;
-	}
+    private static final int BUFFER_SIZE = 4096;
+    private static final int ELEMENT_SIZE = 512;
+    
+    private static final Logger logger = Logger.getLogger(SocketcandConnection.class.getCanonicalName());
+    
+    protected String busName;
+    protected int port;
+    protected String host;
+    private FrameReceiver receiver;
+    private BufferedReader reader;
+    private final char[] elementBuffer = new char[ELEMENT_SIZE];
 
-	public void setReceiver(FrameReceiver receiver) {
-		this.receiver = receiver;
-	}
-	
-	public String getBusName() {
-		return busName;
-	}
-	
-	public String getHost() {
-		return host;
-	}
-	
-	public int getPort() {
-		return port;
-	}
-	
-	/**
-	 * This method reads data from an {@link InputStreamReader} and tries to
-	 * extract elements that are enclosed by '<' and '>'. A buffer is used to
-	 * construct elements that need multiple reads. Whitespace between the
-	 * elements is ignored. 
-	 * The method blocks until an element can be returned. 
-	 * @param in the InputStreamReader from which should be read
-	 * @return the first element read
-	 * @throws IOException
-	 */
-	protected String getElement(InputStreamReader in) throws IOException, InterruptedException, SocketTimeoutException {
-		Boolean first = true;
-		
-		while(true) {
-			/* on the first run we check if elements can be retrieved without
-			 * reading in more data.
-			 */
-			if(!(first && bufferPosition > 0))
-				bufferPosition += in.read(buffer, bufferPosition, BUFFER_SIZE-bufferPosition);
-			
-			first = false;
-			
-			/* locate opening '<' */
-			int start=-1;
-			if(buffer[0] == '<') {
-				start = 0;
-			} else {
-				for(int i=0;i<bufferPosition;i++) {
-					if(buffer[i]=='<')
-						start = i;
-				}
-			}
-			
-			/* if no '<' is in the string, the string can be discarded */
-			if(start==-1) {
-				bufferPosition = 0;
-				continue;
-			}
-			
-			/* locate first closing '>' */
-			int stop=-1;
-			for(int i=start+1;i<bufferPosition;i++) {
-				if(buffer[i]=='>') {
-					stop = i;
-					break;
-				}
-			}
-			/* no '>' --> not enough data yet */
-			if(stop==-1) {
-				continue;
-			}
-	
-			String element = String.copyValueOf(buffer, start, stop-start+1);
-			
-			if(bufferPosition==(stop+1))
-				bufferPosition=0;
-			else {
-				for(int i=stop+1;i<bufferPosition;i++) {
-					buffer[i-stop-1] = buffer[i];
-				}
-				bufferPosition = bufferPosition-stop-1;
-			}
-		
-			return element;
-		}
-	}
+    public FrameReceiver getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(FrameReceiver receiver) {
+        this.receiver = receiver;
+    }
+
+    public String getBusName() {
+        return busName;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    protected void setInput(InputStreamReader stream) {
+        reader = new BufferedReader(stream, BUFFER_SIZE);
+    }
+
+    /**
+     * This method reads data from an {@link InputStreamReader} and tries to
+     * extract elements that are enclosed by '<' and '>'. The Reader must be set
+     * via setInput() before calling getElement().
+     * A buffer is used to
+     * construct elements that need multiple reads. Whitespace between the
+     * elements is ignored. 
+     * The method blocks until an element can be returned. 
+     * @param in the InputStreamReader from which should be read
+     * @return the first element read
+     * @throws IOException
+     */
+    protected String getElement() throws IOException, InterruptedException, SocketTimeoutException {
+        int pos = 0;
+        boolean inElement = false;
+        
+        while (true) {
+            char c = (char) reader.read();
+
+            /* Find opening < */
+            if (!inElement) {
+                if (c == '<') {
+                    inElement = true;
+                    elementBuffer[pos] = c;
+                    pos++;
+                }
+            } else {
+                if(pos >= ELEMENT_SIZE-1) { /* Handle large elements */
+                    logger.log(Level.WARNING, "Found frame that is too large. Ignoring...");
+                    pos = 0;
+                    inElement = false;
+                    
+                } else if (c == '>') { /* Find closing > */
+                    elementBuffer[pos] = c;
+                    pos++;
+                    break;
+                } else { /* Element content */
+                    elementBuffer[pos] = c;
+                    pos++;
+                }
+            }
+        }
+        
+        return String.valueOf(elementBuffer, 0, pos + 1);
+    }
 }

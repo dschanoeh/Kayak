@@ -59,12 +59,12 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
             socket.connect(address);
             socket.setSoTimeout(1000);
 
-            input = new InputStreamReader(
-                    socket.getInputStream());
+            input = new InputStreamReader(socket.getInputStream());
+            setInput(input);
 
             output = new PrintWriter(socket.getOutputStream(), true);
 
-            String ret = getElement(input);
+            String ret = getElement();
             if (!ret.equals("< hi >")) {
                 logger.log(Level.SEVERE, "Did not receive greeting from host.");
             }
@@ -72,7 +72,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
             output.print("< open " + busName + " >");
             output.flush();
 
-            ret = getElement(input);
+            ret = getElement();
             if (!ret.equals("< ok >")) {
                 logger.log(Level.SEVERE, "Could not open bus");
             }
@@ -80,7 +80,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
             output.print("< rawmode >");
             output.flush();
 
-            ret = getElement(input);
+            ret = getElement();
             if (!ret.equals("< ok >")) {
                 logger.log(Level.SEVERE, "Could not switch to RAW mode.");
             }
@@ -122,7 +122,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
             }
 
             try {
-                String frame = getElement(input);
+                String frame = getElement();
 
                 String[] fields = frame.split("\\s");
 
