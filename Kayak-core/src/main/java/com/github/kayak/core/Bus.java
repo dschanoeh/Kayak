@@ -281,6 +281,11 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
      * frame.
      */
     public void sendFrame(Frame frame) {
+        /* Try to open BCM connection if not present */
+        if(url != null) {
+            openBCMConnection();
+        }
+        
         if (bcmConnection != null) {
             bcmConnection.sendFrame(frame);
         /* If no BCM connection is present we have to do loopback locally */
@@ -398,9 +403,11 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         /* If the connection was not created yet try to create connection */
         if(bcmConnection == null) {
             if(url != null) {
+                logger.log(Level.INFO, "Creating new BCM connection");
                 bcmConnection = new BCMConnection(url);
                 bcmConnection.setReceiver(bcmReceiver);
             } else {
+                logger.log(Level.WARNING, "Could not open BCM connection because no url was set");
                 return;
             }
         } 
@@ -408,6 +415,7 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         if (bcmConnection.isConnected()) {
             return;
         } else {
+            logger.log(Level.INFO, "Opening BCM connection and resubscribing all IDs");
             bcmConnection.open();
 
             /* Check for all present BCM subscriptions and bring the connection
@@ -428,9 +436,11 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         /* If the connection was not created yet try to create connection */
         if(rawConnection == null) {
             if(url != null) {
+                logger.log(Level.INFO, "Creating new RAW connection");
                 rawConnection = new RAWConnection(url);
                 rawConnection.setReceiver(rawReceiver);
             } else {
+                logger.log(Level.WARNING, "Could not open RAW connection because no url was set");
                 return;
             }
         }
@@ -439,6 +449,7 @@ public class Bus implements SubscriptionChangeReceiver, TimeEventReceiver {
         if(rawConnection.isConnected()) {
             return;
         } else {
+            logger.log(Level.INFO, "Opening RAW connection");
             rawConnection.open();
         }
     }
