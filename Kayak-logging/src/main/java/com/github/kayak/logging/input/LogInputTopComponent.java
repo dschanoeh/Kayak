@@ -1,6 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 	This file is part of Kayak.
+ *
+ *	Kayak is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	Kayak is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package com.github.kayak.logging.input;
 
@@ -23,7 +36,8 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.ImageUtilities;
 
 /**
- * Top component which displays something.
+ *
+ * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.logging.input//LogInput//EN",
 autostore = false)
@@ -282,7 +296,9 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        TimeSource ts = new TimeSource();
+        replay.setTimeSource(ts);
+        ts.stop();
     }
 
     void writeProperties(java.util.Properties p) {
@@ -312,6 +328,8 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
 
     public void setLogFile(LogFile file) {
         this.logFile = file;
+        this.setName(NbBundle.getMessage(LogInputTopComponent.class, "CTL_LogInputTopComponent") + " - " + logFile.getDescription());
+        this.setToolTipText(NbBundle.getMessage(LogInputTopComponent.class, "CTL_LogInputTopComponent") + " - " + logFile.getDescription());
 
         busses = logFile.getBusses();
         java.awt.GridLayout layout = new java.awt.GridLayout();
@@ -336,6 +354,7 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
             buttons[i].setEnabled(false);
 
             buttons[i].addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     removeBus(evt);
                 }

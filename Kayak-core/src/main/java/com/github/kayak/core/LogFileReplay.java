@@ -229,7 +229,8 @@ public class LogFileReplay {
         @Override
         public void stopped() {
             mode = mode.STOP;
-            thread.interrupt();
+            if(thread != null && thread.isAlive())
+                thread.interrupt();
         }
     };
 }
