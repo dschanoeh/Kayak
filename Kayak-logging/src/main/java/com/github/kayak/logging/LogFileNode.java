@@ -145,6 +145,26 @@ public class LogFileNode extends AbstractNode {
             
         };
         
+        Property busses = new PropertySupport.ReadOnly<String>("Busses", String.class, "Busses", "Busses that were logged into this file") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                ArrayList<String> busses = logFile.getBusses();
+                
+                StringBuilder sb = new StringBuilder();
+                
+                for(int i=0;i<busses.size();i++) {
+                    sb.append(busses.get(i));
+                    if(i < (busses.size()-1)) {
+                        sb.append(", ");
+                    }
+                }
+                
+                return sb.toString();
+            }
+
+        };
+        
         Property size = new PropertySupport.ReadOnly<String>("Size", String.class, "Size", "Size of the file") {
 
             private final double BASE = 1024, KB = BASE, MB = KB * BASE, GB = MB * BASE;
@@ -177,9 +197,10 @@ public class LogFileNode extends AbstractNode {
         };
         
         set.put(platform);
-        set.put(fileName);
-        set.put(compressed);
         set.put(description);
+        set.put(fileName);
+        set.put(busses);
+        set.put(compressed);
         set.put(size);
         set.put(length);
 
