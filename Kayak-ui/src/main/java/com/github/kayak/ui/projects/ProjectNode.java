@@ -29,13 +29,15 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.util.Lookup;
 import org.openide.util.datatransfer.PasteType;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class ProjectNode extends AbstractNode implements NewBusCookie {
+public class ProjectNode extends AbstractNode {
 
     private Project project;
     private ProjectChangeListener changeListener = new ProjectChangeListener() {
@@ -68,7 +70,7 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
     };
 
     public ProjectNode(Project project) {
-        super(Children.LEAF);
+        super(Children.LEAF, Lookups.fixed(project));
         setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
 
         this.project = project;
@@ -111,17 +113,6 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
     }
 
     @Override
-    public void addNewBus() {
-        String name = JOptionPane.showInputDialog("Please give a name for the Bus", "newBus");
-
-        if (name != null) {
-            Bus b = new Bus();
-            b.setName(name);
-            project.addBus(b);
-        }
-    }
-
-    @Override
     public void setDisplayName(String s) {
         super.setDisplayName(s);
         project.setName(s);
@@ -130,9 +121,9 @@ public class ProjectNode extends AbstractNode implements NewBusCookie {
     @Override
     public Action[] getActions(boolean popup) {
         if (project.isOpened()) {
-            return new Action[]{new RenameAction(), new DeleteAction(), new CloseAction()};
+            return new Action[]{new NewBusAction(project), new RenameAction(), new DeleteAction(), new CloseAction()};
         } else {
-            return new Action[]{new RenameAction(), new DeleteAction(), new OpenAction()};
+            return new Action[]{new OpenAction(), new RenameAction(), new DeleteAction(), };
         }
     }
 

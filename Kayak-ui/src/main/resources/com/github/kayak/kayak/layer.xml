@@ -2,63 +2,6 @@
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
     <folder name="Actions">
-        <folder name="File">
-            <file name="com-github-kayak-ui-projects-NewBusAction.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="com.github.kayak.ui.projects.Bundle#CTL_NewBusAction"/>
-                <attr name="injectable" stringvalue="com.github.kayak.ui.projects.NewBusAction"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
-                <attr name="noIconInMenu" boolvalue="false"/>
-                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="com.github.kayak.ui.projects.NewBusCookie"/>
-                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/places/network-workgroup.png"/>
-            </file>
-        </folder>
-        <folder name="BusViews">
-            <file name="com-github-kayak-ui-rawview-OpenRawViewAction.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="com.github.kayak.ui.rawview.Bundle#CTL_OpenRawViewAction"/>
-                <attr name="injectable" stringvalue="com.github.kayak.ui.rawview.OpenRawViewAction"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
-                <attr name="noIconInMenu" boolvalue="false"/>
-                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="com.github.kayak.core.Bus"/>
-                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png"/>
-            </file>
-
-            <file name="com-github-kayak-ui-statistics-OpenBusStatisticsAction.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="com.github.kayak.ui.statistics.Bundle#CTL_BusStatisticsAction"/>
-                <attr name="injectable" stringvalue="com.github.kayak.ui.statistics.OpenBusStatisticsAction"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
-                <attr name="noIconInMenu" boolvalue="false"/>
-                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="com.github.kayak.core.Bus"/>
-                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/apps/utilities-system-monitor.png"/>
-            </file>
-        </folder>
-        <folder name="Connections">
-            <file name="com-github-kayak-ui-connections-BookmarkConnectionAction.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="com.github.kayak.ui.connections.Bundle#CTL_BookmarkConnection"/>
-                <attr name="injectable" stringvalue="com.github.kayak.ui.connections.BookmarkConnectionAction"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
-                <attr name="noIconInMenu" boolvalue="false"/>
-                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="com.github.kayak.ui.connections.BusURLNode"/>
-                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/bookmark-new.png"/>
-            </file>
-            <file name="com-github-kayak-ui-connections-DeleteConnectionAction.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="com.github.kayak.ui.connections.Bundle#CTL_DeleteConnectionAction"/>
-                <attr name="injectable" stringvalue="com.github.kayak.ui.connections.DeleteConnectionAction"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
-                <attr name="noIconInMenu" boolvalue="false"/>
-                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="com.github.kayak.ui.connections.BusURLNode"/>
-                <attr name="iconBase" stringvalue="org/freedesktop/tango/16x16/actions/edit-delete.png"/>
-            </file>
-        </folder>
         <folder name="Window">
             <file name="com-github-kayak-ui-busconfiguration-BusConfigurationAction.instance">
                 <attr name="component" methodvalue="com.github.kayak.ui.busconfiguration.BusConfigurationTopComponent.findInstance"/>

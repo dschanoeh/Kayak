@@ -4,11 +4,14 @@
  */
 package com.github.kayak.ui.connections;
 
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionRegistration;
 
-public final class BookmarkConnectionAction extends AbstractAction implements ActionListener {
+@ActionRegistration(displayName="Bookmark connection...", iconBase="org/freedesktop/tango/16x16/actions/bookmark-new.png", iconInMenu=true, surviveFocusChange=true)
+@ActionID(category="Connections", id="com.github.kayak.ui.connections.BookmarkConnectionAction")
+public final class BookmarkConnectionAction extends AbstractAction {
 
     private final BusURLNode context;
 

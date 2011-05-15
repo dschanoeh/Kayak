@@ -19,6 +19,8 @@
 package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.ui.rawview.OpenRawViewAction;
+import com.github.kayak.ui.statistics.OpenBusStatisticsAction;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -86,8 +88,7 @@ public class BusNode extends AbstractNode implements Transferable {
 
     @Override
     public Action[] getActions(boolean context) {
-
-        return new Action[] { new RenameBusAction(), new DeleteBusAction() };
+        return new Action[] { new OpenRawViewAction(bus), new OpenBusStatisticsAction(bus), new RenameBusAction(), new DeleteBusAction() };
     }
 
     private class RenameBusAction extends AbstractAction {
