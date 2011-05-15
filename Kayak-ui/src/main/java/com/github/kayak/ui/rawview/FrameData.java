@@ -72,7 +72,11 @@ public class FrameData {
                     frequency[i]--;
             }
         } else {
-            frequency = new int[data.length];
+            int[] newFrequency = new int[newData.length];
+            for(int i=0;i<newFrequency.length && i<frequency.length;i++) {
+                newFrequency[i] = frequency[i];
+            }
+            frequency = newFrequency;
         }
 
         this.data = newData;

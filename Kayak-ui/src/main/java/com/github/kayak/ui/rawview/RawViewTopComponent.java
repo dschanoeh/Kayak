@@ -140,7 +140,7 @@ public final class RawViewTopComponent extends TopComponent {
                         subscription.subscribe(Integer.parseInt(idStrings[i], 16));
                     }
                 } catch (Exception ex) {
-                    logger.log(Level.WARNING, "Error while parsing filter string\n");
+                    logger.log(Level.WARNING, "Error while parsing filter string", ex);
                 }
             }
         } else {
