@@ -23,6 +23,8 @@ import com.github.kayak.core.BusURL;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -40,6 +42,8 @@ import org.w3c.dom.NodeList;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ProjectManager {
+    
+    private static final Logger logger = Logger.getLogger(ProjectManager.class.getCanonicalName());
 
     private static ProjectManager projectManagement;
     private ArrayList<Project> projects;
@@ -132,11 +136,6 @@ public class ProjectManager {
                     Node nameNode = attributes.getNamedItem("name");
                     String name = nameNode.getNodeValue();
                     Project project = new Project(name);
-                    
-                    Node openedNode = attributes.getNamedItem("opened");
-                    boolean opened = Boolean.parseBoolean(openedNode.getNodeValue());
-                    if(opened)
-                        openProject(project);
 
                     NodeList busses = projects.item(i).getChildNodes();
 
@@ -163,14 +162,17 @@ public class ProjectManager {
                         project.addBus(bus);
                     }
 
-
                     this.projects.add(project);
 
+                    Node openedNode = attributes.getNamedItem("opened");
+                    boolean opened = Boolean.parseBoolean(openedNode.getNodeValue());
+                    if(opened)
+                        openProject(project);
                 }
             }
 
         } catch (Exception ex) {
-            //logOutput.getErr().write("Error while reading connections from file\n");
+            logger.log(Level.WARNING, "Could not load projects", ex);
         }
     }
 
@@ -211,7 +213,7 @@ public class ProjectManager {
             StreamResult result = new StreamResult(stream);
             transformer.transform(source, result);
         } catch (Exception ex) {
-            //logOutput.getErr().write("Error while writing connections to file\n");
+            logger.log(Level.WARNING, "Could not save projects", ex);
         }
     }
 }
