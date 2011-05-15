@@ -46,6 +46,9 @@ public class ProjectManager {
     private Project openedProject;
     private ArrayList<ProjectManagementListener> listeners;
 
+    public Project getOpenedProject() {
+        return openedProject;
+    }
 
     public ArrayList<Project> getProjects() {
         return projects;
@@ -70,6 +73,10 @@ public class ProjectManager {
 
         p.open();
         openedProject = p;
+        
+        for(ProjectManagementListener l : listeners) {
+            l.openProjectChanged(p);
+        }
     }
 
     public void closeProject(Project p) {
@@ -77,6 +84,9 @@ public class ProjectManager {
             return;
 
         openedProject.close();
+        for(ProjectManagementListener l : listeners) {
+            l.openProjectChanged(null);
+        }
     }
 
     public void addListener(ProjectManagementListener listener) {

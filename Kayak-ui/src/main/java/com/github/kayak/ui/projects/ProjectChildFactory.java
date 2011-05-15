@@ -49,12 +49,12 @@ public class ProjectChildFactory extends ChildFactory<Bus> {
         }
 
         @Override
-        public void projectDeleted() {
-
+        public void projectBusAdded(Bus bus) {
+            refresh(true);
         }
 
         @Override
-        public void projectBussesChanged() {
+        public void projectBusRemoved(Bus bus) {
             refresh(true);
         }
     };

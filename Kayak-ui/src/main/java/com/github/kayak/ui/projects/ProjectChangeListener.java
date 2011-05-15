@@ -5,6 +5,8 @@
 
 package com.github.kayak.ui.projects;
 
+import com.github.kayak.core.Bus;
+
 /**
  *
  * @author dsi9mjn
@@ -17,7 +19,7 @@ public interface ProjectChangeListener {
 
     public void projectOpened();
 
-    public void projectDeleted();
-
-    public void projectBussesChanged();
+    public void projectBusAdded(Bus bus);
+    
+    public void projectBusRemoved(Bus bus);
 }

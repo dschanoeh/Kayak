@@ -42,7 +42,7 @@ public class Bus implements SubscriptionChangeReceiver {
     private ControlConnection controlConnection;
     private String name;
     private BusURL url;
-    private ArrayList<BusChangeListener> listeners;
+    private final ArrayList<BusChangeListener> listeners;
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
     private HashSet<Integer> subscribedIDs;
     private ArrayList<StatisticsReceiver> statisticsReceivers;
@@ -92,6 +92,14 @@ public class Bus implements SubscriptionChangeReceiver {
         }
     };
 
+    @Override
+    public String toString() {
+        if(name == null)
+            return super.toString();
+        else
+            return name;
+    }
+
     public BusURL getConnection() {
         return url;
     }
@@ -139,10 +147,11 @@ public class Bus implements SubscriptionChangeReceiver {
      */
     public void destroy() {
         disconnect();
-        
-        for(BusChangeListener listener : listeners) {
-            if(listener != null)
-                listener.destroyed();
+        synchronized(listeners) {
+            for(BusChangeListener listener : listeners) {
+                if(listener != null)
+                    listener.destroyed();
+            }
         }
     }
 
@@ -152,6 +161,7 @@ public class Bus implements SubscriptionChangeReceiver {
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
                 f.setTimestamp(timeSource.getTime());
+                f.setBusName(name);
                 deliverRAWFrame(f);
             }
         }
@@ -163,6 +173,7 @@ public class Bus implements SubscriptionChangeReceiver {
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
                 f.setTimestamp(timeSource.getTime());
+                f.setBusName(name);
                 deliverBCMFrame(f);
             }
         }
@@ -329,11 +340,15 @@ public class Bus implements SubscriptionChangeReceiver {
      * about changes to the bus like added connections etc.
      */
     public void addBusChangeListener(BusChangeListener listener) {
-        listeners.add(listener);
+        synchronized(listeners) {
+            listeners.add(listener);
+        }
     }
 
     public void removeBusChangeListener(BusChangeListener listener) {
-        listeners.remove(listener);
+        synchronized(listeners) {
+            listeners.remove(listener);
+        }
     }
 
     /**
@@ -377,10 +392,16 @@ public class Bus implements SubscriptionChangeReceiver {
      * frame.
      */
     public void sendFrame(Frame frame) {
-        if (bcmConnection != null) {
-            bcmConnection.sendFrame(frame);
+        /* Try to open BCM connection if not present */
+        if(url != null) {
+            openBCMConnection();
+            
+            if (bcmConnection != null) {
+                bcmConnection.sendFrame(frame);
+            }  
         /* If no BCM connection is present we have to do loopback locally */
         } else {
+            frame.setTimestamp(timeSource.getTime());
             deliverBCMFrame(frame);
             deliverRAWFrame(frame);
         }
@@ -403,16 +424,20 @@ public class Bus implements SubscriptionChangeReceiver {
     }
 
     private void notifyListenersConnection() {
-        for(BusChangeListener listener : listeners) {
-            if(listener != null)
-                listener.connectionChanged();
+        synchronized(listeners) {
+            for(BusChangeListener listener : listeners) {
+                if(listener != null)
+                    listener.connectionChanged();
+            }
         }
     }
 
     private void notifyListenersName() {
-        for(BusChangeListener listener : listeners) {
-            if(listener != null)
-                listener.nameChanged();
+        synchronized(listeners) {
+            for(BusChangeListener listener : listeners) {
+                if(listener != null)
+                    listener.nameChanged();
+            }
         }
     }
 
@@ -425,9 +450,11 @@ public class Bus implements SubscriptionChangeReceiver {
         /* If the connection was not created yet try to create connection */
         if(bcmConnection == null) {
             if(url != null) {
+                logger.log(Level.INFO, "Creating new BCM connection");
                 bcmConnection = new BCMConnection(url);
                 bcmConnection.setReceiver(bcmReceiver);
             } else {
+                logger.log(Level.WARNING, "Could not open BCM connection because no url was set");
                 return;
             }
         } 
@@ -435,6 +462,7 @@ public class Bus implements SubscriptionChangeReceiver {
         if (bcmConnection.isConnected()) {
             return;
         } else {
+            logger.log(Level.INFO, "Opening BCM connection and resubscribing all IDs");
             bcmConnection.open();
 
             /* Check for all present BCM subscriptions and bring the connection
@@ -455,9 +483,11 @@ public class Bus implements SubscriptionChangeReceiver {
         /* If the connection was not created yet try to create connection */
         if(rawConnection == null) {
             if(url != null) {
+                logger.log(Level.INFO, "Creating new RAW connection");
                 rawConnection = new RAWConnection(url);
                 rawConnection.setReceiver(rawReceiver);
             } else {
+                logger.log(Level.WARNING, "Could not open RAW connection because no url was set");
                 return;
             }
         }
@@ -466,6 +496,7 @@ public class Bus implements SubscriptionChangeReceiver {
         if(rawConnection.isConnected()) {
             return;
         } else {
+            logger.log(Level.INFO, "Opening RAW connection");
             rawConnection.open();
         }
     }

@@ -21,7 +21,6 @@ import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.BusURL;
 import com.github.kayak.ui.connections.ConnectionManager;
-import com.github.kayak.ui.logfiles.LogFileBusTupel;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
@@ -57,7 +56,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
     };  
 
     public enum Folders {
-        CONNECTION, DESCRIPTION, INPUT, OUTPUT;
+        CONNECTION, DESCRIPTION;
     }
     private Bus bus;
 
@@ -69,7 +68,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
 
     @Override
     public void addNotify() {
-        setKeys(new Folders[] {Folders.CONNECTION, Folders.DESCRIPTION, Folders.INPUT, Folders.OUTPUT});
+        setKeys(new Folders[] {Folders.CONNECTION, Folders.DESCRIPTION});
     }
 
     @Override
@@ -85,20 +84,6 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
 
             AbstractNode node = new AbstractNode(Children.LEAF, Lookups.fixed(bus));
             node.setDisplayName("Description");
-
-            return new Node[]{node};
-        } else if (key == Folders.INPUT) {
-
-            AbstractNode node = new LogFileFolderNode(Children.LEAF, bus);
-            node.setDisplayName("Log input");
-            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/go-previous.png");
-
-            return new Node[]{node};
-        }else if (key == Folders.OUTPUT) {
-
-            AbstractNode node = new AbstractNode(Children.LEAF, Lookups.fixed(bus));
-            node.setDisplayName("Log output");
-            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/go-next.png");
 
             return new Node[]{node};
         }
@@ -124,33 +109,6 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
                             bus.setConnection(url);
                             ConnectionManager.getGlobalConnectionManager().addRecent(url);
                         }
-                        return null;
-                    }
-                };
-            } catch (UnsupportedFlavorException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-            return null;
-        }
-    }
-
-    private class LogFileFolderNode extends AbstractNode {
-
-        public LogFileFolderNode(Children children, Bus bus) {
-            super(children, Lookups.fixed(bus));
-        }
-
-        @Override
-        public PasteType getDropType(Transferable t, int action, int index) {
-            try {
-                final LogFileBusTupel tupel = (LogFileBusTupel) t.getTransferData(LogFileBusTupel.DATA_FLAVOR);
-                return new PasteType() {
-
-                    @Override
-                    public Transferable paste() throws IOException {
-                        
                         return null;
                     }
                 };

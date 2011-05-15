@@ -112,6 +112,6 @@ public abstract class SocketcandConnection {
             }
         }
         
-        return String.valueOf(elementBuffer, 0, pos + 1);
+        return String.valueOf(elementBuffer, 0, pos);
     }
 }

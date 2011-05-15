@@ -12,4 +12,6 @@ package com.github.kayak.ui.projects;
 public interface ProjectManagementListener {
 
     public void projectsUpdated();
+    
+    public void openProjectChanged(Project p);
 }

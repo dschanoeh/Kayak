@@ -106,42 +106,62 @@ public class BCMConnection extends SocketcandConnection implements Runnable {
     }
 
     public void subscribeTo(int id, int sec, int usec) {
-        output.print("< subscribe "
-                + Integer.toString(sec) + " "
-                + Integer.toString(usec) + " "
-                + Integer.toHexString(id) + " >");
-        output.flush();
+        synchronized(output) {
+            output.print("< subscribe "
+                    + Integer.toString(sec) + " "
+                    + Integer.toString(usec) + " "
+                    + Integer.toHexString(id) + " >");
+            output.flush();
+        }
     }
 
     public void unsubscribeFrom(int id) {
-        output.print("< unsubscribe " + Integer.toHexString(id) + " >");
-        output.flush();
+        synchronized(output) {
+            output.print("< unsubscribe " + Integer.toHexString(id) + " >");
+            output.flush();
+        }
     }
 
     public void addSendJob(Frame f, int sec, int usec) {
-        output.print("< add "
-                + Integer.toString(sec) + " "
-                + Integer.toString(usec) + " "
-                + Integer.toHexString(f.getIdentifier()) + " "
-                + Integer.toString(f.getLength()) + " "
-                + Util.byteArrayToHexString(f.getData()) + " >");
-        output.flush();
+        synchronized(output) {
+            output.print("< add "
+                    + Integer.toString(sec) + " "
+                    + Integer.toString(usec) + " "
+                    + Integer.toHexString(f.getIdentifier()) + " "
+                    + Integer.toString(f.getLength()) + " "
+                    + Util.byteArrayToHexString(f.getData()) + " >");
+            output.flush();
+        }
     }
 
     public void updateSendJob(Frame f) {
-        output.print("< add "
-                + Integer.toHexString(f.getIdentifier()) + " "
-                + Integer.toString(f.getLength()) + " "
-                + Util.byteArrayToHexString(f.getData()) + " >");
-        output.flush();
+        synchronized(output) {
+            output.print("< add "
+                    + Integer.toHexString(f.getIdentifier()) + " "
+                    + Integer.toString(f.getLength()) + " "
+                    + Util.byteArrayToHexString(f.getData()) + " >");
+            output.flush();
+        }
     }
 
     public void sendFrame(Frame f) {
-        output.print("< send "
-                + Integer.toHexString(f.getIdentifier()) + " "
-                + Integer.toString(f.getLength()) + " "
-                + Util.byteArrayToHexString(f.getData()) + " >");
-        output.flush();
+        StringBuilder sb = new StringBuilder();
+        sb.append("< send ");
+        sb.append(Integer.toHexString(f.getIdentifier()));
+        sb.append(' ');
+        sb.append(Integer.toString(f.getLength()));
+        sb.append(' ');
+        String data = Util.byteArrayToHexString(f.getData());
+        for(int i=0;i<data.length();i+=2) {
+            sb.append(data.charAt(i));
+            sb.append(data.charAt(i+1));
+            sb.append(' ');
+        }
+        sb.append(">");
+        synchronized(output) {
+            output.print(sb.toString());
+            output.flush();
+        }
     }
 
     @Override
@@ -172,7 +192,7 @@ public class BCMConnection extends SocketcandConnection implements Runnable {
                         logger.log(Level.WARNING, "Could not properly deliver CAN frame", ex);
                     }
                 } else if (fields[1].equals("error")) {
-                    logger.log(Level.WARNING, "Received error from socketcand: " + frame);
+                    logger.log(Level.WARNING, "Received error from socketcand: {0}", frame);
                 }
             } catch(InterruptedException ex) {
                 logger.log(Level.WARNING, "Interrupted exception. Shutting down connection thread");

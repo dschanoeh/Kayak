@@ -114,6 +114,9 @@ public class TimeSource {
      * Pauses the time.
      */
     public void pause() {
+        if(mode == Mode.STOP)
+            return;
+        
         mode = Mode.PAUSE;
         
         pauseReference = System.currentTimeMillis() - reference;
