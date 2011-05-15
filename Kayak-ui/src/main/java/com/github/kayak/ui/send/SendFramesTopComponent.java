@@ -115,7 +115,6 @@ public final class SendFramesTopComponent extends TopComponent {
         };
 
         ButtonColumn bc = new ButtonColumn(jTable1, send, 4);
-        CheckBoxColumn cbc = new CheckBoxColumn(jTable1, sendInterval, 6);
         
         jTable1.getColumn("Bus").setPreferredWidth(100);
         jTable1.getColumn("ID").setPreferredWidth(60);

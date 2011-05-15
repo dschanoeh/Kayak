@@ -164,6 +164,30 @@ public class SendFramesTableModel extends AbstractTableModel {
     }
 
     @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        switch(columnIndex) {
+            case 0:
+                return String.class;
+            case 1:
+                return String.class;
+            case 2:
+                return Integer.class;
+            case 3:
+                return String.class;
+            case 4:
+                return String.class;
+            case 5:
+                return Integer.class;
+            case 6:
+                return Boolean.class;
+            case 7:
+                return String.class;
+        }
+        
+        return super.getColumnClass(columnIndex);
+    }
+
+    @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         if(columnIndex != 0)
             return true;
@@ -208,7 +232,7 @@ public class SendFramesTableModel extends AbstractTableModel {
                 }
                 return;
             case 2:
-                row.setLength(Integer.valueOf((String) aValue));
+                row.setLength((Integer) aValue);
                 return;
             case 3:
                 try {
@@ -223,14 +247,14 @@ public class SendFramesTableModel extends AbstractTableModel {
                 return;
             case 5:
                 try {
-                    int interval = Integer.valueOf((String) aValue);
+                    int interval = (Integer) aValue;
                     row.setInterval(interval);
                 } catch (Exception ex) {
                     logger.log(Level.WARNING, "Could not set new ID", ex);
                 }
                 return;
             case 6:
-                Boolean b = Boolean.parseBoolean((String) aValue);
+                Boolean b = (Boolean) aValue;
                 row.setSending(b);
                 return;
             case 7:
