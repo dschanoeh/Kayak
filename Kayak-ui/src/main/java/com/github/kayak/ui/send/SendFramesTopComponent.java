@@ -21,9 +21,6 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 
-/**
- * Top component which displays something.
- */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.send//SendFrames//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "SendFramesTopComponent",

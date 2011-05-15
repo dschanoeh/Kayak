@@ -22,10 +22,16 @@ import com.github.kayak.core.Bus;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
 @ActionRegistration(displayName="Open RAW view", iconBase="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="BusViews", id="com.github.kayak.ui.rawview.OpenRawViewAction")
+@ActionReferences( value= {
+    @ActionReference(path = "Menu/Bus views", position = 10),
+    @ActionReference(path = "Toolbars/Bus views", position = 10)
+})
 public final class OpenRawViewAction extends AbstractAction {
 
     private final Bus context;

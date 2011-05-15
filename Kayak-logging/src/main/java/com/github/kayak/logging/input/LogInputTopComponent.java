@@ -25,15 +25,12 @@ import com.github.kayak.ui.time.TimeSourceManager;
 import java.awt.Color;
 import java.awt.dnd.DropTarget;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -41,12 +38,12 @@ import org.openide.util.ImageUtilities;
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.logging.input//LogInput//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "LogInputTopComponent",
+iconBase="org/freedesktop/tango/16x16/actions/go-previous.png", 
+persistenceType = TopComponent.PERSISTENCE_NEVER)
+@TopComponent.Registration(mode = "properties", openAtStartup = false)
 public final class LogInputTopComponent extends TopComponent implements BusDropTargetAdapter.BusDropReceiver {
 
-    private static LogInputTopComponent instance;
-    
-    static final String ICON_PATH = "org/freedesktop/tango/16x16/actions/go-previous.png";
-    private static final String PREFERRED_ID = "LogInputTopComponent";
     private LogFile logFile;
     private JLabel[] labels;
     private JTextField[] fields;
@@ -59,8 +56,6 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
         initComponents();
         setName(NbBundle.getMessage(LogInputTopComponent.class, "CTL_LogInputTopComponent"));
         setToolTipText(NbBundle.getMessage(LogInputTopComponent.class, "HINT_LogInputTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-
     }
 
     /** This method is called from within the constructor to
@@ -253,42 +248,6 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
     private javax.swing.JSlider jSlider1;
     // End of variables declaration//GEN-END:variables
 
-    /**
-     * Gets default instance. Do not use directly: reserved for *.settings files only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-     * To obtain the singleton instance, use {@link #findInstance}.
-     */
-    public static synchronized LogInputTopComponent getDefault() {
-        if (instance == null) {
-            instance = new LogInputTopComponent();
-        }
-        return instance;
-    }
-
-    /**
-     * Obtain the LogInputTopComponent instance. Never call {@link #getDefault} directly!
-     */
-    public static synchronized LogInputTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(LogInputTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-            return getDefault();
-        }
-        if (win instanceof LogInputTopComponent) {
-            return (LogInputTopComponent) win;
-        }
-        Logger.getLogger(LogInputTopComponent.class.getName()).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
-        return getDefault();
-    }
-
-    @Override
-    public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_NEVER;
-    }
-
     @Override
     public void componentOpened() {
         // TODO add custom code on component opening
@@ -308,22 +267,9 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
         // TODO store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
     }
 
     public void setLogFile(LogFile file) {

@@ -9,10 +9,16 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
 @ActionRegistration(displayName="New bus...", iconBase="org/freedesktop/tango/16x16/places/network-workgroup.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="File", id="com.github.kayak.ui.projects.NewBusAction")
+@ActionReferences( value= {
+    @ActionReference(path = "Menu/File", position = 200 ),
+    @ActionReference(path = "Toolbars/File", position = 200 )
+})
 public final class NewBusAction extends AbstractAction {
 
     private final Project context;

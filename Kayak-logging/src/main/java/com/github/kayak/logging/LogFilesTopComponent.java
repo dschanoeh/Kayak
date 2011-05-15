@@ -4,12 +4,11 @@
  */
 package com.github.kayak.logging;
 
-import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
-import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
@@ -20,12 +19,16 @@ import org.openide.nodes.Children;
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.logfiles//LogFiles//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "LogFilesTopComponent",
+iconBase="org/freedesktop/tango/16x16/apps/accessories-text-editor.png", 
+persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+@TopComponent.Registration(mode = "management", openAtStartup = true)
+@ActionID(category = "Window", id = "com.github.kayak.logging.LogFilesTopComponent")
+@ActionReference(path = "Menu/Log files", position = 10)
+@TopComponent.OpenActionRegistration(displayName = "#CTL_LogFilesAction",
+preferredID = "LogFilesTopComponent")
 public final class LogFilesTopComponent extends TopComponent implements ExplorerManager.Provider {
 
-    private static LogFilesTopComponent instance;
-    /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "com/github/kayak/ui/logfiles/accessories-text-editor.png";
-    private static final String PREFERRED_ID = "LogFilesTopComponent";
     private ExplorerManager manager = new ExplorerManager();
     private LogFilesNodeFactory factory = new LogFilesNodeFactory();
 
@@ -33,7 +36,6 @@ public final class LogFilesTopComponent extends TopComponent implements Explorer
         initComponents();
         setName(NbBundle.getMessage(LogFilesTopComponent.class, "CTL_LogFilesTopComponent"));
         setToolTipText(NbBundle.getMessage(LogFilesTopComponent.class, "HINT_LogFilesTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
         AbstractNode rootNode = new AbstractNode(Children.create(factory, false));
         manager.setRootContext(rootNode);
@@ -86,40 +88,10 @@ public final class LogFilesTopComponent extends TopComponent implements Explorer
     private org.openide.explorer.view.BeanTreeView beanTreeView1;
     private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
-    /**
-     * Gets default instance. Do not use directly: reserved for *.settings files only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-     * To obtain the singleton instance, use {@link #findInstance}.
-     */
-    public static synchronized LogFilesTopComponent getDefault() {
-        if (instance == null) {
-            instance = new LogFilesTopComponent();
-        }
-        return instance;
-    }
-
-    /**
-     * Obtain the LogFilesTopComponent instance. Never call {@link #getDefault} directly!
-     */
-    public static synchronized LogFilesTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(LogFilesTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-            return getDefault();
-        }
-        if (win instanceof LogFilesTopComponent) {
-            return (LogFilesTopComponent) win;
-        }
-        Logger.getLogger(LogFilesTopComponent.class.getName()).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
-        return getDefault();
-    }
 
     @Override
     public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_NEVER;
+        return TopComponent.PERSISTENCE_ALWAYS;
     }
 
     @Override
@@ -139,22 +111,9 @@ public final class LogFilesTopComponent extends TopComponent implements Explorer
         // TODO store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
     }
 
     @Override

@@ -32,9 +32,10 @@ import javax.swing.event.ListSelectionListener;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 import org.openide.filesystems.FileUtil;
 
 /**
@@ -42,14 +43,18 @@ import org.openide.filesystems.FileUtil;
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.logging.snapshots//SnapshotBuffer//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "SnapshotBufferTopComponent",
+iconBase="org/freedesktop/tango/16x16/devices/camera-photo.png", 
+persistenceType = TopComponent.PERSISTENCE_NEVER)
+@TopComponent.Registration(mode = "properties", openAtStartup = false)
+@ActionID(category = "Window", id = "com.github.kayak.logging.snapshots.SnapshotBufferTopComponent")
+@ActionReference(path = "Menu/Log files" , position = 30 )
+@TopComponent.OpenActionRegistration(displayName = "#CTL_SnapshotBufferTopComponent",
+preferredID = "SnapshotBufferTopComponent")
 public final class SnapshotBufferTopComponent extends TopComponent {
     
     private static final Logger logger = Logger.getLogger(SnapshotBufferTopComponent.class.getCanonicalName());
 
-    private static SnapshotBufferTopComponent instance;
-    /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "org/freedesktop/tango/16x16/devices/camera-photo.png";
-    private static final String PREFERRED_ID = "SnapshotBufferTopComponent";
     private SnapshotBuffer currentBuffer;    
     private SnapshotModel snapshots = new SnapshotModel();
     
@@ -70,7 +75,6 @@ public final class SnapshotBufferTopComponent extends TopComponent {
         initComponents();
         setName(NbBundle.getMessage(SnapshotBufferTopComponent.class, "CTL_SnapshotBufferTopComponent"));
         setToolTipText(NbBundle.getMessage(SnapshotBufferTopComponent.class, "HINT_SnapshotBufferTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
         jList1.addListSelectionListener(selectionListener);
     }
@@ -263,36 +267,6 @@ public final class SnapshotBufferTopComponent extends TopComponent {
     private javax.swing.JTextField jTextField3;
     private javax.swing.JToggleButton jToggleButton1;
     // End of variables declaration//GEN-END:variables
-    /**
-     * Gets default instance. Do not use directly: reserved for *.settings files only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-     * To obtain the singleton instance, use {@link #findInstance}.
-     */
-    public static synchronized SnapshotBufferTopComponent getDefault() {
-        if (instance == null) {
-            instance = new SnapshotBufferTopComponent();
-        }
-        return instance;
-    }
-
-    /**
-     * Obtain the SnapshotBufferTopComponent instance. Never call {@link #getDefault} directly!
-     */
-    public static synchronized SnapshotBufferTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(SnapshotBufferTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-            return getDefault();
-        }
-        if (win instanceof SnapshotBufferTopComponent) {
-            return (SnapshotBufferTopComponent) win;
-        }
-        Logger.getLogger(SnapshotBufferTopComponent.class.getName()).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
-        return getDefault();
-    }
 
     private void newCurrentBuffer() {
         currentBuffer = new SnapshotBuffer();
@@ -304,11 +278,6 @@ public final class SnapshotBufferTopComponent extends TopComponent {
         }
 
         currentBuffer.startBuffering();
-    }
-
-    @Override
-    public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_ALWAYS;
     }
 
     @Override
@@ -328,21 +297,8 @@ public final class SnapshotBufferTopComponent extends TopComponent {
         // TODO store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
     }
 }

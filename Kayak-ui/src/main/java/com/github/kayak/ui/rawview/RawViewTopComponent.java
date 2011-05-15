@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
@@ -19,12 +18,11 @@ import org.netbeans.api.settings.ConvertAsProperties;
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.rawview//RawView//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "RawViewTopComponent",
+iconBase="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png", 
+persistenceType = TopComponent.PERSISTENCE_NEVER)
+@TopComponent.Registration(mode = "editor", openAtStartup = false)
 public final class RawViewTopComponent extends TopComponent {
-
-    private static RawViewTopComponent instance;
-    /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "com/github/kayak/ui/rawview/format-justify-fill.png";
-    private static final String PREFERRED_ID = "RawViewTopComponent";
 
     private static final Logger logger = Logger.getLogger(RawViewTopComponent.class.getName());
     private Bus bus;
@@ -54,7 +52,6 @@ public final class RawViewTopComponent extends TopComponent {
         initComponents();
         setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent"));
         setToolTipText(NbBundle.getMessage(RawViewTopComponent.class, "HINT_RawViewTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
     }
 
     /** This method is called from within the constructor to
@@ -168,11 +165,6 @@ public final class RawViewTopComponent extends TopComponent {
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_NEVER;
-    }
-
-    @Override
     public void componentOpened() {
         // TODO add custom code on component opening
     }
@@ -190,22 +182,9 @@ public final class RawViewTopComponent extends TopComponent {
         // TODO store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
     }
 
     public void setBus(Bus bus) {
