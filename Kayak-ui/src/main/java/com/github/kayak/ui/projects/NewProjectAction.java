@@ -25,8 +25,11 @@ public final class NewProjectAction implements ActionListener {
         String name = JOptionPane.showInputDialog("Please give a name for the Project", "myProject");
 
         if(name != null) {
+            ProjectManager manager = ProjectManager.getGlobalProjectManager();
             Project p = new Project(name);
-            ProjectManager.getGlobalProjectManager().addProject(p);
+            manager.addProject(p);
+            if(manager.getOpenedProject() == null)
+                manager.openProject(p);
         }
     }
 }

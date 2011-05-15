@@ -44,7 +44,7 @@ public final class SendFramesTopComponent extends TopComponent {
 
             @Override
             public void projectsUpdated() {
-                throw new UnsupportedOperationException("Not supported yet.");
+                
             }
 
             @Override

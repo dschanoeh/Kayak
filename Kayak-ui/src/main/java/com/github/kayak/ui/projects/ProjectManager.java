@@ -88,6 +88,7 @@ public class ProjectManager {
             return;
 
         openedProject.close();
+        openedProject = null;
         for(ProjectManagementListener l : listeners) {
             l.openProjectChanged(null);
         }
