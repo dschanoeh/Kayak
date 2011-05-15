@@ -128,6 +128,9 @@ public class SendFramesTableModel extends AbstractTableModel {
     private ArrayList<TableRow> rows = new ArrayList<TableRow>();
     
     public void remove(int row) {
+        if(rows.get(row).isSending())
+            rows.get(row).setSending(false);
+        
         rows.remove(row);
         fireTableRowsDeleted(row, row);
     }
