@@ -26,8 +26,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
@@ -196,6 +198,16 @@ public class LogFileNode extends AbstractNode {
 
         };
         
+        Property edited = new PropertySupport.ReadOnly<String>("Edited", String.class, "Edited", "Time and date of the last file edit") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                Date d = new Date(logFile.getFile().lastModified());
+                return DateFormat.getDateTimeInstance().format(d);
+            }
+
+        };
+        
         set.put(platform);
         set.put(description);
         set.put(fileName);
@@ -203,6 +215,7 @@ public class LogFileNode extends AbstractNode {
         set.put(compressed);
         set.put(size);
         set.put(length);
+        set.put(edited);
 
         s.put(set);
 
