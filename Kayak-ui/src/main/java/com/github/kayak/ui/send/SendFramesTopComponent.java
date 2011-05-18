@@ -1,6 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 	This file is part of Kayak.
+ *
+ *	Kayak is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	Kayak is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package com.github.kayak.ui.send;
 
@@ -21,6 +34,10 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 
+/**
+ *
+ * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
+ */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.send//SendFrames//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "SendFramesTopComponent",
@@ -60,7 +77,7 @@ public final class SendFramesTopComponent extends TopComponent {
 
         @Override
         public void projectClosed() {
-            
+
         }
 
         @Override
@@ -98,16 +115,6 @@ public final class SendFramesTopComponent extends TopComponent {
                 JTable table = (JTable) e.getSource();
                 int modelRow = Integer.valueOf(e.getActionCommand());
                 ((SendFramesTableModel) table.getModel()).send(modelRow);
-            }
-        };
-        
-        Action sendInterval = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTable table = (JTable) e.getSource();
-                int modelRow = Integer.valueOf(e.getActionCommand());
-                ((SendFramesTableModel) table.getModel()).toggleSendInterval(modelRow);
             }
         };
 
@@ -152,6 +159,7 @@ public final class SendFramesTopComponent extends TopComponent {
         jTable1.setModel(tableModel);
         jScrollPane1.setViewportView(jTable1);
 
+        jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SendFramesTopComponent.class, "SendFramesTopComponent.jLabel1.text")); // NOI18N
@@ -201,7 +209,9 @@ public final class SendFramesTopComponent extends TopComponent {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
             Bus b = (Bus) jComboBox1.getSelectedItem();
-            tableModel.add(b);
+            
+            if(b != null)
+                tableModel.add(b);
         } catch (Exception ex) {
             logger.log(Level.WARNING, "No bus was selected");
         }
@@ -229,7 +239,7 @@ public final class SendFramesTopComponent extends TopComponent {
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        ProjectManager.getGlobalProjectManager().removeListener(managementListener);
     }
 
     void writeProperties(java.util.Properties p) {
