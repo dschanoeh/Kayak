@@ -23,6 +23,14 @@
         <folder name="File">
             <attr name="position" intvalue="0"/>
         </folder>
+        <file name="GoTo_hidden"/>
+        <folder name="Tools">
+            <file name="Separator1.instance_hidden"/>
+            <file name="org-netbeans-modules-favorites-templates-TemplatesAction.shadow_hidden"/>
+        </folder>
+        <folder name="View">
+            <file name="org-netbeans-core-actions-HTMLViewAction.shadow_hidden"/>
+        </folder>
         <folder name="Window">
             <file name="DescriptionsAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-descriptions-DescriptionsAction.instance"/>
@@ -51,6 +59,9 @@
             <!--<folder name="statistics">
                 <file name="BusStatisticsTopComponent.wstcref" url="BusStatisticsTopComponentWstcref.xml"/>
             </folder>-->
+            <folder name="properties">
+                <file name="properties.wstcref" url="propertiesWstcref.xml"/>
+            </folder>
         </folder>
     </folder>
 </filesystem>

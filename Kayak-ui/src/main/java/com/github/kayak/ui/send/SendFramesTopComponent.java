@@ -18,6 +18,7 @@
 package com.github.kayak.ui.send;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.core.Util;
 import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManagementListener;
@@ -41,7 +42,7 @@ import org.openide.awt.ActionReference;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.send//SendFrames//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "SendFramesTopComponent",
-//iconBase="SET/PATH/TO/ICON/HERE", 
+iconBase="org/freedesktop/tango/16x16/actions/mail-forward.png",  
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 @ActionID(category = "Window", id = "com.github.kayak.ui.send.SendFramesTopComponent")
