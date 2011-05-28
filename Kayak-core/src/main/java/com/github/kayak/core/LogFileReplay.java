@@ -40,7 +40,6 @@ public class LogFileReplay {
     private TimeSource.Mode mode;
     private BufferedReader reader;
     private Thread thread;
-    private boolean loop;
     private long timeOffset;
     private HashMap<String, Bus> busses;
     private boolean infiniteReplay;
@@ -93,16 +92,17 @@ public class LogFileReplay {
     private void seekToBeginning() {
         logger.log(Level.INFO, "Seeking to begin of file");
         try {
-            if (reader == null) {
-                InputStream inputStream;
-                if (logFile.getCompressed()) {
-                    inputStream = new GZIPInputStream(new FileInputStream(logFile.getFile()));
-                } else {
-                    inputStream = new FileInputStream(logFile.getFile());
-                }
-
-                reader = new BufferedReader(new InputStreamReader(inputStream));
+            if(reader != null)
+                reader.close();
+            
+            InputStream inputStream;
+            if (logFile.getCompressed()) {
+                inputStream = new GZIPInputStream(new FileInputStream(logFile.getFile()));
+            } else {
+                inputStream = new FileInputStream(logFile.getFile());
             }
+
+            reader = new BufferedReader(new InputStreamReader(inputStream));
 
             /* Skip header */
             reader.mark(1024);
@@ -117,6 +117,7 @@ public class LogFileReplay {
                 reader.mark(1024);
             }
         } catch (Exception ex) {
+            logger.log(Level.WARNING, "Exception while seeking to begin of file", ex);
         }
     }
 
@@ -185,7 +186,7 @@ public class LogFileReplay {
                             bus.sendFrame(frame);
                         }
                     } else {
-                        if (loop) {
+                        if (infiniteReplay) {
                             seekToBeginning();
                             continue;
                         } else {
