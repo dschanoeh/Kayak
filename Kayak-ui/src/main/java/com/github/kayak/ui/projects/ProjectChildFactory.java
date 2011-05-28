@@ -34,27 +34,27 @@ public class ProjectChildFactory extends ChildFactory<Bus> {
     private ProjectChangeListener listener = new ProjectChangeListener() {
 
         @Override
-        public void projectNameChanged() {
+        public void projectNameChanged(Project p, String name) {
 
         }
 
         @Override
-        public void projectClosed() {
+        public void projectClosed(Project p) {
 
         }
 
         @Override
-        public void projectOpened() {
+        public void projectOpened(Project p) {
 
         }
 
         @Override
-        public void projectBusAdded(Bus bus) {
+        public void projectBusAdded(Project p, Bus bus) {
             refresh(true);
         }
 
         @Override
-        public void projectBusRemoved(Bus bus) {
+        public void projectBusRemoved(Project p, Bus bus) {
             refresh(true);
         }
     };

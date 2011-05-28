@@ -87,12 +87,12 @@ public class SnapshotBuffer {
     private ProjectChangeListener projectListener = new ProjectChangeListener() {
 
         @Override
-        public void projectNameChanged() {
+        public void projectNameChanged(Project p, String name) {
             
         }
 
         @Override
-        public void projectClosed() {
+        public void projectClosed(Project p) {
             currentProject.removeProjectChangeListener(projectListener);
             
             for(Subscription s : subscriptions) {
@@ -104,17 +104,17 @@ public class SnapshotBuffer {
         }
 
         @Override
-        public void projectOpened() {
+        public void projectOpened(Project p) {
 
         }
 
         @Override
-        public void projectBusAdded(Bus bus) {
+        public void projectBusAdded(Project p, Bus bus) {
             
         }
 
         @Override
-        public void projectBusRemoved(Bus bus) {
+        public void projectBusRemoved(Project p, Bus bus) {
             busses.remove(bus);
         }
     };

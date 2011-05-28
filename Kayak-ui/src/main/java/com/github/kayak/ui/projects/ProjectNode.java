@@ -29,7 +29,6 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-import org.openide.util.Lookup;
 import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.Lookups;
 
@@ -43,28 +42,28 @@ public class ProjectNode extends AbstractNode {
     private ProjectChangeListener changeListener = new ProjectChangeListener() {
 
         @Override
-        public void projectNameChanged() {
+        public void projectNameChanged(Project p, String name) {
         }
 
         @Override
-        public void projectClosed() {
+        public void projectClosed(Project p) {
             setChildren(Children.LEAF);
             setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
         }
 
         @Override
-        public void projectOpened() {
+        public void projectOpened(Project p) {
             setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
             setChildren(Children.create(new ProjectChildFactory(project), true));
         }
 
         @Override
-        public void projectBusAdded(Bus bus) {
+        public void projectBusAdded(Project p, Bus bus) {
             
         }
 
         @Override
-        public void projectBusRemoved(Bus bus) {
+        public void projectBusRemoved(Project p, Bus bus) {
             
         }
     };

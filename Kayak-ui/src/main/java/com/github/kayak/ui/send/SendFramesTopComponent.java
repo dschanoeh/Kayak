@@ -18,7 +18,6 @@
 package com.github.kayak.ui.send;
 
 import com.github.kayak.core.Bus;
-import com.github.kayak.core.Util;
 import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManagementListener;
@@ -72,27 +71,27 @@ public final class SendFramesTopComponent extends TopComponent {
     private ProjectChangeListener projectListener = new ProjectChangeListener() {
 
         @Override
-        public void projectNameChanged() {
+        public void projectNameChanged(Project p, String name) {
             
         }
 
         @Override
-        public void projectClosed() {
+        public void projectClosed(Project p) {
 
         }
 
         @Override
-        public void projectOpened() {
+        public void projectOpened(Project p) {
             
         }
 
         @Override
-        public void projectBusAdded(Bus bus) {
+        public void projectBusAdded(Project p, Bus bus) {
             fillComboBox();
         }
 
         @Override
-        public void projectBusRemoved(Bus bus) {
+        public void projectBusRemoved(Project p, Bus bus) {
             fillComboBox();
         }
     };

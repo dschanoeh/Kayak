@@ -75,7 +75,7 @@ public class Project {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
         }
         for(ProjectChangeListener listener : listeners) {
-            listener.projectBusAdded(b);
+            listener.projectBusAdded(this, b);
         }
     }
 
@@ -85,7 +85,7 @@ public class Project {
             b.setTimeSource(null);
         }
         for(ProjectChangeListener listener : listeners) {
-            listener.projectBusRemoved(b);
+            listener.projectBusRemoved(this, b);
         }
     }
 
@@ -100,21 +100,21 @@ public class Project {
 
     private void notifyListenersName() {
         for(ProjectChangeListener listener : listeners) {
-            listener.projectNameChanged();
+            listener.projectNameChanged(this, getName());
         }
     }
 
     private void notifyListenersClosed() {
         ProjectChangeListener[] listenerArray = listeners.toArray(new ProjectChangeListener[listeners.size()]);
         for(ProjectChangeListener listener : listenerArray) {
-            listener.projectClosed();
+            listener.projectClosed(this);
         }
     }
 
     private void notifyListenersOpened() {
         ProjectChangeListener[] listenerArray = listeners.toArray(new ProjectChangeListener[listeners.size()]);
         for(ProjectChangeListener listener : listenerArray) {
-            listener.projectOpened();
+            listener.projectOpened(this);
         }
     }
 

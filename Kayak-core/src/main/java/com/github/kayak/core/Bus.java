@@ -43,6 +43,7 @@ public class Bus implements SubscriptionChangeReceiver {
     private String name;
     private BusURL url;
     private final ArrayList<BusChangeListener> listeners;
+    private final ArrayList<EventFrameReceiver> eventFrameReceivers;
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
     private HashSet<Integer> subscribedIDs;
     private ArrayList<StatisticsReceiver> statisticsReceivers;
@@ -203,6 +204,7 @@ public class Bus implements SubscriptionChangeReceiver {
         listeners = new ArrayList<BusChangeListener>();
         subscribedIDs = new HashSet<Integer>();
         statisticsReceivers = new ArrayList<StatisticsReceiver>();
+        eventFrameReceivers = new ArrayList<EventFrameReceiver>();
     }
 
 
@@ -499,6 +501,26 @@ public class Bus implements SubscriptionChangeReceiver {
             logger.log(Level.INFO, "Opening RAW connection");
             rawConnection.open();
         }
+    }
+    
+    public void addEventFrameReceiver(EventFrameReceiver receiver) {
+        eventFrameReceivers.add(receiver);
+    }
+    
+    public void removeEventFrameReceiver(EventFrameReceiver receiver) {
+        eventFrameReceivers.remove(receiver);
+    }
+    
+    public void sendEventFrame(EventFrame f) {
+        f.setTimestamp(timeSource.getTime());
+        f.setBusName(name);
+        
+        for(EventFrameReceiver receiver : eventFrameReceivers) {
+            if(receiver != null)
+                receiver.newEventFrame(f);
+        }
+        
+        logger.log(Level.INFO, "received event frame{0}", f.getMessage());
     }
     
 }

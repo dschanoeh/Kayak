@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -40,7 +41,8 @@ public class LogFileReplay {
     private TimeSource.Mode mode;
     private BufferedReader reader;
     private Thread thread;
-    private long timeOffset;
+    private long timeOffset; /* time of the first frame in the log file */
+    private long startTime; /* time when the replay was started */
     private HashMap<String, Bus> busses;
     private boolean infiniteReplay;
 
@@ -119,6 +121,8 @@ public class LogFileReplay {
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Exception while seeking to begin of file", ex);
         }
+        
+        startTime = timeSource.getTime();
     }
 
     private Runnable myRunnable = new Runnable() {
@@ -168,12 +172,11 @@ public class LogFileReplay {
 
                             Frame frame = new Frame(identifier, message);
 
-                            long timeToWait = msecs - (timeSource.getTime());
+                            long timeToWait = msecs - (timeSource.getTime() - startTime);
 
                             /* if timeToWait is <0 we are to late. if it is >0 we have to wait. This only makes sense if
                              * it is more than a few ms.
                              */
-
                             if (timeToWait >= 10) {
                                 try {
                                     Thread.sleep(timeToWait);
@@ -184,9 +187,60 @@ public class LogFileReplay {
                             }
 
                             bus.sendFrame(frame);
+                        } else if(line.startsWith("EVENT")) {
+                            String[] cols = line.split("\\s");
+                            
+                            EventFrame ev;
+                            Bus bus = null;
+                            
+                            if(cols[1].startsWith("(")) { /* timestamp */
+                                if(cols[2].startsWith("\"")) { /* timestamp and bus name */
+                                    ev = new EventFrame(cols[3].substring(1, cols[3].length()-1));
+                                    bus = busses.get(logFile.getAlias(cols[2]));
+                                } else { /* no bus name */
+                                    ev = new EventFrame(cols[2].substring(1, cols[2].length()-1));
+                                }
+                                
+                                long msecs = (long) (Double.parseDouble((cols[1].substring(1, cols[1].length() - 1))) * 1000) - timeOffset;
+                                ev.setTimestamp(msecs);
+                                long timeToWait = msecs - (timeSource.getTime() - startTime);
+                            
+                                if (timeToWait >= 10) {
+                                    try {
+                                        Thread.sleep(timeToWait);
+                                    } catch (InterruptedException ex) {
+                                        if(checkMode())
+                                            return;
+                                    }
+                                }
+                            } else { /* no timestamp */
+                                if(cols[2].startsWith("\"")) { /* bus name */
+                                    bus = busses.get(logFile.getAlias(cols[2]));
+                                    ev = new EventFrame(cols[2].substring(1, cols[2].length()-1));
+                                } else { /* no bus name */
+                                    ev = new EventFrame(cols[1].substring(1, cols[1].length()-1));
+                                }
+                            }
+                            
+                            if (bus == null) {
+                                Set<String> keys = busses.keySet();
+                                for(String key : keys) {
+                                    busses.get(key).sendEventFrame(ev);
+                                }
+                            }
+                            
+                            bus.sendEventFrame(ev);
                         }
                     } else {
                         if (infiniteReplay) {
+                            EventFrame ev = new EventFrame("Seeking to beginning");
+                            ev.setTimestamp(timeOffset);
+                            
+                            Set<String> keys = busses.keySet();
+                            for(String key : keys) {
+                                busses.get(key).sendEventFrame(ev);
+                            }
+                                
                             seekToBeginning();
                             continue;
                         } else {
