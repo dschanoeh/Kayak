@@ -104,7 +104,9 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
 
     public void clear() {
         synchronized(this) {
+            int length = data.size();
             data.clear();
+            fireTableRowsDeleted(0, length);
         }
     }
 

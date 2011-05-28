@@ -64,6 +64,7 @@ public final class RawViewTopComponent extends TopComponent {
 
         jToolBar1 = new javax.swing.JToolBar();
         jToggleButton1 = new javax.swing.JToggleButton();
+        jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -87,6 +88,17 @@ public final class RawViewTopComponent extends TopComponent {
         });
         jToolBar1.add(jToggleButton1);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jButton1.text")); // NOI18N
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton1);
+
         add(jToolBar1);
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.X_AXIS));
@@ -108,7 +120,7 @@ public final class RawViewTopComponent extends TopComponent {
 
         add(jPanel1);
 
-        jTable1.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Monospaced", 0, 14));
         jTable1.setModel(model);
         jTable1.setDoubleBuffered(true);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -153,7 +165,12 @@ public final class RawViewTopComponent extends TopComponent {
             model.setColorized(false);
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        model.clear();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
