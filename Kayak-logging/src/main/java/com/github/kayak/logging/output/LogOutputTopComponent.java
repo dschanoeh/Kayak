@@ -52,8 +52,6 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
     
     private static final Logger logger = Logger.getLogger(LogOutputTopComponent.class.getCanonicalName());
 
-    static final String ICON_PATH = "org/freedesktop/tango/16x16/actions/go-next.png";
-    private static final String PREFERRED_ID = "LogOutputTopComponent";
     private ExplorerManager manager;  
     private BusListModel model = new BusListModel();
     private boolean recording = false;
@@ -104,7 +102,6 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
         initComponents();
         setName(NbBundle.getMessage(LogOutputTopComponent.class, "CTL_LogOutputTopComponent"));
         setToolTipText(NbBundle.getMessage(LogOutputTopComponent.class, "HINT_LogOutputTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
         

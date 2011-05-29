@@ -20,7 +20,9 @@ package com.github.kayak.ui.projects;
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.BusURL;
+import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.ui.connections.ConnectionManager;
+import com.github.kayak.ui.descriptions.DescriptionNode;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
@@ -53,6 +55,11 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
         public void destroyed() {
             
         }
+
+        @Override
+        public void descriptionChanged() {
+            
+        }
     };  
 
     public enum Folders {
@@ -81,14 +88,38 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
 
             return new Node[]{node};
         } else if (key == Folders.DESCRIPTION) {
-
-            AbstractNode node = new AbstractNode(Children.LEAF, Lookups.fixed(bus));
-            node.setDisplayName("Description");
-
-            return new Node[]{node};
+            return new Node[]{ new DescriptionFolderNode() };
         }
 
         return null;
+    }
+    
+    private class DescriptionFolderNode extends AbstractNode {
+        
+        public DescriptionFolderNode() {
+            super(Children.create(new DescriptionChildFactory(bus), true));
+            setDisplayName("Description");
+        }
+        
+        @Override
+        public PasteType getDropType(Transferable t, int action, int index) {
+            try {
+                final BusDescription desc = (BusDescription) t.getTransferData(DescriptionNode.DATA_FLAVOR);
+                return new PasteType() {
+
+                    @Override
+                    public Transferable paste() throws IOException {
+                        bus.setDescription(desc);
+                        return null;
+                    }
+                };
+            } catch (UnsupportedFlavorException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            return null;
+        }
     }
 
     private class ConnectionFolderNode extends AbstractNode {

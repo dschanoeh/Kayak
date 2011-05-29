@@ -37,6 +37,11 @@
             <artifactId>Kayak-logging</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>Kayak-kcd</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

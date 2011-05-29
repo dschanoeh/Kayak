@@ -18,6 +18,7 @@
 
 package com.github.kayak.core;
 
+import com.github.kayak.core.description.BusDescription;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,6 +48,7 @@ public class Bus implements SubscriptionChangeReceiver {
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
     private HashSet<Integer> subscribedIDs;
     private ArrayList<StatisticsReceiver> statisticsReceivers;
+    private BusDescription description;
 
     private StatisticsReceiver statisticsReceiver = new StatisticsReceiver() {
 
@@ -442,6 +444,15 @@ public class Bus implements SubscriptionChangeReceiver {
             }
         }
     }
+    
+    private void notifyListenersDescriptionChanged() {
+        synchronized(listeners) {
+            for(BusChangeListener listener : listeners) {
+                if(listener != null)
+                    listener.descriptionChanged();
+            }
+        }
+    }
 
     /**
      * Checks if the BCM connection exists and is connected. If not tries
@@ -521,6 +532,15 @@ public class Bus implements SubscriptionChangeReceiver {
         }
         
         logger.log(Level.INFO, "received event frame{0}", f.getMessage());
+    }
+
+    public void setDescription(BusDescription desc) {
+        this.description = desc;
+        notifyListenersDescriptionChanged();
+    }
+    
+    public BusDescription getDescription() {
+        return description;
     }
     
 }

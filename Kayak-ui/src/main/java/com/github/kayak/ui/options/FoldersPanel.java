@@ -135,7 +135,7 @@ final class FoldersPanel extends javax.swing.JPanel {
         String homeFolder = System.getProperty("user.home");
         
         logFilesTextField.setText(NbPreferences.forModule(FoldersPanel.class).get("Log file directory", homeFolder + "/kayak/log/"));
-        busDescriptionTextField.setText(NbPreferences.forModule(FoldersPanel.class).get("Bus description directory", homeFolder + "/kayak/descriptions/"));
+        busDescriptionTextField.setText(Options.getDescriptionsFolder());
     }
 
     void store() {

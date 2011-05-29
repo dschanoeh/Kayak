@@ -45,6 +45,11 @@ public final class RawViewTopComponent extends TopComponent {
         public void destroyed() {
             close();
         }
+
+        @Override
+        public void descriptionChanged() {
+            
+        }
     };
 
     public RawViewTopComponent() {

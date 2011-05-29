@@ -73,6 +73,12 @@
                 <artifactId>nbm-maven-plugin</artifactId>
                 <version>3.5</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <publicPackages>
+                        <publicPackage>com.github.kayak.canio.kcd</publicPackage>
+                        <publicPackage>com.github.kayak.canio.kcd.loader</publicPackage>
+                    </publicPackages>
+                </configuration>
             </plugin>
 
             <plugin>
