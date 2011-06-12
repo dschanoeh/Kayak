@@ -20,9 +20,14 @@ package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusURL;
+import com.github.kayak.core.description.BusDescription;
+import com.github.kayak.core.description.DescriptionLoader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -31,6 +36,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.Lookup;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -158,6 +166,38 @@ public class ProjectManager {
                                 BusURL connection = BusURL.fromString(connectionAttributes.getNamedItem("url").getNodeValue());
                                 bus.setConnection(connection);
                             }
+
+                            if(busChildren.item(k).getNodeName().equals("Description")) {
+                                NamedNodeMap descriptionAttributes = busChildren.item(k).getAttributes();
+                                String fileName = descriptionAttributes.getNamedItem("fileName").getNodeValue();
+                                String descriptionName = descriptionAttributes.getNamedItem("name").getNodeValue();
+
+                                File file = new File(fileName);
+                                FileObject fileObject = FileUtil.toFileObject(file);
+
+                                if(file.canRead()) {
+
+                                    Collection<? extends DescriptionLoader> loaders = Lookup.getDefault().lookupAll(DescriptionLoader.class);
+
+                                    for(DescriptionLoader loader : loaders) {
+                                        String[] extensions = loader.getSupportedExtensions();
+                                        for(String ext : extensions) {
+                                            if(ext.equals(fileObject.getExt())) {
+                                                com.github.kayak.core.description.Document parseFile = loader.parseFile(file);
+                                                HashSet<BusDescription> busDescriptions = parseFile.getBusses();
+
+                                                for(BusDescription b : busDescriptions)  {
+                                                    if(b.getName().equals(descriptionName)) {
+                                                        bus.setDescription(b);
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         project.addBus(bus);
@@ -202,6 +242,15 @@ public class ProjectManager {
                         Element connectionElement = doc.createElement("Connection");
                         connectionElement.setAttribute("url", connection.toURLString());
                         busElement.appendChild(connectionElement);
+                    }
+
+                    BusDescription desc = bus.getDescription();
+                    
+                    if(desc != null) {
+                        Element descriptionElement = doc.createElement("Description");
+                        descriptionElement.setAttribute("fileName", desc.getDocument().getFileName());
+                        descriptionElement.setAttribute("name", desc.getName());
+                        busElement.appendChild(descriptionElement);
                     }
 
                 }
