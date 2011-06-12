@@ -40,7 +40,6 @@ public class EventsStatusElementProvider implements StatusLineElementProvider {
 
         @Override
         public void projectsUpdated() {
-            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
