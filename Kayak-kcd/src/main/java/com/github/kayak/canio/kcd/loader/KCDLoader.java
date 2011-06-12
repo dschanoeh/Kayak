@@ -70,7 +70,6 @@ public class KCDLoader implements DescriptionLoader {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
 
@@ -82,6 +81,7 @@ public class KCDLoader implements DescriptionLoader {
         doc.setCompany(documentInfo.getCompany());
         doc.setDate(documentInfo.getDate());
         doc.setName(documentInfo.getName());
+        doc.setFileName(file.getAbsolutePath());
 
         List<Node> nodes = netdef.getNode();
         for(Node n : nodes) {
@@ -89,18 +89,17 @@ public class KCDLoader implements DescriptionLoader {
         }
 
         for(Bus b : netdef.getBus()) {
-            BusDescription description = new BusDescription();
+            BusDescription description = doc.createBusDescription();
             description.setName(b.getName());
             description.setBaudrate(b.getBaudrate());
 
             for(Message m :  b.getMessage()) {
-                MessageDescription messageDescription = new MessageDescription();
-                messageDescription.setId(Integer.parseInt(m.getId().substring(2),16));
+                MessageDescription messageDescription = description.createMessage(Integer.parseInt(m.getId().substring(2),16));
                 messageDescription.setInterval(m.getInterval());
                 messageDescription.setName(m.getName());
 
                 for(Signal s : m.getSignal()) {
-                    SignalDescription signalDescription = new SignalDescription();
+                    SignalDescription signalDescription = messageDescription.createSignal();
                     if(s.getEndianess().equals("motorola")) {
                         signalDescription.setByteOrder(ByteOrder.BIG_ENDIAN);
                     } else {

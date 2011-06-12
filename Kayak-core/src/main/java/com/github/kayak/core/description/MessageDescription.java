@@ -20,7 +20,6 @@ package com.github.kayak.core.description;
 
 import com.github.kayak.core.Frame;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
@@ -33,6 +32,11 @@ public class MessageDescription {
     private String name;
     private String producer;
     private HashSet<SignalDescription> signals;
+    private BusDescription bus;
+
+    public BusDescription getBus() {
+        return bus;
+    }
 
     public String getProducer() {
         return producer;
@@ -44,10 +48,6 @@ public class MessageDescription {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getInterval() {
@@ -74,8 +74,10 @@ public class MessageDescription {
         this.signals = signals;
     }
 
-    public MessageDescription() {
+    protected MessageDescription(BusDescription bus, int id) {
         signals = new HashSet<SignalDescription>();
+        this.bus = bus;
+        this.id = id;
     }
 
     public Message decodeFrame(Frame f) {
@@ -94,6 +96,12 @@ public class MessageDescription {
         }
         
         return m;
+    }
+
+    public SignalDescription createSignal() {
+        SignalDescription s = new SignalDescription(this);
+        signals.add(s);
+        return s;
     }
 
 }

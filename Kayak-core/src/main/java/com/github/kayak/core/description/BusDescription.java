@@ -20,7 +20,6 @@ package com.github.kayak.core.description;
 
 import com.github.kayak.core.Frame;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  *
@@ -31,6 +30,7 @@ public class BusDescription {
     private String name;
     private int baudrate;
     private HashMap<Integer,MessageDescription> messages;
+    private Document document;
 
     public int getBaudrate() {
         return baudrate;
@@ -56,7 +56,8 @@ public class BusDescription {
         this.name = name;
     }
 
-    public BusDescription() {
+    protected BusDescription(Document d) {
+        document = d;
         name = "";
         baudrate = 500000;
         messages = new HashMap<Integer,MessageDescription>();
@@ -71,4 +72,19 @@ public class BusDescription {
             return null;
         }
     }
+
+    public Document getDocument() {
+        return document;
+    }
+
+    public MessageDescription createMessage(int id) {
+        if(!messages.containsKey(id)) {
+            MessageDescription m = new MessageDescription(this, id);
+            messages.put(id, m);
+            return m;
+        } else {
+            return null;
+        }
+    }
+
 }
