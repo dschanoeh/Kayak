@@ -164,6 +164,7 @@ public final class MessageViewTopComponent extends TopComponent implements Explo
 	    } else {
 		SearchFilteredNode filteredNode = new SearchFilteredNode(root, filter);
 	        manager.setRootContext(filteredNode);
+                beanTreeView1.expandAll();
 	    }
 	}//GEN-LAST:event_jTextField2KeyReleased
 
