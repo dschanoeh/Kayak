@@ -8,7 +8,6 @@ import com.github.kayak.core.Bus;
 import java.awt.dnd.DropTarget;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DropMode;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -42,8 +41,8 @@ public final class MessageViewTopComponent extends TopComponent implements Explo
 	setName(NbBundle.getMessage(MessageViewTopComponent.class, "CTL_MessageViewTopComponent"));
 	setToolTipText(NbBundle.getMessage(MessageViewTopComponent.class, "HINT_MessageViewTopComponent"));
 	
-	DropTarget dt = new DropTarget(jButton1, new MessageSignalDropAdapter(model));
-	jButton1.setDropTarget(dt);
+	DropTarget dt = new DropTarget(jTable1, new MessageSignalDropAdapter(model));
+	jTable1.setDropTarget(dt);
 	
     }
 
@@ -70,6 +69,7 @@ public final class MessageViewTopComponent extends TopComponent implements Explo
 
                 jTable1.setModel(model);
                 jTable1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+                jTable1.setFillsViewportHeight(true);
                 jScrollPane1.setViewportView(jTable1);
 
                 jToolBar1.setFloatable(false);
