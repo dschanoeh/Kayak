@@ -10,30 +10,34 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-import org.openide.util.lookup.Lookups;
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.projects//Projects//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "ProjectsTopComponent",
+iconBase="org/freedesktop/tango/16x16/mimetypes/package-x-generic.png", 
+persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+@TopComponent.Registration(mode = "explorer", openAtStartup = true)
+@ActionID(category = "Window", id = "com.github.kayak.ui.projects.ProjectsTopComponent")
+@ActionReference(path = "Menu/Window" , position = 10 )
+@TopComponent.OpenActionRegistration(displayName = "#CTL_ProjectsTopComponent",
+preferredID = "ProjectsTopComponent")
 public final class ProjectsTopComponent extends TopComponent implements ExplorerManager.Provider {
 
-    private static ProjectsTopComponent instance;
     private ExplorerManager manager = new ExplorerManager();
-    /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "com/github/kayak/ui/projects/package-x-generic.png";
-    private static final String PREFERRED_ID = "ProjectsTopComponent";
 
     public ProjectsTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(ProjectsTopComponent.class, "CTL_ProjectsTopComponent"));
         setToolTipText(NbBundle.getMessage(ProjectsTopComponent.class, "HINT_ProjectsTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
@@ -70,41 +74,6 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.openide.explorer.view.BeanTreeView beanTreeView1;
     // End of variables declaration//GEN-END:variables
-    /**
-     * Gets default instance. Do not use directly: reserved for *.settings files only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-     * To obtain the singleton instance, use {@link #findInstance}.
-     */
-    public static synchronized ProjectsTopComponent getDefault() {
-        if (instance == null) {
-            instance = new ProjectsTopComponent();
-        }
-        return instance;
-    }
-
-    /**
-     * Obtain the ProjectsTopComponent instance. Never call {@link #getDefault} directly!
-     */
-    public static synchronized ProjectsTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(ProjectsTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-            return getDefault();
-        }
-        if (win instanceof ProjectsTopComponent) {
-            return (ProjectsTopComponent) win;
-        }
-        Logger.getLogger(ProjectsTopComponent.class.getName()).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
-        return getDefault();
-    }
-
-    @Override
-    public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_ALWAYS;
-    }
 
     @Override
     public void componentOpened() {
@@ -123,22 +92,9 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
         // TODO store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
     }
 
     @Override

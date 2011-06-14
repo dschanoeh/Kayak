@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mode PUBLIC
+ "-//NetBeans//DTD Mode Properties 2.3//EN"
+ "http://www.netbeans.org/dtds/mode-properties2_3.dtd">
+<mode version="2.0">
+ <name unique="statistics" />
+ <kind type="view" />
+ <state type="joined" />
+ <constraints>
+    <path orientation="vertical" number="20" weight="0.5" />
+    <path orientation="horizontal" number="20" weight="0.3" />
+ </constraints>
+ <empty-behaviour permanent="true"/>
+</mode>

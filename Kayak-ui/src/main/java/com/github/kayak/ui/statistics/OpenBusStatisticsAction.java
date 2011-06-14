@@ -19,18 +19,29 @@
 package com.github.kayak.ui.statistics;
 
 import com.github.kayak.core.Bus;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public final class OpenBusStatisticsAction implements ActionListener {
+@ActionRegistration(displayName="Open bus statistics", iconBase="org/freedesktop/tango/16x16/apps/utilities-system-monitor.png", iconInMenu=true, surviveFocusChange=true)
+@ActionID(category="BusViews", id="com.github.kayak.ui.statistics.OpenBusStatisticsAction")
+@ActionReferences( value= {
+    @ActionReference(path = "Menu/Bus views", position = 20 ),
+    @ActionReference(path = "Toolbars/Bus views", position = 20 )
+})
+public final class OpenBusStatisticsAction extends AbstractAction {
 
     private final Bus context;
 
     public OpenBusStatisticsAction(Bus context) {
+        this.putValue(NAME, "Open bus statistics");
         this.context = context;
     }
 

@@ -47,7 +47,11 @@ public class SignalDescriptionTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
 
-        description = new SignalDescription();
+        Document d = new Document();
+        BusDescription b = d.createBusDescription();
+        MessageDescription m = b.createMessage(42);
+
+        description = m.createSignal();
         description.setType(SignalDescription.Type.UNSIGNED);
         description.setNotes("This is a test signal");
         description.setUnit("0.1 km/h");
@@ -57,21 +61,21 @@ public class SignalDescriptionTest {
         description.setIntercept(0);
         description.setSlope(1);
 
-        description2 = new SignalDescription();
+        description2 = m.createSignal();
         description2.setType(SignalDescription.Type.SIGNED);
         description2.setLength(8);
         description2.setOffset(0);
         description2.setIntercept(0);
         description2.setSlope(1);
         
-        description3 = new SignalDescription();
+        description3 = m.createSignal();
         description3.setType(SignalDescription.Type.SIGNED);
         description3.setLength(7);
         description3.setOffset(4);
         description3.setIntercept(0);
         description3.setSlope(1);
 
-        description4 = new SignalDescription();
+        description4 = m.createSignal();
         description4.setType(SignalDescription.Type.SIGNED);
         description4.setByteOrder(ByteOrder.BIG_ENDIAN);
         description4.setLength(12);
@@ -79,7 +83,7 @@ public class SignalDescriptionTest {
         description4.setIntercept(0);
         description4.setSlope(1);
 
-        description5 = new SignalDescription();
+        description5 = m.createSignal();
         description5.setType(SignalDescription.Type.SIGNED);
         description5.setByteOrder(ByteOrder.BIG_ENDIAN);
         description5.setLength(6);

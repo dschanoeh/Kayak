@@ -13,4 +13,5 @@ public interface BusChangeListener {
     public void connectionChanged();
     public void nameChanged();
     public void destroyed();
+    public void descriptionChanged();
 }

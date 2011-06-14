@@ -33,6 +33,7 @@ public class Document {
     private String author;
     private String company;
     private String date;
+    private String fileName;
 
     public HashSet<String> getNodes() {
         return nodes;
@@ -70,10 +71,13 @@ public class Document {
         return busses;
     }
 
-    public void setBusses(HashSet<BusDescription> busses) {
-        this.busses = busses;
+    public BusDescription createBusDescription() {
+        BusDescription b = new BusDescription(this);
+        
+        return b;
     }
-
+    
+    
     public String getName() {
         return name;
     }
@@ -95,5 +99,12 @@ public class Document {
         busses = new HashSet<BusDescription>();
     }
 
-    
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
 }

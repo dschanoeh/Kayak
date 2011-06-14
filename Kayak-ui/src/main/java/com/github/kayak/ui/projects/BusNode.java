@@ -19,6 +19,11 @@
 package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.ui.rawview.OpenRawViewAction;
+import com.github.kayak.ui.statistics.OpenBusStatisticsAction;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -30,7 +35,9 @@ import org.openide.util.lookup.Lookups;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class BusNode extends AbstractNode {
+public class BusNode extends AbstractNode implements Transferable {
+
+    public static final DataFlavor DATA_FLAVOR = new DataFlavor(BusNode.class, "BusNode");
 
     private Bus bus;
     private Project project;
@@ -44,6 +51,35 @@ public class BusNode extends AbstractNode {
         this.project = project;
     }
 
+    public Bus getBus() {
+        return bus;
+    }
+
+    @Override
+    public Transferable drag() {
+        return this;
+    }
+
+    @Override
+    public DataFlavor[] getTransferDataFlavors() {
+        return new DataFlavor[]{DATA_FLAVOR};
+    }
+
+    @Override
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+        return flavor == DATA_FLAVOR;
+    }
+
+    @Override
+    public Object getTransferData(DataFlavor flavor)
+            throws UnsupportedFlavorException {
+        if (flavor == DATA_FLAVOR) {
+            return this;
+        } else {
+            throw new UnsupportedFlavorException(flavor);
+        }
+    }
+
     @Override
     public void setDisplayName(String s) {
         super.setDisplayName(s);
@@ -52,8 +88,7 @@ public class BusNode extends AbstractNode {
 
     @Override
     public Action[] getActions(boolean context) {
-
-        return new Action[] { new RenameBusAction(), new DeleteBusAction() };
+        return new Action[] { new OpenRawViewAction(bus), new OpenBusStatisticsAction(bus), new RenameBusAction(), new DeleteBusAction() };
     }
 
     private class RenameBusAction extends AbstractAction {

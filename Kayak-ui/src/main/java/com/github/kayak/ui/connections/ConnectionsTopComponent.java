@@ -4,45 +4,39 @@
  */
 package com.github.kayak.ui.connections;
 
-import com.github.kayak.core.BusURL;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
-import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
-
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui//Connections//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "ConnectionsTopComponent",
+iconBase="org/freedesktop/tango/16x16/devices/network-wireless.png", 
+persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+@TopComponent.Registration(mode = "management", openAtStartup = true)
+@ActionID(category = "Window", id = "com.github.kayak.ui.connections.ConnectionsTopComponent")
+@ActionReference(path = "Menu/Connections" , position = 10 )
+@TopComponent.OpenActionRegistration(displayName = "#CTL_ConnectionsTopComponent",
+preferredID = "ConnectionsTopComponent")
 public final class ConnectionsTopComponent extends TopComponent implements ExplorerManager.Provider {
 
-    private static ConnectionsTopComponent instance;
-    /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "com/github/kayak/ui/network-wireless.png";
-    private static final String PREFERRED_ID = "ConnectionsTopComponent";
-
     private ExplorerManager manager = new ExplorerManager();
-
-    private ConnectionManager connectionManager;
 
     public ConnectionsTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(ConnectionsTopComponent.class, "CTL_ConnectionsTopComponent"));
         setToolTipText(NbBundle.getMessage(ConnectionsTopComponent.class, "HINT_ConnectionsTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-
        
-        connectionManager = ConnectionManager.getGlobalConnectionManager();
         ConnectionNodeFactory factory = new ConnectionNodeFactory();
 
         AbstractNode rootNode = new AbstractNode(Children.create(factory, true));
@@ -78,41 +72,6 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.openide.explorer.view.BeanTreeView beanTreeView1;
     // End of variables declaration//GEN-END:variables
-    /**
-     * Gets default instance. Do not use directly: reserved for *.settings files only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-     * To obtain the singleton instance, use {@link #findInstance}.
-     */
-    public static synchronized ConnectionsTopComponent getDefault() {
-        if (instance == null) {
-            instance = new ConnectionsTopComponent();
-        }
-        return instance;
-    }
-
-    /**
-     * Obtain the ConnectionsTopComponent instance. Never call {@link #getDefault} directly!
-     */
-    public static synchronized ConnectionsTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(ConnectionsTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-            return getDefault();
-        }
-        if (win instanceof ConnectionsTopComponent) {
-            return (ConnectionsTopComponent) win;
-        }
-        Logger.getLogger(ConnectionsTopComponent.class.getName()).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
-        return getDefault();
-    }
-
-    @Override
-    public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_ALWAYS;
-    }
 
     @Override
     public void componentOpened() {
@@ -131,22 +90,9 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
         // TODO store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
     }
 
     @Override

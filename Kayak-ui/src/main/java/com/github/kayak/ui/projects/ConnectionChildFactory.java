@@ -53,6 +53,11 @@ public class ConnectionChildFactory extends ChildFactory<BusURL> {
         public void destroyed() {
             
         }
+
+        @Override
+        public void descriptionChanged() {
+            
+        }
     };
 
     public ConnectionChildFactory(Bus bus) {

@@ -80,9 +80,29 @@ public class Frame implements Comparable<Frame> {
         return data;
     }
     
+    @Override
     public String toString() {
         String s = "Frame [" + Integer.toHexString(identifier) + "] " + Util.byteArrayToHexString(data);
         return s;
+    }
+    
+    public String toLogFileNotation() {
+        StringBuilder sb = new StringBuilder(40);
+
+        sb.append('(');
+        sb.append(Long.toString(timestamp/1000));
+        sb.append('.');
+        sb.append(String.format("%03d",timestamp%1000));
+        sb.append("000) ");
+        sb.append(busName);
+        sb.append(" ");
+        sb.append(String.format("%03x", identifier));
+        sb.append('#');
+        for(byte b : data) {
+            sb.append(String.format("%02x", b));
+        }
+        sb.append('\n');
+        return sb.toString();
     }
 
     @Override

@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>RELEASE691</version>
+            <version>RELEASE70</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -71,15 +71,21 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.5</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <publicPackages>
+                        <publicPackage>com.github.kayak.canio.kcd</publicPackage>
+                        <publicPackage>com.github.kayak.canio.kcd.loader</publicPackage>
+                    </publicPackages>
+                </configuration>
             </plugin>
 
             <plugin>
                 <!-- netbeans modules in 6.9+ are 1.6 compatible -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>

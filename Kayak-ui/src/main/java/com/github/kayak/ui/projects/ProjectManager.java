@@ -20,15 +20,25 @@ package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusURL;
+import com.github.kayak.core.description.BusDescription;
+import com.github.kayak.core.description.DescriptionLoader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.Lookup;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -40,12 +50,17 @@ import org.w3c.dom.NodeList;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ProjectManager {
+    
+    private static final Logger logger = Logger.getLogger(ProjectManager.class.getCanonicalName());
 
     private static ProjectManager projectManagement;
     private ArrayList<Project> projects;
     private Project openedProject;
     private ArrayList<ProjectManagementListener> listeners;
 
+    public Project getOpenedProject() {
+        return openedProject;
+    }
 
     public ArrayList<Project> getProjects() {
         return projects;
@@ -70,6 +85,10 @@ public class ProjectManager {
 
         p.open();
         openedProject = p;
+        
+        for(ProjectManagementListener l : listeners) {
+            l.openProjectChanged(p);
+        }
     }
 
     public void closeProject(Project p) {
@@ -77,6 +96,10 @@ public class ProjectManager {
             return;
 
         openedProject.close();
+        openedProject = null;
+        for(ProjectManagementListener l : listeners) {
+            l.openProjectChanged(null);
+        }
     }
 
     public void addListener(ProjectManagementListener listener) {
@@ -122,11 +145,6 @@ public class ProjectManager {
                     Node nameNode = attributes.getNamedItem("name");
                     String name = nameNode.getNodeValue();
                     Project project = new Project(name);
-                    
-                    Node openedNode = attributes.getNamedItem("opened");
-                    boolean opened = Boolean.parseBoolean(openedNode.getNodeValue());
-                    if(opened)
-                        openProject(project);
 
                     NodeList busses = projects.item(i).getChildNodes();
 
@@ -148,19 +166,54 @@ public class ProjectManager {
                                 BusURL connection = BusURL.fromString(connectionAttributes.getNamedItem("url").getNodeValue());
                                 bus.setConnection(connection);
                             }
+
+                            if(busChildren.item(k).getNodeName().equals("Description")) {
+                                NamedNodeMap descriptionAttributes = busChildren.item(k).getAttributes();
+                                String fileName = descriptionAttributes.getNamedItem("fileName").getNodeValue();
+                                String descriptionName = descriptionAttributes.getNamedItem("name").getNodeValue();
+
+                                File file = new File(fileName);
+                                FileObject fileObject = FileUtil.toFileObject(file);
+
+                                if(file.canRead()) {
+
+                                    Collection<? extends DescriptionLoader> loaders = Lookup.getDefault().lookupAll(DescriptionLoader.class);
+
+                                    for(DescriptionLoader loader : loaders) {
+                                        String[] extensions = loader.getSupportedExtensions();
+                                        for(String ext : extensions) {
+                                            if(ext.equals(fileObject.getExt())) {
+                                                com.github.kayak.core.description.Document parseFile = loader.parseFile(file);
+                                                HashSet<BusDescription> busDescriptions = parseFile.getBusses();
+
+                                                for(BusDescription b : busDescriptions)  {
+                                                    if(b.getName().equals(descriptionName)) {
+                                                        bus.setDescription(b);
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         project.addBus(bus);
                     }
 
-
                     this.projects.add(project);
 
+                    Node openedNode = attributes.getNamedItem("opened");
+                    boolean opened = Boolean.parseBoolean(openedNode.getNodeValue());
+                    if(opened)
+                        openProject(project);
                 }
             }
 
         } catch (Exception ex) {
-            //logOutput.getErr().write("Error while reading connections from file\n");
+            logger.log(Level.WARNING, "Could not load projects", ex);
         }
     }
 
@@ -191,6 +244,15 @@ public class ProjectManager {
                         busElement.appendChild(connectionElement);
                     }
 
+                    BusDescription desc = bus.getDescription();
+                    
+                    if(desc != null) {
+                        Element descriptionElement = doc.createElement("Description");
+                        descriptionElement.setAttribute("fileName", desc.getDocument().getFileName());
+                        descriptionElement.setAttribute("name", desc.getName());
+                        busElement.appendChild(descriptionElement);
+                    }
+
                 }
             }
 
@@ -201,7 +263,7 @@ public class ProjectManager {
             StreamResult result = new StreamResult(stream);
             transformer.transform(source, result);
         } catch (Exception ex) {
-            //logOutput.getErr().write("Error while writing connections to file\n");
+            logger.log(Level.WARNING, "Could not save projects", ex);
         }
     }
 }

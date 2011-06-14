@@ -12,6 +12,8 @@ To build Kayak follow the instructions in BUILD.md
 * .kcd bus description format
 * project and log file management
 * simple raw view of CAN frames
+* sending of single and repetitive CAN frames
+* creation and replay of log files
  
 ### Why the name Kayak?
 Because a kayak is a small, lightweight and versatile boat compared to a canoe. 

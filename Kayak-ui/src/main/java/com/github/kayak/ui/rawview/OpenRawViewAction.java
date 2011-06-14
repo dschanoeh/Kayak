@@ -19,14 +19,25 @@
 package com.github.kayak.ui.rawview;
 
 import com.github.kayak.core.Bus;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
 
-public final class OpenRawViewAction implements ActionListener {
+@ActionRegistration(displayName="Open RAW view", iconBase="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png", iconInMenu=true, surviveFocusChange=true)
+@ActionID(category="BusViews", id="com.github.kayak.ui.rawview.OpenRawViewAction")
+@ActionReferences( value= {
+    @ActionReference(path = "Menu/Bus views", position = 10),
+    @ActionReference(path = "Toolbars/Bus views", position = 10)
+})
+public final class OpenRawViewAction extends AbstractAction {
 
     private final Bus context;
 
     public OpenRawViewAction(Bus context) {
+        this.putValue(NAME, "Open RAW view");
         this.context = context;
     }
 

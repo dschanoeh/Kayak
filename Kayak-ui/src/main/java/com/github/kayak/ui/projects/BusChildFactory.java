@@ -20,8 +20,9 @@ package com.github.kayak.ui.projects;
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.BusURL;
+import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.ui.connections.ConnectionManager;
-import com.github.kayak.ui.logfiles.LogFileBusTupel;
+import com.github.kayak.ui.descriptions.DescriptionNode;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
@@ -54,10 +55,15 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
         public void destroyed() {
             
         }
+
+        @Override
+        public void descriptionChanged() {
+            
+        }
     };  
 
     public enum Folders {
-        CONNECTION, DESCRIPTION, INPUT, OUTPUT;
+        CONNECTION, DESCRIPTION;
     }
     private Bus bus;
 
@@ -69,7 +75,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
 
     @Override
     public void addNotify() {
-        setKeys(new Folders[] {Folders.CONNECTION, Folders.DESCRIPTION, Folders.INPUT, Folders.OUTPUT});
+        setKeys(new Folders[] {Folders.CONNECTION, Folders.DESCRIPTION});
     }
 
     @Override
@@ -82,28 +88,38 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
 
             return new Node[]{node};
         } else if (key == Folders.DESCRIPTION) {
-
-            AbstractNode node = new AbstractNode(Children.LEAF, Lookups.fixed(bus));
-            node.setDisplayName("Description");
-
-            return new Node[]{node};
-        } else if (key == Folders.INPUT) {
-
-            AbstractNode node = new LogFileFolderNode(Children.LEAF, bus);
-            node.setDisplayName("Log input");
-            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/go-previous.png");
-
-            return new Node[]{node};
-        }else if (key == Folders.OUTPUT) {
-
-            AbstractNode node = new AbstractNode(Children.LEAF, Lookups.fixed(bus));
-            node.setDisplayName("Log output");
-            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/go-next.png");
-
-            return new Node[]{node};
+            return new Node[]{ new DescriptionFolderNode() };
         }
 
         return null;
+    }
+    
+    private class DescriptionFolderNode extends AbstractNode {
+        
+        public DescriptionFolderNode() {
+            super(Children.create(new DescriptionChildFactory(bus), true));
+            setDisplayName("Description");
+            setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/text-x-generic.png");
+        }
+        
+        @Override
+        public PasteType getDropType(Transferable t, int action, int index) {
+            try {
+                final BusDescription desc = (BusDescription) t.getTransferData(DescriptionNode.DATA_FLAVOR);
+                return new PasteType() {
+
+                    @Override
+                    public Transferable paste() throws IOException {
+                        bus.setDescription(desc);
+                        return null;
+                    }
+                };
+            } catch (UnsupportedFlavorException ex) {
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            return null;
+        }
     }
 
     private class ConnectionFolderNode extends AbstractNode {
@@ -128,34 +144,6 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
                     }
                 };
             } catch (UnsupportedFlavorException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-            return null;
-        }
-    }
-
-    private class LogFileFolderNode extends AbstractNode {
-
-        public LogFileFolderNode(Children children, Bus bus) {
-            super(children, Lookups.fixed(bus));
-        }
-
-        @Override
-        public PasteType getDropType(Transferable t, int action, int index) {
-            try {
-                final LogFileBusTupel tupel = (LogFileBusTupel) t.getTransferData(LogFileBusTupel.DATA_FLAVOR);
-                return new PasteType() {
-
-                    @Override
-                    public Transferable paste() throws IOException {
-                        
-                        return null;
-                    }
-                };
-            } catch (UnsupportedFlavorException ex) {
-                Exceptions.printStackTrace(ex);
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }

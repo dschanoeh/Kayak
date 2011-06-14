@@ -4,11 +4,19 @@
  */
 package com.github.kayak.ui.connections;
 
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
 
-public final class DeleteConnectionAction extends AbstractAction implements ActionListener {
+@ActionRegistration(displayName="Delete connection...", iconBase="org/freedesktop/tango/16x16/actions/edit-delete.png", iconInMenu=true, surviveFocusChange=true)
+@ActionID(category="Connections", id="com.github.kayak.ui.connections.DeleteConnectionAction")
+@ActionReferences(value = {
+    @ActionReference(path="Menu/Connections", position=40), 
+    @ActionReference(path="Toolbar/Connections", position=40)})
+public final class DeleteConnectionAction extends AbstractAction {
 
     private final BusURLNode context;
 
@@ -18,6 +26,7 @@ public final class DeleteConnectionAction extends AbstractAction implements Acti
         putValue(NAME, "Delete");
     }
 
+    @Override
     public void actionPerformed(ActionEvent ev) {
         if(context.getType() == BusURLNode.Type.FAVOURITE) {
             ConnectionManager.getGlobalConnectionManager().removeFavourite(context.getURL());

@@ -17,6 +17,7 @@
  */
 package com.github.kayak.core;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ import java.util.Set;
  */
 public class Subscription {
 
-    private HashSet<Integer> ids;
+    private transient HashSet<Integer> ids;
     private Boolean muted;
     private Boolean subscribeAll;
     private FrameReceiver receiver;
@@ -157,14 +158,21 @@ public class Subscription {
         changeReceiver.subscriptionAllChanged(subscribeAll, this);
     }
 
+    /**
+     * Returns true if all IDs are subscribed by this Subscription
+     */
     public Boolean getSubscribeAll() {
         return subscribeAll;
     }
 
     public Set<Integer> getAllIdentifiers() {
-        return ids;
+        return Collections.unmodifiableSet(ids);
     }
 
+    /**
+     * Informs the {@link SubscriptionChangeReceiver} that the Subscription
+     * will not be used anymore and no more Frames shall be received.
+     */
     public void Terminate() {
         if(changeReceiver != null)
             changeReceiver.subscriptionTerminated(this);

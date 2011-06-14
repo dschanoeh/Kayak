@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;

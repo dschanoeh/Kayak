@@ -35,7 +35,7 @@ public class TimeSource {
     private long reference;
     private long pauseReference;
     private Mode mode = Mode.STOP;
-    private ArrayList<TimeEventReceiver> receivers;
+    private final ArrayList<TimeEventReceiver> receivers= new ArrayList<TimeEventReceiver>();;
 
     public Mode getMode() {
         return mode;
@@ -43,7 +43,6 @@ public class TimeSource {
     
     public TimeSource() {
         reference = System.currentTimeMillis();
-        receivers = new ArrayList<TimeEventReceiver>();
     }
     
     public void reset() {
@@ -76,11 +75,15 @@ public class TimeSource {
      * changes of the TimeSource.
      */
     public void register(TimeEventReceiver receiver) {
-        receivers.add(receiver);
+        synchronized(receivers) {
+            receivers.add(receiver);
+        }
     }
     
     public void deregister(TimeEventReceiver receiver) {
-        receivers.remove(receiver);
+        synchronized(receivers) {
+            receivers.remove(receiver);
+        }
     }
     
     /**
@@ -98,9 +101,11 @@ public class TimeSource {
 
             mode = Mode.PLAY;
 
-            for(TimeEventReceiver receiver : receivers) {
-                if(receiver != null)
-                    receiver.played();
+            synchronized(receivers) {
+                for(TimeEventReceiver receiver : receivers) {
+                    if(receiver != null)
+                        receiver.played();
+                }
             }
         }
     }
@@ -109,22 +114,29 @@ public class TimeSource {
      * Pauses the time.
      */
     public void pause() {
+        if(mode == Mode.STOP)
+            return;
+        
         mode = Mode.PAUSE;
         
         pauseReference = System.currentTimeMillis() - reference;
         
-        for(TimeEventReceiver receiver : receivers) {
-            if(receiver != null)
-                receiver.paused();
+        synchronized(receivers) {
+            for(TimeEventReceiver receiver : receivers) {
+                if(receiver != null)
+                    receiver.paused();
+            }
         }
     }
     
     public void stop() {
         mode = Mode.STOP;
         
-        for(TimeEventReceiver receiver : receivers) {
-            if(receiver != null)
-                receiver.stopped();
+        synchronized(receivers) {
+            for(TimeEventReceiver receiver : receivers) {
+                if(receiver != null)
+                    receiver.stopped();
+            }
         }
     }
 }

@@ -8,29 +8,41 @@ import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
+import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
+import org.openide.explorer.ExplorerUtils;
+import org.openide.nodes.AbstractNode;
+import org.openide.nodes.Children;
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.descriptions//Descriptions//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "DescriptionsTopComponent",
+iconBase="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png", 
+persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+@TopComponent.Registration(mode = "management", openAtStartup = true)
+@ActionID(category = "Window", id = "com.github.kayak.ui.descriptions.DescriptionsTopComponent")
+@ActionReference(path = "Menu/Descriptions", position = 10)
+@TopComponent.OpenActionRegistration(displayName = "#CTL_DescriptionsAction",
+preferredID = "DescriptionsTopComponent")
 public final class DescriptionsTopComponent extends TopComponent implements ExplorerManager.Provider {
 
-    private static DescriptionsTopComponent instance;
-    /** path to the icon used by the component and its open action */
-//    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
-    private static final String PREFERRED_ID = "DescriptionsTopComponent";
     ExplorerManager manager = new ExplorerManager();
+    DescriptionsNodeFactory factory = new DescriptionsNodeFactory();
 
     public DescriptionsTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(DescriptionsTopComponent.class, "CTL_DescriptionsTopComponent"));
         setToolTipText(NbBundle.getMessage(DescriptionsTopComponent.class, "HINT_DescriptionsTopComponent"));
-//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-
+        
+        AbstractNode rootNode = new AbstractNode(Children.create(factory, false));
+        manager.setRootContext(rootNode);
+        associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
     }
 
     /** This method is called from within the constructor to
@@ -60,36 +72,6 @@ public final class DescriptionsTopComponent extends TopComponent implements Expl
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.openide.explorer.view.BeanTreeView beanTreeView1;
     // End of variables declaration//GEN-END:variables
-    /**
-     * Gets default instance. Do not use directly: reserved for *.settings files only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-     * To obtain the singleton instance, use {@link #findInstance}.
-     */
-    public static synchronized DescriptionsTopComponent getDefault() {
-        if (instance == null) {
-            instance = new DescriptionsTopComponent();
-        }
-        return instance;
-    }
-
-    /**
-     * Obtain the DescriptionsTopComponent instance. Never call {@link #getDefault} directly!
-     */
-    public static synchronized DescriptionsTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(DescriptionsTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-            return getDefault();
-        }
-        if (win instanceof DescriptionsTopComponent) {
-            return (DescriptionsTopComponent) win;
-        }
-        Logger.getLogger(DescriptionsTopComponent.class.getName()).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
-        return getDefault();
-    }
 
     @Override
     public int getPersistenceType() {
@@ -113,22 +95,9 @@ public final class DescriptionsTopComponent extends TopComponent implements Expl
         // TODO store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
     }
 
     @Override

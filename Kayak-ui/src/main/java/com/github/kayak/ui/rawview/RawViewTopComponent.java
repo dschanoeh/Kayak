@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
@@ -19,12 +18,11 @@ import org.netbeans.api.settings.ConvertAsProperties;
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.rawview//RawView//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "RawViewTopComponent",
+iconBase="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png", 
+persistenceType = TopComponent.PERSISTENCE_NEVER)
+@TopComponent.Registration(mode = "editor", openAtStartup = false)
 public final class RawViewTopComponent extends TopComponent {
-
-    private static RawViewTopComponent instance;
-    /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "com/github/kayak/ui/rawview/format-justify-fill.png";
-    private static final String PREFERRED_ID = "RawViewTopComponent";
 
     private static final Logger logger = Logger.getLogger(RawViewTopComponent.class.getName());
     private Bus bus;
@@ -47,6 +45,11 @@ public final class RawViewTopComponent extends TopComponent {
         public void destroyed() {
             close();
         }
+
+        @Override
+        public void descriptionChanged() {
+            
+        }
     };
 
     public RawViewTopComponent() {
@@ -54,7 +57,6 @@ public final class RawViewTopComponent extends TopComponent {
         initComponents();
         setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent"));
         setToolTipText(NbBundle.getMessage(RawViewTopComponent.class, "HINT_RawViewTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
     }
 
     /** This method is called from within the constructor to
@@ -67,6 +69,7 @@ public final class RawViewTopComponent extends TopComponent {
 
         jToolBar1 = new javax.swing.JToolBar();
         jToggleButton1 = new javax.swing.JToggleButton();
+        jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -90,6 +93,17 @@ public final class RawViewTopComponent extends TopComponent {
         });
         jToolBar1.add(jToggleButton1);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jButton1.text")); // NOI18N
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton1);
+
         add(jToolBar1);
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.X_AXIS));
@@ -111,7 +125,7 @@ public final class RawViewTopComponent extends TopComponent {
 
         add(jPanel1);
 
-        jTable1.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Monospaced", 0, 14));
         jTable1.setModel(model);
         jTable1.setDoubleBuffered(true);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -140,7 +154,7 @@ public final class RawViewTopComponent extends TopComponent {
                         subscription.subscribe(Integer.parseInt(idStrings[i], 16));
                     }
                 } catch (Exception ex) {
-                    logger.log(Level.WARNING, "Error while parsing filter string\n");
+                    logger.log(Level.WARNING, "Error while parsing filter string", ex);
                 }
             }
         } else {
@@ -156,7 +170,12 @@ public final class RawViewTopComponent extends TopComponent {
             model.setColorized(false);
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        model.clear();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
@@ -166,11 +185,6 @@ public final class RawViewTopComponent extends TopComponent {
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToolBar jToolBar1;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_NEVER;
-    }
 
     @Override
     public void componentOpened() {
@@ -190,22 +204,9 @@ public final class RawViewTopComponent extends TopComponent {
         // TODO store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
     }
 
     public void setBus(Bus bus) {
