@@ -35,6 +35,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
 	this.description = signalDescription;
 
 	setDisplayName(signalDescription.getName());
+        setIconBaseWithExtension("org/freedesktop/tango/16x16/status/dialog-information.png");
     }
 
         @Override

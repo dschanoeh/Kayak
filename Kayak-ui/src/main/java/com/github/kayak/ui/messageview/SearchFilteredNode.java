@@ -4,6 +4,7 @@
  */
 package com.github.kayak.ui.messageview;
 
+import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.core.description.MessageDescription;
 import com.github.kayak.core.description.SignalDescription;
 import java.util.ArrayList;
@@ -64,7 +65,6 @@ public class SearchFilteredNode extends FilterNode {
 
                 /* try to find message */
                 MessageDescription messageDescription = (MessageDescription) node.getLookup().lookup(MessageDescription.class);
-
                 if(messageDescription != null) {
 
                     if(messageMatches(messageDescription, filterString)) {
@@ -83,12 +83,17 @@ public class SearchFilteredNode extends FilterNode {
 
                 /* try to find signal */
                 SignalDescription signalDescription = (SignalDescription) node.getLookup().lookup(SignalDescription.class);
-
                 if(signalDescription != null) {
 
                     if(signalMatches(signalDescription, filterString)) {
                         result.add(node);
                     }
+                }
+
+                /* All bus descriptions will stay in the tree by default */
+                BusDescription busDescription = (BusDescription) node.getLookup().lookup(BusDescription.class);
+                if(busDescription != null) {
+                    result.add(node);
                 }
 
             }

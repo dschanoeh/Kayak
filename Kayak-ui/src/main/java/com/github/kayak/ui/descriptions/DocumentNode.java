@@ -37,7 +37,7 @@ public class DocumentNode extends AbstractNode {
         super(Children.create(new DocumentChildrenFactory(document), true), Lookups.fixed(document));
         this.document = document;
         setName(document.getName());
-        this.setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/text-x-generic.png");
+        setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/text-x-generic.png");
     }
 
     @Override

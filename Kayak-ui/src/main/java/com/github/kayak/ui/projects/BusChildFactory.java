@@ -99,6 +99,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
         public DescriptionFolderNode() {
             super(Children.create(new DescriptionChildFactory(bus), true));
             setDisplayName("Description");
+            setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/text-x-generic.png");
         }
         
         @Override
@@ -114,7 +115,6 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
                     }
                 };
             } catch (UnsupportedFlavorException ex) {
-                Exceptions.printStackTrace(ex);
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -144,7 +144,6 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
                     }
                 };
             } catch (UnsupportedFlavorException ex) {
-                Exceptions.printStackTrace(ex);
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
