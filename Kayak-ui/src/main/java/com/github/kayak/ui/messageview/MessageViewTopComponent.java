@@ -67,6 +67,11 @@ public final class MessageViewTopComponent extends TopComponent {
                 jButton1.setFocusable(false);
                 jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
                 jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+                jButton1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton1ActionPerformed(evt);
+                        }
+                });
                 jToolBar1.add(jButton1);
 
                 jTable1.setModel(model);
@@ -88,6 +93,14 @@ public final class MessageViewTopComponent extends TopComponent {
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE))
                 );
         }// </editor-fold>//GEN-END:initComponents
+
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+            int[] rows = jTable1.getSelectedRows();
+
+            for(int i : rows) {
+                model.remove(i);
+            }
+        }//GEN-LAST:event_jButton1ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;

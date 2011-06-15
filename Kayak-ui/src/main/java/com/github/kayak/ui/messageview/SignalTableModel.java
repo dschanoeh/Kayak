@@ -1,6 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ *      This file is part of Kayak.
+ *      
+ *      Kayak is free software: you can redistribute it and/or modify
+ *      it under the terms of the GNU Lesser General Public License as published by
+ *      the Free Software Foundation, either version 3 of the License, or
+ *      (at your option) any later version.
+ *      
+ *      Kayak is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
+ *      
+ *      You should have received a copy of the GNU Lesser General Public License
+ *      along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
+ *      
  */
 package com.github.kayak.ui.messageview;
 
@@ -23,9 +36,9 @@ import javax.swing.table.AbstractTableModel;
  */
 public class SignalTableModel extends AbstractTableModel implements MessageSignalDropAdapter.Receiver {
 
-    private ArrayList<SignalDescription> signalsDescriptions = new ArrayList<SignalDescription>();
     private HashMap<Bus, Subscription> subscriptions = new HashMap<Bus, Subscription>();
-    private HashMap<SignalDescription, Signal> signals = new HashMap<SignalDescription, Signal>();
+
+    private ArrayList<SignalTableEntry> entries = new ArrayList<SignalTableEntry>();
 
     private FrameReceiver receiver = new FrameReceiver() {
 
@@ -37,9 +50,11 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             HashSet<Signal> frameSignals = m.getSignals();
 
             for(Signal s : frameSignals) {
-               if(signalsDescriptions.contains(s.getDescription())) {
-                    signals.put(s.getDescription(), s);             
-               }
+                for(SignalTableEntry entry : entries) {
+                    if(s.getDescription().equals(entry.getDescription())) {
+                        entry.setSignal(s);
+                    }   
+                }
             }
         }
     };
@@ -83,7 +98,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
 
     @Override
     public int getRowCount() {
-        return signalsDescriptions.size();
+        return entries.size();
     }
 
     @Override
@@ -92,18 +107,18 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
     }
 
     public void remove(int i) {
-        signalsDescriptions.remove(i);
+        entries.remove(i);
         fireTableRowsDeleted(i, i);
     }
     
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        SignalDescription signalDesc = signalsDescriptions.get(rowIndex);
-        Signal signal = signals.get(signalDesc);
+        SignalTableEntry entry = entries.get(rowIndex);
+        Signal signal = entry.getSignal();
 
         switch(columnIndex) {
             case 0:
-                return signalDesc.getName();
+                return entry.getDescription().getName();
             case 1:
                 if(signal != null) {
                     return signal.getValue();
@@ -111,9 +126,10 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
                     return "";
                 }
             case 2:
-                return signalDesc.getUnit();
+                return entry.getDescription().getUnit();
             case 3:
-                return signalDesc.getMessage().getName();
+                MessageDescription message = entry.getDescription().getMessage();
+                return message.getName() + " (0x" + Integer.toHexString(message.getId()) + ")";
             case 4:
                 if(signal != null)
                     return signal.getRawValue();
@@ -125,9 +141,21 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
     }
 
     public void addSignal(SignalDescription desc, Bus bus) {
-        if(!signalsDescriptions.contains(desc)) {
-            signalsDescriptions.add(desc);
-            fireTableRowsInserted(signalsDescriptions.size()-1, signalsDescriptions.size()-1);
+        boolean found = false;
+
+        for(SignalTableEntry entry : entries) {
+            if(entry.getBus() == bus && entry.getDescription() == desc) {
+                found = true;
+                break;
+            }
+        }
+        
+        if(!found) {
+            SignalTableEntry entry = new SignalTableEntry();
+            entry.setDescription(desc);
+            entry.setBus(bus);
+            entries.add(entry);
+            fireTableRowsInserted(entries.size()-1, entries.size()-1);
             
             Subscription s;
             if(subscriptions.containsKey(bus)) {
