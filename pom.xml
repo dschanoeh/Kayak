@@ -15,8 +15,7 @@
  	You should have received a copy of the GNU Lesser General Public License
  	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
 
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.kayak</groupId>
@@ -52,7 +51,6 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>nbm-maven-plugin</artifactId>
-                    <version>3.5</version>
                     <extensions>true</extensions>
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
@@ -90,7 +88,8 @@
         <module>Kayak-kcd</module>
         <module>Kayak-core</module>
         <module>Kayak-logging</module>
-    </modules>
+    <module>Kayak-mapview</module>
+  </modules>
 
     <reporting>
         <outputDirectory>${project.build.directory}/site</outputDirectory>

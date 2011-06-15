@@ -34,7 +34,7 @@ import org.openide.util.lookup.Lookups;
 public class MessageDescriptionNode extends AbstractNode implements Transferable {
 
     public static final DataFlavor DATA_FLAVOR = new DataFlavor(MessageDescriptionNode.class, "MessageDescriptionNode");
-    
+
     private MessageDescription description;
 
     public MessageDescription getDescription() {
