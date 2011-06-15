@@ -23,15 +23,19 @@ import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
 
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.messageview//MessageView//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "MessageViewTopComponent",
 iconBase="org/freedesktop/tango/16x16/status/dialog-information.png",
-persistenceType = TopComponent.PERSISTENCE_NEVER)
+persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 @ActionID(category = "Window", id = "com.github.kayak.ui.messageview.MessageViewTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@ActionReferences( value = {
+    @ActionReference(path = "Menu/Bus views" /*, position = 333 */,name="Open message view"),
+    @ActionReference(path = "Toolbars/Bus views", name = "Open message view")
+})
 @TopComponent.OpenActionRegistration(displayName = "#CTL_MessageViewAction",
 preferredID = "MessageViewTopComponent")
 public final class MessageViewTopComponent extends TopComponent {
