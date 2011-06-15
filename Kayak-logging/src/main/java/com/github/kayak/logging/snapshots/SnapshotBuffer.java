@@ -278,7 +278,7 @@ public class SnapshotBuffer {
             
             HashSet<String> busNames = new HashSet<String>();
             for(Frame frame : frames) {
-                busNames.add(frame.getBusName());
+                busNames.add(frame.getBus().getName());
             }
             for(String name : busNames) {
                 out.write("DEVICE_ALIAS " + name + " " + name + "\n");

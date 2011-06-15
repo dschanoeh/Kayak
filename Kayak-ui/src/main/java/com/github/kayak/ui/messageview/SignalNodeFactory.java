@@ -4,6 +4,7 @@
  */
 package com.github.kayak.ui.messageview;
 
+import com.github.kayak.core.Bus;
 import com.github.kayak.core.description.MessageDescription;
 import com.github.kayak.core.description.SignalDescription;
 import java.util.List;
@@ -17,9 +18,11 @@ import org.openide.nodes.Node;
 public class SignalNodeFactory extends ChildFactory<SignalDescription> {
 
     private MessageDescription description;
+    private Bus bus;
 
-    public SignalNodeFactory(MessageDescription description) {
+    public SignalNodeFactory(MessageDescription description, Bus bus) {
         this.description = description;
+        this.bus = bus;
     }
 
     
@@ -32,7 +35,7 @@ public class SignalNodeFactory extends ChildFactory<SignalDescription> {
 
     @Override
     protected Node[] createNodesForKey(SignalDescription key) {
-        return new Node[] { new SignalDescriptionNode(key) };
+        return new Node[] { new SignalDescriptionNode(key, bus) };
     }
     
 }

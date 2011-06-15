@@ -17,13 +17,16 @@
  */
 package com.github.kayak.ui.messageview;
 
+import com.github.kayak.core.Bus;
 import com.github.kayak.core.description.MessageDescription;
 import com.github.kayak.core.description.SignalDescription;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.IOException;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -33,9 +36,9 @@ public class MessageSignalDropAdapter extends DropTargetAdapter{
 
     public static interface Receiver {
         
-        public void dropped(SignalDescription signal);
+        public void dropped(SignalDescription signal, Bus bus);
 
-        public void dropped(MessageDescription message);
+        public void dropped(MessageDescription message, Bus bus);
         
     };
 
@@ -47,36 +50,38 @@ public class MessageSignalDropAdapter extends DropTargetAdapter{
 
     @Override
     public void dragEnter(DropTargetDragEvent dtde) {
-        if (!dtde.isDataFlavorSupported(MessageDescriptionNode.DATA_FLAVOR) &&
-                !dtde.isDataFlavorSupported(SignalDescriptionNode.DATA_FLAVOR)) {
+        if (!dtde.isDataFlavorSupported(MessageDescriptionNode.BUS_DATA_FLAVOR) &&
+                !dtde.isDataFlavorSupported(SignalDescriptionNode.BUS_DATA_FLAVOR)) {
             dtde.rejectDrag();
         }
     }
 
     @Override
     public void drop(DropTargetDropEvent dtde) {
-        try {
+        Transferable transferable = dtde.getTransferable();
+        
+        if(transferable.isDataFlavorSupported(MessageDescriptionNode.MESSAGE_DATA_FLAVOR)) {
             try {
-                MessageDescription n = (MessageDescription) dtde.getTransferable().getTransferData(MessageDescriptionNode.DATA_FLAVOR);
-                if(n != null) {
-                    receiver.dropped(n);
+                MessageDescription desc = (MessageDescription) transferable.getTransferData(MessageDescriptionNode.MESSAGE_DATA_FLAVOR);
+                Bus bus = (Bus) transferable.getTransferData(MessageDescriptionNode.BUS_DATA_FLAVOR);
+                    receiver.dropped(desc, bus);
                     return;
-                }
-
-            } catch (UnsupportedFlavorException ex) {}
-
+            } catch (UnsupportedFlavorException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } else if(transferable.isDataFlavorSupported(SignalDescriptionNode.SIGNAL_DATA_FLAVOR)) {
             try {
-                SignalDescription n = (SignalDescription) dtde.getTransferable().getTransferData(SignalDescriptionNode.DATA_FLAVOR);
-                if(n != null) {
-                    receiver.dropped(n);
+                SignalDescription desc = (SignalDescription) transferable.getTransferData(SignalDescriptionNode.SIGNAL_DATA_FLAVOR);
+                Bus bus = (Bus) transferable.getTransferData(SignalDescriptionNode.BUS_DATA_FLAVOR);
+                    receiver.dropped(desc, bus);
                     return;
-                }
-
-            } catch (UnsupportedFlavorException ex) {}
-            
-        } catch (IOException ex) {
-            dtde.rejectDrop();
+            } catch (UnsupportedFlavorException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
     }
-    
 }

@@ -164,7 +164,6 @@ public class Bus implements SubscriptionChangeReceiver {
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
                 f.setTimestamp(timeSource.getTime());
-                f.setBusName(name);
                 deliverRAWFrame(f);
             }
         }
@@ -176,7 +175,6 @@ public class Bus implements SubscriptionChangeReceiver {
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
                 f.setTimestamp(timeSource.getTime());
-                f.setBusName(name);
                 deliverBCMFrame(f);
             }
         }
@@ -412,17 +410,19 @@ public class Bus implements SubscriptionChangeReceiver {
     }
 
     private void deliverBCMFrame(Frame frame) {
+        frame.setBus(this);
         for (Subscription s : subscriptionsBCM) {
             if (!s.isMuted()) {
-                s.deliverFrame(frame);
+                s.deliverFrame(frame, this);
             }
         }
     }
 
     private void deliverRAWFrame(Frame frame) {
+        frame.setBus(this);
         for (Subscription s : subscriptionsRAW) {
             if (!s.isMuted()) {
-                s.deliverFrame(frame);
+                s.deliverFrame(frame, this);
             }
         }
     }
@@ -524,7 +524,7 @@ public class Bus implements SubscriptionChangeReceiver {
     
     public void sendEventFrame(EventFrame f) {
         f.setTimestamp(timeSource.getTime());
-        f.setBusName(name);
+        f.setBus(this);
         
         for(EventFrameReceiver receiver : eventFrameReceivers) {
             if(receiver != null)

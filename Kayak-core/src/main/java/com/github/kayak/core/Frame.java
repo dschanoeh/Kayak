@@ -30,15 +30,15 @@ public class Frame implements Comparable<Frame> {
 
     private byte[] data;
     private int identifier;
-    private String busName;
     private long timestamp;
+    private Bus bus;
     
-    public String getBusName() {
-        return busName;
+    public Bus getBus() {
+        return bus;
     }
 
-    public void setBusName(String busName) {
-        this.busName = busName;
+    public void setBus(Bus bus) {
+        this.bus = bus;
     }
 
     public void setTimestamp(long timestamp) {
@@ -94,7 +94,7 @@ public class Frame implements Comparable<Frame> {
         sb.append('.');
         sb.append(String.format("%03d",timestamp%1000));
         sb.append("000) ");
-        sb.append(busName);
+        sb.append(bus.getName());
         sb.append(" ");
         sb.append(String.format("%03x", identifier));
         sb.append('#');

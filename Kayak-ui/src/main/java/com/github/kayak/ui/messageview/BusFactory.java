@@ -127,15 +127,15 @@ public class BusFactory extends ChildFactory<BusDescription> {
 
     @Override
     protected Node[] createNodesForKey(BusDescription key) {
-        AbstractNode node = new AbstractNode(Children.create(new MessageNodeFactory(key), true), Lookups.fixed(key));
-        node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
-
-        String busName = null;
+        Bus bus = null;
         for(Bus b : project.getBusses()) {
             if(b.getDescription() == key)
-                busName = b.getName();
+                bus = b;
         }
-        node.setDisplayName(busName + " (" + key.getName() + ")");
+        
+        AbstractNode node = new AbstractNode(Children.create(new MessageNodeFactory(key, bus), true), Lookups.fixed(key, bus));
+        node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
+        node.setDisplayName(bus.getName() + " (" + key.getName() + ")");
         return new Node[] { node };
     }
     

@@ -17,6 +17,7 @@
  */
 package com.github.kayak.ui.messageview;
 
+import com.github.kayak.core.Bus;
 import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.core.description.MessageDescription;
 import java.util.List;
@@ -30,9 +31,11 @@ import org.openide.nodes.Node;
 public class MessageNodeFactory extends ChildFactory<MessageDescription> {
 
     private BusDescription description;
+    private Bus bus;
     
-    public MessageNodeFactory(BusDescription description) {
+    public MessageNodeFactory(BusDescription description, Bus bus) {
 	this.description = description;	
+        this.bus = bus;
     }
     
     @Override
@@ -46,7 +49,7 @@ public class MessageNodeFactory extends ChildFactory<MessageDescription> {
 
     @Override
     protected Node[] createNodesForKey(MessageDescription key) {
-	return new Node[] { new MessageDescriptionNode(key) };	     
+	return new Node[] { new MessageDescriptionNode(key, bus) };	     
     }
     
 }

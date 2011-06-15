@@ -4,9 +4,17 @@
  */
 package com.github.kayak.ui.messageview;
 
+import com.github.kayak.core.Bus;
+import com.github.kayak.core.Frame;
+import com.github.kayak.core.FrameReceiver;
+import com.github.kayak.core.Subscription;
+import com.github.kayak.core.description.Message;
 import com.github.kayak.core.description.MessageDescription;
+import com.github.kayak.core.description.Signal;
 import com.github.kayak.core.description.SignalDescription;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -16,6 +24,25 @@ import javax.swing.table.AbstractTableModel;
 public class SignalTableModel extends AbstractTableModel implements MessageSignalDropAdapter.Receiver {
 
     private ArrayList<SignalDescription> signalsDescriptions = new ArrayList<SignalDescription>();
+    private HashMap<Bus, Subscription> subscriptions = new HashMap<Bus, Subscription>();
+    private HashMap<SignalDescription, Signal> signals = new HashMap<SignalDescription, Signal>();
+
+    private FrameReceiver receiver = new FrameReceiver() {
+
+        @Override
+        public void newFrame(Frame frame) {
+            Bus bus = frame.getBus();
+            
+            Message m = bus.getDescription().decodeFrame(frame);
+            HashSet<Signal> frameSignals = m.getSignals();
+
+            for(Signal s : frameSignals) {
+               if(signalsDescriptions.contains(s.getDescription())) {
+                    signals.put(s.getDescription(), s);             
+               }
+            }
+        }
+    };
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
@@ -27,6 +54,10 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
                 return String.class;
             case 2:
                 return String.class;
+            case 3:
+                return String.class;
+            case 4:
+                return Long.class;
             default:
                 return String.class;
         }
@@ -40,7 +71,11 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             case 1:
                 return "Value";
             case 2:
+                return "Unit";
+            case 3:
                 return "Message";
+            case 4:
+                return "Raw value";
             default:
                 return "";
         }
@@ -53,7 +88,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
 
     @Override
     public int getColumnCount() {
-        return 3;
+        return 5;
     }
 
     public void remove(int i) {
@@ -63,35 +98,58 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
     
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        SignalDescription signal = signalsDescriptions.get(rowIndex);
+        SignalDescription signalDesc = signalsDescriptions.get(rowIndex);
+        Signal signal = signals.get(signalDesc);
 
         switch(columnIndex) {
             case 0:
-                return signal.getName();
+                return signalDesc.getName();
             case 1:
-                return "";
+                if(signal != null) {
+                    return signal.getValue();
+                } else {
+                    return "";
+                }
             case 2:
-                return "";
+                return signalDesc.getUnit();
+            case 3:
+                return signalDesc.getMessage().getName();
+            case 4:
+                if(signal != null)
+                    return signal.getRawValue();
+                else
+                    return 0;
             default:
                 return null;
         }
     }
 
-    public void addSignal(SignalDescription desc) {
-        signalsDescriptions.add(desc);
+    public void addSignal(SignalDescription desc, Bus bus) {
+        if(!signalsDescriptions.contains(desc)) {
+            signalsDescriptions.add(desc);
+            fireTableRowsInserted(signalsDescriptions.size()-1, signalsDescriptions.size()-1);
+            
+            Subscription s;
+            if(subscriptions.containsKey(bus)) {
+                s = subscriptions.get(bus);
+            } else {
+                s = new Subscription(receiver, bus);
+                subscriptions.put(bus, s);
+            }
 
-        fireTableRowsInserted(signalsDescriptions.size()-1, signalsDescriptions.size()-1);
+            s.subscribe(desc.getMessage().getId());
+        }
     }
 
     @Override
-    public void dropped(SignalDescription signal) {
-        addSignal(signal);
+    public void dropped(SignalDescription signal, Bus bus) {
+        addSignal(signal, bus);
     }
 
     @Override
-    public void dropped(MessageDescription message) {
+    public void dropped(MessageDescription message, Bus bus) {
         for(SignalDescription s : message.getSignals())
-            addSignal(s);
+            addSignal(s, bus);
     }
     
 }

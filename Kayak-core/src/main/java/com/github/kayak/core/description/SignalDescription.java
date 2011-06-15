@@ -145,6 +145,7 @@ public class SignalDescription {
         Signal signal = new Signal();
         signal.setUnit(unit);
         signal.setNotes(notes);
+        signal.setDescription(this);
 
         /* read raw value */
         long rawValue = extractBits(data, offset, length, byteOrder);

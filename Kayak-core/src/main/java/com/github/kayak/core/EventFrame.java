@@ -61,7 +61,7 @@ public class EventFrame extends Frame {
     @Override
     public String toLogFileNotation() {
         long timestamp = getTimestamp();
-        String busName = getBusName();
+        String busName = getBus().getName();
         StringBuilder sb = new StringBuilder(40);
 
         sb.append("EVENT (");

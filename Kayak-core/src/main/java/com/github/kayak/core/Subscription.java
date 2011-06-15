@@ -143,7 +143,7 @@ public class Subscription {
         return false;
     }
 
-    public void deliverFrame(Frame frame) {
+    public void deliverFrame(Frame frame, Bus bus) {
         if (subscribeAll) {
             receiver.newFrame(frame);
         } else {

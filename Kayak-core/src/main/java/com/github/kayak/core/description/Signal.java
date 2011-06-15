@@ -32,6 +32,15 @@ public class Signal {
     private String value;
     private String label;
     private String notes;
+    private SignalDescription description;
+
+    public SignalDescription getDescription() {
+        return description;
+    }
+
+    public void setDescription(SignalDescription description) {
+        this.description = description;
+    }
 
     public String getLabel() {
         return label;
