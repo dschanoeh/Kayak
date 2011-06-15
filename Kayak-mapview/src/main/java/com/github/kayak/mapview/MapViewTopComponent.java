@@ -20,6 +20,7 @@ package com.github.kayak.mapview;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.jdesktop.swingx.JXMapKit;
@@ -85,7 +86,7 @@ public final class MapViewTopComponent extends TopComponent {
         jPanel2.setLayout(new BorderLayout());
         jPanel2.add(mapKit, BorderLayout.CENTER);
         
-        waypoints = new HashSet<Waypoint>();
+        waypoints = Collections.synchronizedSet(new HashSet<Waypoint>());
         WaypointPainter painter = new WaypointPainter();
         painter.setRenderer(new WaypointRenderer() {  
       

@@ -17,8 +17,15 @@
  */
 package com.github.kayak.ui.descriptions;
 
+import com.github.kayak.core.Bus;
+import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.core.description.Document;
+import com.github.kayak.ui.projects.Project;
+import com.github.kayak.ui.projects.ProjectManager;
+import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -95,5 +102,32 @@ public class DocumentNode extends AbstractNode {
         
         return s;
     }
+    
+    @Override
+    public Action[] getActions(boolean context) {
+        return new Action[] { new CreateProjectAction() };
+    }
+
+    private class CreateProjectAction extends AbstractAction {
+
+        public CreateProjectAction() {
+            putValue(NAME, "Create project...");
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Project p = new Project(document.getName());
+
+            for(BusDescription bd : document.getBusses()) {
+                Bus b = new Bus();
+                b.setName(bd.getName());
+                b.setDescription(bd);
+                p.addBus(b);
+            }
+
+            ProjectManager.getGlobalProjectManager().addProject(p);
+        }
+        
+    };
     
 }

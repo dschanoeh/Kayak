@@ -72,6 +72,9 @@ public class ProjectManager {
     }
 
     public void removeProject(Project e) {
+        if(openedProject == e)
+            closeProject(e);
+
         projects.remove(e);
         notifyListeners();
     }
@@ -81,10 +84,10 @@ public class ProjectManager {
             return;
 
         if(openedProject != null)
-            openedProject.close();
+            closeProject(openedProject);
 
-        p.open();
         openedProject = p;
+        p.open();
         
         for(ProjectManagementListener l : listeners) {
             l.openProjectChanged(p);
@@ -97,9 +100,6 @@ public class ProjectManager {
 
         openedProject.close();
         openedProject = null;
-        for(ProjectManagementListener l : listeners) {
-            l.openProjectChanged(null);
-        }
     }
 
     public void addListener(ProjectManagementListener listener) {

@@ -40,6 +40,7 @@ public class BusFactory extends ChildFactory<BusDescription> {
             for(Bus b : p.getBusses()) {
                 b.addBusChangeListener(busListener);
             }
+            refresh(true);
         }
     };
 
@@ -55,6 +56,8 @@ public class BusFactory extends ChildFactory<BusDescription> {
             for(Bus b : p.getBusses()) {
                 b.removeBusChangeListener(busListener);
             }
+            project = null;
+            refresh(true);
         }
 
         @Override
