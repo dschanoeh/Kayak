@@ -140,9 +140,9 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
             switch (columnIndex) {
                 case 0:
                     long timestamp = data.get(keys[rowIndex]).getTimestamp();
-                    return String.format("%.3f",(double) timestamp/1000);
+                    return String.format("%.6f",(double) timestamp/1000000);
                 case 1:
-                    return data.get(keys[rowIndex]).getInterval();
+                    return data.get(keys[rowIndex]).getInterval() / 1000;
                 case 2:
                     return "0x" + Integer.toHexString(data.get(keys[rowIndex]).getIdentifier());
                 case 3:

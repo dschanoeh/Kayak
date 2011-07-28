@@ -90,10 +90,10 @@ public class Frame implements Comparable<Frame> {
         StringBuilder sb = new StringBuilder(40);
 
         sb.append('(');
-        sb.append(Long.toString(timestamp/1000));
+        sb.append(Long.toString(timestamp/1000000));
         sb.append('.');
-        sb.append(String.format("%03d",timestamp%1000));
-        sb.append("000) ");
+        sb.append(String.format("%06d",timestamp%1000000));
+        sb.append(' ');
         sb.append(bus.getName());
         sb.append(" ");
         sb.append(String.format("%03x", identifier));

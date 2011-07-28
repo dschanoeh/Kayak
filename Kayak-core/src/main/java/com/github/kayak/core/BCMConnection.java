@@ -166,6 +166,8 @@ public class BCMConnection extends SocketcandConnection implements Runnable {
 
     @Override
     public void run() {
+        StringBuilder sb;
+        
         while (true) {
             if(Thread.interrupted())
                 return;
@@ -178,11 +180,18 @@ public class BCMConnection extends SocketcandConnection implements Runnable {
                 /* We received a frame */
                 if (fields[1].equals("frame")) {
                     try {
-                        String dataString = "";
+                        sb = new StringBuilder(16);
                         for (int i = 4; i < fields.length-1; i++) {
-                            dataString += fields[i];
+                            sb.append(fields[i]);
                         }
-                        Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(dataString));
+                        Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(sb.toString()));
+                        int pos = 0;
+                        for(;pos<fields[3].length();pos++) {
+                            if(fields[3].charAt(pos) =='.')
+                                break;
+                        }
+                        long timestamp = 1000000 * Long.parseLong(fields[3].substring(0, pos)) + Long.parseLong(fields[3].substring(pos+1));
+                        f.setTimestamp(timestamp);
                         FrameReceiver receiver = this.getReceiver();
                         if (receiver != null) {
                             receiver.newFrame(f);

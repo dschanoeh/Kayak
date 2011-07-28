@@ -49,6 +49,7 @@ public class Bus implements SubscriptionChangeReceiver {
     private HashSet<Integer> subscribedIDs;
     private ArrayList<StatisticsReceiver> statisticsReceivers;
     private BusDescription description;
+    private long delta=0; /* delta between socketcand system time and local timesource */
 
     private StatisticsReceiver statisticsReceiver = new StatisticsReceiver() {
 
@@ -163,7 +164,16 @@ public class Bus implements SubscriptionChangeReceiver {
         @Override
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
-                f.setTimestamp(timeSource.getTime());
+                long timestamp = f.getTimestamp();
+                if(timestamp != 0) {
+                    if(delta == 0) {
+                        delta = timestamp - timeSource.getTime();
+                    }
+                    timestamp -= delta;
+                    f.setTimestamp(timestamp);
+                } else {
+                    f.setTimestamp(timeSource.getTime());
+                }
                 deliverRAWFrame(f);
             }
         }
@@ -174,7 +184,16 @@ public class Bus implements SubscriptionChangeReceiver {
         @Override
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
-                f.setTimestamp(timeSource.getTime());
+                long timestamp = f.getTimestamp();
+                if(timestamp != 0) {
+                    if(delta == 0) {
+                        delta = timestamp - timeSource.getTime();
+                    }
+                    timestamp -= delta;
+                    f.setTimestamp(timestamp);
+                } else {
+                    f.setTimestamp(timeSource.getTime());
+                }
                 deliverBCMFrame(f);
             }
         }
