@@ -15,4 +15,12 @@ public class Options {
         String homeFolder = System.getProperty("user.home");
         return NbPreferences.forModule(Options.class).get("Log file directory", homeFolder + "/kayak/descriptions/");
     }
+
+    public static boolean getShowStartPage() {
+        return NbPreferences.forModule(Options.class).getBoolean("Show start page", true);
+    }
+
+    public static void setShowStartPage(boolean b) {
+        NbPreferences.forModule(Options.class).putBoolean("Show start page", b);
+    }
 }
