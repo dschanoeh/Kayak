@@ -4,7 +4,6 @@
  */
 package com.github.kayak.ui.connections;
 
-import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;

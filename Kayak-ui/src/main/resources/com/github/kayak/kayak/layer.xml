@@ -69,7 +69,6 @@
     <folder name="Windows2">
         <folder name="Components">
             <file name="BusStatisticsTopComponent.settings" url="BusStatisticsTopComponentSettings.xml"/>
-            <file name="DescriptionsTopComponent.settings" url="DescriptionsTopComponentSettings.xml"/>
             <file name="StartPageTopComponent.settings" url="StartPageTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
