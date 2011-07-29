@@ -11,24 +11,59 @@
         </folder>
     </folder>
     <folder name="Toolbars">
+        <file name="Clipboard_hidden"/>
+        <folder name="File">
+            <file name="org-openide-actions-SaveAllAction.shadow_hidden"/>
+        </folder>
+        <file name="UndoRedo_hidden"/>
     </folder>
 
     <folder name="Menu">
+        <file name="Edit_hidden"/>
         <folder name="File">
-            <attr name="position" intvalue="0"/>
+            <attr name="position" intvalue="10"/>
+            <file name="Separator2.instance_hidden"/>
+            <file name="Separator3.instance_hidden"/>
+            <file name="org-netbeans-modules-print-action-PageSetupAction.shadow_hidden"/>
+            <file name="org-netbeans-modules-print-action-PrintAction.shadow_hidden"/>
+            <file name="org-openide-actions-SaveAction.shadow_hidden"/>
+            <file name="org-openide-actions-SaveAllAction.shadow_hidden"/>
+            <file name="org-openide-actions-SaveAsAction.shadow_hidden"/>
         </folder>
+        <folder name="Tools">
+            <attr name="position" intvalue="20"/>
+        </folder>
+        <folder name="Connections">
+            <attr name="position" intvalue="30"/>
+        </folder>
+        <folder name="Bus views">
+            <attr name="position" intvalue="40"/>
+        </folder>
+        <folder name="Descriptions">
+            <attr name="position" intvalue="50"/>
+        </folder>
+        <folder name="Log files">
+            <attr name="position" intvalue="60"/>
+        </folder>
+        
         <file name="GoTo_hidden"/>
         <folder name="Tools">
+            <attr name="position" intvalue="70"/>
             <file name="Separator1.instance_hidden"/>
             <file name="org-netbeans-modules-favorites-templates-TemplatesAction.shadow_hidden"/>
         </folder>
         <folder name="View">
+            <attr name="position" intvalue="80"/>
             <file name="org-netbeans-core-actions-HTMLViewAction.shadow_hidden"/>
         </folder>
         <folder name="Window">
+            <attr name="position" intvalue="90"/>
             <file name="StartPageAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/com-github-kayak-ui-startpage-StartPageAction.instance"/>
             </file>
+        </folder>
+        <folder name="Help">
+            <attr name="position" intvalue="100"/>
         </folder>
     </folder>
     <folder name="Windows2">
