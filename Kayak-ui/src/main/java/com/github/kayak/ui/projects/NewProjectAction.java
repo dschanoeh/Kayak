@@ -16,7 +16,7 @@ import org.openide.awt.ActionRegistration;
 @ActionRegistration(iconInMenu = true, displayName = "#CTL_NewProject", iconBase = "org/freedesktop/tango/16x16/mimetypes/package-x-generic.png")
 @ActionReferences(value = {
     @ActionReference(path = "Shortcuts", name = "D-N"),
-    @ActionReference(path = "Toolbars/File", name = "com-github-kayak-ui-projects-NewProject", position = 100),
+    @ActionReference(path = "Actions/Projects", position = 100 ),
     @ActionReference(path = "Menu/File", name = "com-github-kayak-ui-projects-NewProject", position = 100)})
 public final class NewProjectAction implements ActionListener {
 

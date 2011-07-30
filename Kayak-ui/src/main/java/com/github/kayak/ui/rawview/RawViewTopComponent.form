@@ -20,6 +20,7 @@
   <SubComponents>
     <Container class="javax.swing.JToolBar" name="jToolBar1">
       <Properties>
+        <Property name="floatable" type="boolean" value="false"/>
         <Property name="rollover" type="boolean" value="true"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[32767, 31]"/>

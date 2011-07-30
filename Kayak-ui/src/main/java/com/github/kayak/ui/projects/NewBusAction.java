@@ -16,8 +16,9 @@ import org.openide.awt.ActionRegistration;
 @ActionRegistration(displayName="New bus...", iconBase="org/freedesktop/tango/16x16/places/network-workgroup.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="File", id="com.github.kayak.ui.projects.NewBusAction")
 @ActionReferences( value= {
+    @ActionReference(path = "Shortcuts", name = "D-B"),
     @ActionReference(path = "Menu/File", position = 200 ),
-    @ActionReference(path = "Toolbars/File", position = 200 )
+    @ActionReference(path = "Actions/Projects", position = 200 )
 })
 public final class NewBusAction extends AbstractAction {
 

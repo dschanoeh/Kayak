@@ -7,9 +7,7 @@
     </folder>
     <folder name="Toolbars">
         <file name="Clipboard_hidden"/>
-        <folder name="File">
-            <file name="org-openide-actions-SaveAllAction.shadow_hidden"/>
-        </folder>
+        <folder name="File"/>
         <file name="UndoRedo_hidden"/>
     </folder>
 

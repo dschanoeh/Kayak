@@ -14,8 +14,7 @@ import org.openide.awt.ActionRegistration;
 @ActionRegistration(displayName="Delete connection...", iconBase="org/freedesktop/tango/16x16/actions/edit-delete.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="Connections", id="com.github.kayak.ui.connections.DeleteConnectionAction")
 @ActionReferences(value = {
-    @ActionReference(path="Menu/Connections", position=40), 
-    @ActionReference(path="Toolbar/Connections", position=40)})
+    @ActionReference(path="Menu/Connections", position=40)}) 
 public final class DeleteConnectionAction extends AbstractAction {
 
     private final BusURLNode context;
