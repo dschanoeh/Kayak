@@ -126,7 +126,8 @@ public final class RawViewTopComponent extends TopComponent {
 
                 add(jPanel1);
 
-                jTable1.setFont(new java.awt.Font("Monospaced", 0, 14));
+                jTable1.setAutoCreateRowSorter(true);
+                jTable1.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
                 jTable1.setModel(model);
                 jTable1.setDoubleBuffered(true);
                 jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);

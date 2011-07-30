@@ -30,6 +30,15 @@ public class SignalTableEntry {
     private Bus bus;
     private SignalDescription description;
     private Signal signal;
+    private boolean refresh;
+
+    public boolean isRefresh() {
+        return refresh;
+    }
+
+    public void setRefresh(boolean refresh) {
+        this.refresh = refresh;
+    }
 
     public Bus getBus() {
         return bus;

@@ -29,16 +29,40 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import javax.swing.table.AbstractTableModel;
+import org.openide.util.Exceptions;
 
 /**
  *
- * @author dschanoeh
+ * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class SignalTableModel extends AbstractTableModel implements MessageSignalDropAdapter.Receiver {
 
     private HashMap<Bus, Subscription> subscriptions = new HashMap<Bus, Subscription>();
+    private final ArrayList<SignalTableEntry> entries = new ArrayList<SignalTableEntry>();
+    private Thread refreshThread;
 
-    private ArrayList<SignalTableEntry> entries = new ArrayList<SignalTableEntry>();
+    private Runnable refreshRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            while(true) {
+                for(int i=0;i<entries.size();i++) {
+                    synchronized(entries) {
+                        SignalTableEntry entry = entries.get(i);
+                        if(entry.isRefresh()) {
+                            fireTableRowsUpdated(i, i);
+                            entry.setRefresh(false);
+                        }
+                    }
+                }
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        }
+    };
 
     private FrameReceiver receiver = new FrameReceiver() {
 
@@ -49,15 +73,23 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             Message m = bus.getDescription().decodeFrame(frame);
             HashSet<Signal> frameSignals = m.getSignals();
 
-            for(Signal s : frameSignals) {
-                for(SignalTableEntry entry : entries) {
-                    if(s.getDescription().equals(entry.getDescription())) {
-                        entry.setSignal(s);
-                    }   
+            synchronized(entries) {
+                for(Signal s : frameSignals) {
+                    for(SignalTableEntry entry : entries) {
+                        if(s.getDescription().equals(entry.getDescription())) {
+                            entry.setSignal(s);
+                            entry.setRefresh(true);
+                        }   
+                    }
                 }
             }
         }
     };
+
+    public SignalTableModel() {
+        refreshThread = new Thread(refreshRunnable);
+        refreshThread.start();
+    }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
@@ -107,8 +139,10 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
     }
 
     public void remove(int i) {
-        entries.remove(i);
-        fireTableRowsDeleted(i, i);
+        synchronized(entries) {
+            entries.remove(i);
+            fireTableRowsDeleted(i, i);
+        }
     }
     
     @Override
@@ -154,7 +188,9 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             SignalTableEntry entry = new SignalTableEntry();
             entry.setDescription(desc);
             entry.setBus(bus);
-            entries.add(entry);
+            synchronized(entries) {
+                entries.add(entry);
+            }
             fireTableRowsInserted(entries.size()-1, entries.size()-1);
             
             Subscription s;

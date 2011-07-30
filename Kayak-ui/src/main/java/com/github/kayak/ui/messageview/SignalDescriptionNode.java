@@ -106,7 +106,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
             }
 
         };
-
+                
         Property byteOrder = new PropertySupport.ReadOnly<String>("Byte order", String.class, "Byte order", "Byte order of the signal") {
 
             @Override
@@ -143,10 +143,51 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
 
         };
 
+        Property offset = new PropertySupport.ReadOnly<Integer>("Offset", Integer.class, "Offset", "Offset (in bit) of the signal in the frame") {
+
+            @Override
+            public Integer getValue() throws IllegalAccessException, InvocationTargetException {
+                return description.getOffset();
+            }
+
+        };
+        
+        Property length = new PropertySupport.ReadOnly<Integer>("Length", Integer.class, "Length", "Length (in bit) of the signal in the frame") {
+
+            @Override
+            public Integer getValue() throws IllegalAccessException, InvocationTargetException {
+                return description.getLength();
+            }
+
+        };
+
+        Property slope = new PropertySupport.ReadOnly<Double>("Slope", Double.class, "Slope", "Slope of the signal") {
+
+            @Override
+            public Double getValue() throws IllegalAccessException, InvocationTargetException {
+                return description.getSlope();
+            }
+
+        };
+
+        Property intercept = new PropertySupport.ReadOnly<Double>("Intercept", Double.class, "Intercept", "Intercept of the signal") {
+
+            @Override
+            public Double getValue() throws IllegalAccessException, InvocationTargetException {
+                return description.getIntercept();
+            }
+
+        };
+
+
         set.put(notes);
         set.put(type);
         set.put(unit);
         set.put(byteOrder);
+        set.put(offset);
+        set.put(length);
+        set.put(slope);
+        set.put(intercept);
 
         s.put(set);
 

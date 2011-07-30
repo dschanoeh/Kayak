@@ -78,7 +78,9 @@ public final class MessageViewTopComponent extends TopComponent {
                 });
                 jToolBar1.add(jButton1);
 
+                jTable1.setAutoCreateRowSorter(true);
                 jTable1.setModel(model);
+                jTable1.setDoubleBuffered(true);
                 jTable1.setFillsViewportHeight(true);
                 jScrollPane1.setViewportView(jTable1);
 
