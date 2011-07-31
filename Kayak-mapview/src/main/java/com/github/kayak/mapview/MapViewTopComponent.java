@@ -36,7 +36,6 @@ import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.Waypoint;
 import org.jdesktop.swingx.mapviewer.WaypointPainter;
 import org.jdesktop.swingx.mapviewer.WaypointRenderer;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -85,7 +84,7 @@ public final class MapViewTopComponent extends TopComponent {
                 public void newFrame(Frame frame) {
                     if(description != null && frame.getIdentifier() == description.getMessage().getId()) {
                         Signal s = description.decodeData(frame.getData());
-                        latitude = Double.parseDouble(s.getValue());
+                        latitude = s.getValue();
 
                         addWaypoint(latitude, longitude);
                     }
@@ -120,7 +119,7 @@ public final class MapViewTopComponent extends TopComponent {
                 public void newFrame(Frame frame) {
                     if(description != null && frame.getIdentifier() == description.getMessage().getId()) {
                         Signal s = description.decodeData(frame.getData());
-                        longitude = Double.parseDouble(s.getValue());
+                        longitude = s.getValue();
 
                         addWaypoint(latitude, longitude);
                     }

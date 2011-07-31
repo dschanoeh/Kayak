@@ -156,20 +156,20 @@ public class SignalDescription {
             case SIGNED:
                 long signBit = (long) (1L << ((long) length - 1L));
                 long signedRawValue = rawValue - ((rawValue & signBit) << 1);
-                long signedValue = signedRawValue * (long) slope + (long) intercept;
-                signal.setValue(Long.toString(signedValue));
+                double signedValue = (double) signedRawValue * slope + intercept;
+                signal.setValue(signedValue);
                 break;
             case UNSIGNED:
-                long unsignedValue = rawValue * (long) slope + (long) intercept;
-                signal.setValue(Long.toString(unsignedValue));
+                double unsignedValue = (double) rawValue * slope +  intercept;
+                signal.setValue(unsignedValue);
                 break;
             case SINGLE:
                 float floatValue = (float) rawValue * (float) slope + (float) intercept;
-                signal.setValue(Float.toString(floatValue));
+                signal.setValue((double) floatValue);
                 break;
             case DOUBLE:
                 double doubleValue = (double) rawValue * slope + intercept;
-                signal.setValue(Double.toString(doubleValue));
+                signal.setValue(doubleValue);
                 break;
         }
 

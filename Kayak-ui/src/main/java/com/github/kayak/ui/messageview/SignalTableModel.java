@@ -37,6 +37,26 @@ import org.openide.util.Exceptions;
  */
 public class SignalTableModel extends AbstractTableModel implements MessageSignalDropAdapter.Receiver {
 
+    public static enum Presentation {
+        READABLE("Readable"),
+        EXACT("Exact"),
+        INTEGER("Integer");
+
+        private final String _displayName;
+
+        /** constructor */
+        Presentation(final String displayName) {
+            _displayName = displayName;
+        }
+
+        /** overrides method toString() in java.lang.Enum class */
+        @Override
+        public String toString(){
+            return _displayName;
+        }
+    };
+
+    private Presentation activePresentation = Presentation.READABLE;
     private HashMap<Bus, Subscription> subscriptions = new HashMap<Bus, Subscription>();
     private final ArrayList<SignalTableEntry> entries = new ArrayList<SignalTableEntry>();
     private Thread refreshThread;
@@ -85,6 +105,14 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             }
         }
     };
+
+    public Presentation getActivePresentation() {
+        return activePresentation;
+    }
+
+    public void setActivePresentation(Presentation activePresentation) {
+        this.activePresentation = activePresentation;
+    }
 
     public SignalTableModel() {
         refreshThread = new Thread(refreshRunnable);
@@ -155,7 +183,14 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
                 return entry.getDescription().getName();
             case 1:
                 if(signal != null) {
-                    return signal.getValue();
+                    switch(activePresentation) {
+                        case EXACT:
+                            return signal.getExactString();
+                        case INTEGER:
+                            return signal.getIntegerString();
+                        case READABLE:
+                            return signal.getReadableString();
+                    }
                 } else {
                     return "";
                 }

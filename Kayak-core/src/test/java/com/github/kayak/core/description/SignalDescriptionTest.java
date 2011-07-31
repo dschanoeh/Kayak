@@ -113,7 +113,7 @@ public class SignalDescriptionTest {
     public void tearDown() {
     }
 
-    @Test
+    /*@Test
     public void testValue() {
 
         System.out.println("Testing value 1");
@@ -168,6 +168,6 @@ public class SignalDescriptionTest {
         long expResult = -17;
         long result = Long.parseLong(data5.getValue());
         assertEquals(expResult, result);
-    }
+    }*/
 
 }

@@ -18,6 +18,7 @@
 package com.github.kayak.ui.messageview;
 
 import java.awt.dnd.DropTarget;
+import javax.swing.DefaultComboBoxModel;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -40,6 +41,7 @@ persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 preferredID = "MessageViewTopComponent")
 public final class MessageViewTopComponent extends TopComponent {
 
+
     private SignalTableModel model = new SignalTableModel();
     
     public MessageViewTopComponent() {
@@ -61,6 +63,9 @@ public final class MessageViewTopComponent extends TopComponent {
 
                 jToolBar1 = new javax.swing.JToolBar();
                 jButton1 = new javax.swing.JButton();
+                jSeparator1 = new javax.swing.JToolBar.Separator();
+                jLabel1 = new javax.swing.JLabel();
+                jComboBox1 = new javax.swing.JComboBox();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jTable1 = new javax.swing.JTable();
 
@@ -77,6 +82,18 @@ public final class MessageViewTopComponent extends TopComponent {
                         }
                 });
                 jToolBar1.add(jButton1);
+                jToolBar1.add(jSeparator1);
+
+                org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(MessageViewTopComponent.class, "MessageViewTopComponent.jLabel1.text")); // NOI18N
+                jToolBar1.add(jLabel1);
+
+                jComboBox1.setModel(new DefaultComboBoxModel(SignalTableModel.Presentation.values()));
+                jComboBox1.addItemListener(new java.awt.event.ItemListener() {
+                        public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                                jComboBox1ItemStateChanged(evt);
+                        }
+                });
+                jToolBar1.add(jComboBox1);
 
                 jTable1.setAutoCreateRowSorter(true);
                 jTable1.setModel(model);
@@ -103,14 +120,21 @@ public final class MessageViewTopComponent extends TopComponent {
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
             int[] rows = jTable1.getSelectedRows();
 
-            for(int i : rows) {
-                model.remove(i);
+            for(int i=0;i<rows.length;i++) {
+                model.remove(rows[i]-i);
             }
         }//GEN-LAST:event_jButton1ActionPerformed
 
+        private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
+            model.setActivePresentation((SignalTableModel.Presentation) jComboBox1.getSelectedItem());
+        }//GEN-LAST:event_jComboBox1ItemStateChanged
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
+        private javax.swing.JComboBox jComboBox1;
+        private javax.swing.JLabel jLabel1;
         private javax.swing.JScrollPane jScrollPane1;
+        private javax.swing.JToolBar.Separator jSeparator1;
         private javax.swing.JTable jTable1;
         private javax.swing.JToolBar jToolBar1;
         // End of variables declaration//GEN-END:variables

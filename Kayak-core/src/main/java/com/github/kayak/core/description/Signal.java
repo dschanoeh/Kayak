@@ -18,6 +18,8 @@
 
 package com.github.kayak.core.description;
 
+import java.text.DecimalFormat;
+
 /**
  * A signal is a single data value that can be extracted out of a {@link Frame}.
  * The parameters for the extraction are defined in the
@@ -27,9 +29,11 @@ package com.github.kayak.core.description;
  */
 public class Signal {
 
+    private static final DecimalFormat readableFormat = new DecimalFormat("0.00");
+
     private long rawValue;
     private String unit;
-    private String value;
+    private double value;
     private String label;
     private String notes;
     private SignalDescription description;
@@ -66,11 +70,11 @@ public class Signal {
         this.unit = unit;
     }
 
-    public String getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Double value) {
         this.value = value;
     }
 
@@ -80,6 +84,18 @@ public class Signal {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getExactString() {
+        return Double.toString(value);
+    }
+
+    public String getReadableString() {
+        return readableFormat.format(value);
+    }
+
+    public String getIntegerString() {
+        return Long.toString(Math.round(value));
     }
 
     public Signal() {
