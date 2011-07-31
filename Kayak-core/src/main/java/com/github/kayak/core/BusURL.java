@@ -21,10 +21,13 @@ package com.github.kayak.core;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * URL class that absoulutely defines the connection parameters for a single bus
@@ -34,6 +37,8 @@ import java.net.Socket;
  */
 public class BusURL implements Transferable {
 
+    private static final Logger logger = Logger.getLogger(BusURL.class.getCanonicalName());
+    
     public static final DataFlavor DATA_FLAVOR = new DataFlavor(BusURL.class, "BusURL");
     private String host;
     private String bus;
@@ -182,23 +187,34 @@ public class BusURL implements Transferable {
     public Boolean checkConnection() {
         Socket socket = new Socket();
         InetSocketAddress address = new InetSocketAddress(host, port);
-
+        InputStreamReader input = null;
         try {
             socket.setSoTimeout(10);
             socket.connect(address, 50);
 
-            InputStreamReader input = new InputStreamReader(
+            input = new InputStreamReader(
                     socket.getInputStream());
 
-            /*String ret = "";
-
-            for(int i=0;i<)
-
-            if (!ret.equals("< hi >")) {
-                logger.log(Level.SEVERE, "Did not receive greeting from host.");
-            }*/
+            String ret = "< hi >";
+            
+            for(int i=0;i<6;i++) {
+                if(input.read() != ret.charAt(i)) {
+                    logger.log(Level.INFO, "Could not connect to host");
+                    return false;
+                }
+            }
         } catch (IOException ex) {
+            logger.log(Level.INFO, "Could not connect to host", ex);
             return false;
+        }
+        finally {
+            if(input != null) {
+                    try {
+                    input.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(BusURL.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
 
         return true;
