@@ -35,7 +35,7 @@ autostore = false)
 iconBase="org/freedesktop/tango/16x16/status/dialog-information.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @ActionID(category = "Descriptions", id = "com.github.kayak.ui.messageview.MessagesTopComponent")
-@ActionReference(path = "Menu/Descriptions" /*, position = 333 */)
+@ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.Registration(mode = "management", openAtStartup = true)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_MessagesAction",
 preferredID = "MessagesTopComponent")
