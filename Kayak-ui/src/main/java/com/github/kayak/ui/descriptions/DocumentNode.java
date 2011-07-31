@@ -105,29 +105,7 @@ public class DocumentNode extends AbstractNode {
     
     @Override
     public Action[] getActions(boolean context) {
-        return new Action[] { new CreateProjectAction() };
+        return new Action[] { new CreateProjectAction(this) };
     }
 
-    private class CreateProjectAction extends AbstractAction {
-
-        public CreateProjectAction() {
-            putValue(NAME, "Create project...");
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Project p = new Project(document.getName());
-
-            for(BusDescription bd : document.getBusses()) {
-                Bus b = new Bus();
-                b.setName(bd.getName());
-                b.setDescription(bd);
-                p.addBus(b);
-            }
-
-            ProjectManager.getGlobalProjectManager().addProject(p);
-        }
-        
-    };
-    
 }
