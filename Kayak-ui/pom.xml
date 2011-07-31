@@ -107,6 +107,7 @@
                 <configuration>
                     <publicPackages>
                         <publicPackage>com.github.kayak.ui</publicPackage>
+                        <publicPackage>com.github.kayak.ui.messageview</publicPackage>
                         <publicPackage>com.github.kayak.ui.projects</publicPackage>
                         <publicPackage>com.github.kayak.ui.time</publicPackage>
                     </publicPackages>

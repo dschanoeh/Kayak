@@ -17,9 +17,16 @@
  */
 package com.github.kayak.mapview;
 
+import com.github.kayak.core.Bus;
+import com.github.kayak.core.Frame;
+import com.github.kayak.core.FrameReceiver;
+import com.github.kayak.core.Subscription;
+import com.github.kayak.core.description.Signal;
+import com.github.kayak.core.description.SignalDescription;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.dnd.DropTarget;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,9 +44,6 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 
-/**
- * Top component which displays something.
- */
 @ConvertAsProperties(dtd = "-//com.github.kayak.mapview//MapView//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "MapViewTopComponent",
@@ -57,21 +61,75 @@ public final class MapViewTopComponent extends TopComponent {
 
     private JXMapKit mapKit = new JXMapKit();
     Set<Waypoint> waypoints;
+    double latitude, longitude;
 
-    private Runnable myRunnable = new Runnable() {
+    private SignalDescriptionDropTargetAdapter.SignalDescriptionDropReceiver latitudeDropReceiver = new SignalDescriptionDropTargetAdapter.SignalDescriptionDropReceiver() {
+
+        Bus b;
+        Subscription s;
+        SignalDescription description;
 
         @Override
-        public void run() {
-            double i = 0;
-            while(true) {
-                addWaypoint(52.42182, 10.786+i);
-                i+=0.0001;
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+        public void receive(Bus b, SignalDescription desc) {
+
+            if(s != null) {
+                s.Terminate();
             }
+
+            jTextField3.setText(desc.getName());
+            description = desc;
+
+            FrameReceiver latitudeReceiver = new FrameReceiver() {
+
+                @Override
+                public void newFrame(Frame frame) {
+                    if(description != null && frame.getIdentifier() == description.getMessage().getId()) {
+                        Signal s = description.decodeData(frame.getData());
+                        latitude = Double.parseDouble(s.getValue());
+
+                        addWaypoint(latitude, longitude);
+                    }
+                }
+            };
+            
+            int id = desc.getMessage().getId();
+            Subscription s = new Subscription(latitudeReceiver, b);
+            s.subscribe(id);
+        }
+    };
+
+    private SignalDescriptionDropTargetAdapter.SignalDescriptionDropReceiver longitudeDropReceiver = new SignalDescriptionDropTargetAdapter.SignalDescriptionDropReceiver() {
+
+        Bus b;
+        Subscription s;
+        SignalDescription description;
+
+        @Override
+        public void receive(Bus b, SignalDescription desc) {
+
+            if(s != null) {
+                s.Terminate();
+            }
+
+            jTextField4.setText(desc.getName());
+            description = desc;
+
+            FrameReceiver longitudeReceiver = new FrameReceiver() {
+
+                @Override
+                public void newFrame(Frame frame) {
+                    if(description != null && frame.getIdentifier() == description.getMessage().getId()) {
+                        Signal s = description.decodeData(frame.getData());
+                        longitude = Double.parseDouble(s.getValue());
+
+                        addWaypoint(latitude, longitude);
+                    }
+                }
+            };
+            
+            int id = desc.getMessage().getId();
+            Subscription s = new Subscription(longitudeReceiver, b);
+            s.subscribe(id);
         }
     };
 
@@ -104,8 +162,12 @@ public final class MapViewTopComponent extends TopComponent {
         painter.setWaypoints(waypoints);
         mapKit.getMainMap().setOverlayPainter(painter);
 
-        Thread t = new Thread(myRunnable);
-        t.start();
+        DropTarget latitudeDropTarget = new DropTarget(jTextField1, new SignalDescriptionDropTargetAdapter(latitudeDropReceiver));
+        jTextField3.setDropTarget(latitudeDropTarget);
+        
+        DropTarget longitudeDropTarget = new DropTarget(jTextField1, new SignalDescriptionDropTargetAdapter(longitudeDropReceiver));
+        jTextField4.setDropTarget(longitudeDropTarget);
+        
     }
 
     /** This method is called from within the constructor to
@@ -172,6 +234,11 @@ public final class MapViewTopComponent extends TopComponent {
                 jTextField4.setText(org.openide.util.NbBundle.getMessage(MapViewTopComponent.class, "MapViewTopComponent.jTextField4.text")); // NOI18N
 
                 org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(MapViewTopComponent.class, "MapViewTopComponent.jButton2.text")); // NOI18N
+                jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+                        public void mouseClicked(java.awt.event.MouseEvent evt) {
+                                jButton2MouseClicked(evt);
+                        }
+                });
 
                 javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
                 jPanel3.setLayout(jPanel3Layout);
@@ -191,7 +258,7 @@ public final class MapViewTopComponent extends TopComponent {
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(jButton2))
                                         .addComponent(jButton1))
-                                .addContainerGap(67, Short.MAX_VALUE))
+                                .addContainerGap(111, Short.MAX_VALUE))
                 );
                 jPanel3Layout.setVerticalGroup(
                         jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -218,11 +285,11 @@ public final class MapViewTopComponent extends TopComponent {
                                         .addGroup(jPanel1Layout.createSequentialGroup()
                                                 .addComponent(jLabel1)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(jLabel2)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                                .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
                                                 .addGap(212, 212, 212))
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -251,7 +318,7 @@ public final class MapViewTopComponent extends TopComponent {
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
@@ -260,6 +327,10 @@ public final class MapViewTopComponent extends TopComponent {
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
             waypoints.clear();
         }//GEN-LAST:event_jButton1ActionPerformed
+
+        private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
+            
+        }//GEN-LAST:event_jButton2MouseClicked
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
