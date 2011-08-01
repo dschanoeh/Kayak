@@ -15,81 +15,91 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package com.github.kayak.ui.projects;
 
-package com.github.kayak.ui.connections;
-
+import com.github.kayak.core.Bus;
+import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.BusURL;
+import com.github.kayak.ui.connections.BookmarkConnectionAction;
+import com.github.kayak.ui.connections.ConnectionManager;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
+import org.openide.util.Exceptions;
+import org.openide.util.datatransfer.PasteType;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
- * @author dsi9mjn
+ * @author dschanoeh
  */
-public class BusURLNode extends AbstractNode {
+public class ConnectedBusURLNode extends AbstractNode {
 
-    public static enum Type {
-        RECENT, FAVOURITE, DISCOVERY
-    }
+    private static final Logger logger = Logger.getLogger(ConnectedBusURLNode.class.getCanonicalName());
 
-    private Type type;
     private BusURL url;
+    private Bus bus;
 
-    public Type getType() {
-        return type;
-    }
+    private BusChangeListener listener = new BusChangeListener() {
 
-    public BusURL getURL() {
-        return url;
-    }
-
-    @Override
-    public Transferable drag() throws IOException {
-        return url;
-    }
-
-    private class TestConnectionAction extends AbstractAction {
-
-        public TestConnectionAction() {
-            putValue(NAME, "Check connection");
+        @Override
+        public void connectionChanged() {
+            BusURL conn = bus.getConnection();
+            url = conn;
+            if(conn == null) {
+                setDisplayName("Connection: None"); 
+            } else {
+                setDisplayName("Connection: " + url.toString()); 
+            }
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            Boolean result = url.checkConnection();
-            if(!result)
-                setIconBaseWithExtension("org/freedesktop/tango/16x16/emblems/emblem-unreadable.png");
-            else
-                setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");
+        public void nameChanged() {
         }
-    }
 
-    public BusURLNode(BusURL url, Type type) {
-        super(Children.LEAF);
+        @Override
+        public void destroyed() {
+        }
+
+        @Override
+        public void descriptionChanged() {
+        }
+    };
+
+    public ConnectedBusURLNode(BusURL url, Bus bus) {
+        super(Children.LEAF, Lookups.fixed(bus));
+
         this.url = url;
-        setDisplayName(url.toString());
-        this.type = type;
-        setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");
-    }
+        this.bus = bus;
 
+        bus.addBusChangeListener(listener);
+
+        if(url == null) {
+            setDisplayName("Connection: None");
+        } else {
+            setDisplayName("Connection: " + url.toString());
+        }
+        setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");    
+    }
+    
     @Override
     public Action[] getActions(boolean popup) {
-        if(type == Type.FAVOURITE)
-            return new Action[] { new DeleteConnectionAction(this), new TestConnectionAction() };
-        else if(type == Type.DISCOVERY)
-            return new Action[] { new BookmarkConnectionAction(url), new TestConnectionAction() };
+        if(url != null)
+            return new Action[] { new DisconnectAction(), new BookmarkConnectionAction(url) };
         else
-            return new Action[] { new BookmarkConnectionAction(url), new TestConnectionAction() };
+            return new Action[]{};
     }
-
+    
     @Override
     protected Sheet createSheet() {
         Sheet s = super.createSheet();
@@ -150,4 +160,42 @@ public class BusURLNode extends AbstractNode {
 
         return s;
     }
+    
+    @Override
+    public PasteType getDropType(Transferable t, int action, int index) {
+        try {
+            final BusURL newURL = (BusURL) t.getTransferData(BusURL.DATA_FLAVOR);
+            return new PasteType() {
+
+                @Override
+                public Transferable paste() throws IOException {
+                    if(newURL.checkConnection()) {
+                        url = newURL;
+                        bus.setConnection(url);
+                        ConnectionManager.getGlobalConnectionManager().addRecent(url);
+                    } else {
+                        logger.log(Level.WARNING, "Could not connect!");
+                    }
+                    return null;
+                }
+            };
+        } catch (UnsupportedFlavorException ex) {
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return null;
+    }
+    
+    private class DisconnectAction extends AbstractAction {
+
+        public DisconnectAction() {
+            putValue(NAME, "Disconnect");
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            bus.disconnect();
+        }
+        
+    }; 
 }

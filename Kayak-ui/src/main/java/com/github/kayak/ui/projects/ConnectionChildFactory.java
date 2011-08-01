@@ -21,11 +21,7 @@ package com.github.kayak.ui.projects;
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.BusURL;
-import com.github.kayak.ui.connections.BusURLNode;
-import java.awt.event.ActionEvent;
 import java.util.List;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
 
@@ -75,35 +71,7 @@ public class ConnectionChildFactory extends ChildFactory<BusURL> {
 
     @Override
     protected Node[] createNodesForKey(BusURL key) {
-        return new Node[] {new MyBusURLNode(key, bus)};
+        return new Node[] {new ConnectedBusURLNode(key, bus)};
     }
 
-    private class MyBusURLNode extends BusURLNode {
-        private Bus bus;
-
-        private class DisconnectAction extends AbstractAction {
-
-            public DisconnectAction() {
-                putValue(NAME, "Disconnect");
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                bus.disconnect();
-            }
-
-        };
-
-        public MyBusURLNode(BusURL url, Bus bus) {
-            super(url, BusURLNode.Type.CONNECTED);
-            this.bus = bus;
-        }
-
-        @Override
-        public Action[] getActions(boolean popup) {
-            return new Action[] {
-              new DisconnectAction()
-            };
-        }
-    };
 }

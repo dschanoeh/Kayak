@@ -4,6 +4,7 @@
  */
 package com.github.kayak.ui.connections;
 
+import com.github.kayak.core.BusURL;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.openide.awt.ActionID;
@@ -17,9 +18,9 @@ import org.openide.awt.ActionRegistration;
     @ActionReference(path="Menu/Connections", position=30)}) 
 public final class BookmarkConnectionAction extends AbstractAction {
 
-    private final BusURLNode context;
+    private final BusURL context;
 
-    public BookmarkConnectionAction(BusURLNode context) {
+    public BookmarkConnectionAction(BusURL context) {
         this.context = context;
 
         putValue(NAME, "Bookmark");
@@ -27,8 +28,6 @@ public final class BookmarkConnectionAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        if(context.getType() != BusURLNode.Type.FAVOURITE) {
-            ConnectionManager.getGlobalConnectionManager().addFavourite(context.getURL());
-        }
+        ConnectionManager.getGlobalConnectionManager().addFavourite(context);
     }
 }
