@@ -19,12 +19,14 @@ package com.github.kayak.ui.messageview;
 
 import java.awt.dnd.DropTarget;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
+import org.openide.util.ImageUtilities;
 
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.messageview//MessageView//EN",
 autostore = false)
@@ -48,7 +50,7 @@ public final class MessageViewTopComponent extends TopComponent {
         initComponents();
         setName(NbBundle.getMessage(MessageViewTopComponent.class, "CTL_MessageViewTopComponent"));
         setToolTipText(NbBundle.getMessage(MessageViewTopComponent.class, "HINT_MessageViewTopComponent"));
-        
+         
         DropTarget dt = new DropTarget(jTable1, new MessageSignalDropAdapter(model));
 	jTable1.setDropTarget(dt);
     }
@@ -72,6 +74,7 @@ public final class MessageViewTopComponent extends TopComponent {
                 jToolBar1.setFloatable(false);
                 jToolBar1.setRollover(true);
 
+                jButton1.setIcon(new ImageIcon(ImageUtilities.loadImage("org/freedesktop/tango/16x16/actions/edit-delete.png")));
                 org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(MessageViewTopComponent.class, "MessageViewTopComponent.jButton1.text")); // NOI18N
                 jButton1.setFocusable(false);
                 jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
