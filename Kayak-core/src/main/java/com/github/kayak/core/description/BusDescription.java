@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author dschanoeh
+ * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
 public class BusDescription {
 

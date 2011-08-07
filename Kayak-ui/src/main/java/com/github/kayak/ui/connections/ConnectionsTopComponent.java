@@ -94,26 +94,14 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
         private javax.swing.JToolBar jToolBar1;
         // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void componentOpened() {
-        
-    }
-
-    @Override
-    public void componentClosed() {
-        
-    }
-
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
     }
 
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
     }
 
     @Override

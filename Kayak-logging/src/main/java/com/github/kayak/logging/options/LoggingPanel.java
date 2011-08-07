@@ -28,7 +28,6 @@ final class LoggingPanel extends javax.swing.JPanel {
     LoggingPanel(LoggingOptionsPanelController controller) {
         this.controller = controller;
         initComponents();
-        // TODO listen to changes in form fields and call controller.changed()
     }
 
     /** This method is called from within the constructor to

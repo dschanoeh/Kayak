@@ -22,7 +22,7 @@ import java.util.HashSet;
 
 /**
  *
- * @author dschanoeh
+ * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
 public class Document {
 

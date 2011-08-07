@@ -92,7 +92,7 @@ public final class MapViewTopComponent extends TopComponent {
             };
             
             int id = desc.getMessage().getId();
-            Subscription s = new Subscription(latitudeReceiver, b);
+            s = new Subscription(latitudeReceiver, b);
             s.subscribe(id);
         }
     };
@@ -127,7 +127,7 @@ public final class MapViewTopComponent extends TopComponent {
             };
             
             int id = desc.getMessage().getId();
-            Subscription s = new Subscription(longitudeReceiver, b);
+            s = new Subscription(longitudeReceiver, b);
             s.subscribe(id);
         }
     };
@@ -347,15 +347,6 @@ public final class MapViewTopComponent extends TopComponent {
         private javax.swing.JTextField jTextField3;
         private javax.swing.JTextField jTextField4;
         // End of variables declaration//GEN-END:variables
-    @Override
-    public void componentOpened() {
-        // TODO add custom code on component opening
-    }
-
-    @Override
-    public void componentClosed() {
-        // TODO add custom code on component closing
-    }
 
     private void addWaypoint(double latitude, double longitude) {
         mapKit.setAddressLocation(new GeoPosition(latitude, longitude));
@@ -368,11 +359,9 @@ public final class MapViewTopComponent extends TopComponent {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
     }
 
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
     }
 }
