@@ -18,11 +18,14 @@
 package com.github.kayak.ui.messageview;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.core.description.Node;
 import com.github.kayak.core.description.SignalDescription;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteOrder;
+import java.util.HashSet;
+import java.util.Iterator;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -178,7 +181,26 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
             }
 
         };
+        
+        Property consumer = new PropertySupport.ReadOnly<String>("Consumer", String.class, "Consumer", "Bus nodes that consume this signal") {
 
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                HashSet<Node> consumers = description.getConsumers();
+                StringBuilder sb = new StringBuilder();
+                
+                Iterator<Node> it = consumers.iterator();
+                while(it.hasNext()) {
+                    sb.append(it.next().getName());
+                
+                    if(it.hasNext())
+                        sb.append(", ");
+                }
+ 
+		return sb.toString();	
+            }
+
+        };
 
         set.put(notes);
         set.put(type);
@@ -188,6 +210,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
         set.put(length);
         set.put(slope);
         set.put(intercept);
+        set.put(consumer);
 
         s.put(set);
 

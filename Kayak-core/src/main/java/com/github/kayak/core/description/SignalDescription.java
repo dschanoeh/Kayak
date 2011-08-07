@@ -41,7 +41,7 @@ public class SignalDescription {
     private String name;
     private Type type;
     private HashMap<Integer, String> labels;
-    private HashSet<String> consumer;
+    private HashSet<Node> consumers;
     private ByteOrder byteOrder;
     private MessageDescription message;
 
@@ -49,12 +49,12 @@ public class SignalDescription {
         return message;
     }
 
-    public HashSet<String> getConsumer() {
-        return consumer;
+    public HashSet<Node> getConsumers() {
+        return consumers;
     }
 
-    public void setConsumer(HashSet<String> consumer) {
-        this.consumer = consumer;
+    public void setConsumers(HashSet<Node> consumer) {
+        this.consumers = consumer;
     }
 
     public ByteOrder getByteOrder() {

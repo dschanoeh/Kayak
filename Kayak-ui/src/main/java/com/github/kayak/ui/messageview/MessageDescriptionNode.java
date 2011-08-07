@@ -19,6 +19,7 @@ package com.github.kayak.ui.messageview;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.description.MessageDescription;
+import com.github.kayak.core.description.Node;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.lang.reflect.InvocationTargetException;
@@ -104,9 +105,21 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
             }
 
         };
+        
+        Property producer = new PropertySupport.ReadOnly<String>("Producer", String.class, "Producer", "Node that produces this message") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                Node producer = description.getProducer();
+                
+		return producer.getName();	
+            }
+
+        };
 
         set.put(id);
         set.put(interval);
+        set.put(producer);
 
         s.put(set);
 

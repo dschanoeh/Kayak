@@ -26,7 +26,7 @@ import java.util.HashSet;
  */
 public class Document {
 
-    private HashSet<String> nodes;
+    private HashSet<Node> nodes;
     private HashSet<BusDescription> busses;
     private String name;
     private String version;
@@ -35,11 +35,11 @@ public class Document {
     private String date;
     private String fileName;
 
-    public HashSet<String> getNodes() {
+    public HashSet<Node> getNodes() {
         return nodes;
     }
 
-    public void setNodes(HashSet<String> nodes) {
+    public void setNodes(HashSet<Node> nodes) {
         this.nodes = nodes;
     }
 
@@ -95,7 +95,7 @@ public class Document {
     }
 
     public Document() {
-        nodes = new HashSet<String>();
+        nodes = new HashSet<Node>();
         busses = new HashSet<BusDescription>();
     }
 

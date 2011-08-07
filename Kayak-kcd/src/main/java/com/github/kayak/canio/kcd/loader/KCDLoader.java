@@ -19,9 +19,12 @@
 package com.github.kayak.canio.kcd.loader;
 
 import com.github.kayak.canio.kcd.Bus;
+import com.github.kayak.canio.kcd.Consumer;
 import com.github.kayak.canio.kcd.Message;
 import com.github.kayak.canio.kcd.NetworkDefinition;
 import com.github.kayak.canio.kcd.Node;
+import com.github.kayak.canio.kcd.NodeRef;
+import com.github.kayak.canio.kcd.Producer;
 import com.github.kayak.canio.kcd.Signal;
 import com.github.kayak.canio.kcd.Value;
 import com.github.kayak.core.description.BusDescription;
@@ -32,6 +35,7 @@ import com.github.kayak.core.description.SignalDescription;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.ByteOrder;
+import java.util.HashSet;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import javax.xml.bind.JAXBContext;
@@ -83,9 +87,9 @@ public class KCDLoader implements DescriptionLoader {
         doc.setName(documentInfo.getName());
         doc.setFileName(file.getAbsolutePath());
 
-        List<Node> nodes = netdef.getNode();
-        for(Node n : nodes) {
-            doc.getNodes().add(n.getName());
+        HashSet<com.github.kayak.core.description.Node> nodes = doc.getNodes();
+        for(Node n : netdef.getNode()) {
+            nodes.add(new com.github.kayak.core.description.Node(n.getId(), n.getName()));
         }
 
         for(Bus b : netdef.getBus()) {
@@ -97,6 +101,23 @@ public class KCDLoader implements DescriptionLoader {
                 MessageDescription messageDescription = description.createMessage(Integer.parseInt(m.getId().substring(2),16));
                 messageDescription.setInterval(m.getInterval());
                 messageDescription.setName(m.getName());
+                
+                /* set producer */
+                Producer producer = m.getProducer();
+                if(producer != null) {
+                    List<NodeRef> ref = m.getProducer().getNodeRef();
+                    if(ref.size() > 1) {
+
+                    } else if (ref.size() == 1) {
+                        String id = ref.get(0).getId();
+                        for(com.github.kayak.core.description.Node n : nodes) {
+                            if(n.getId().equals(id)) {
+                                messageDescription.setProducer(n);
+                                break;
+                            }
+                        }
+                    }
+                }
 
                 for(Signal s : m.getSignal()) {
                     SignalDescription signalDescription = messageDescription.createSignal();
@@ -105,7 +126,23 @@ public class KCDLoader implements DescriptionLoader {
                     } else {
                         signalDescription.setByteOrder(ByteOrder.LITTLE_ENDIAN);
                     }
-                    /* TODO set consumers */
+                    
+                    /* set consumers */
+                    Consumer c = s.getConsumer();
+                    if(c != null && c.getNodeRef() != null) {
+                        List<NodeRef> signalRef = c.getNodeRef();
+                        HashSet<com.github.kayak.core.description.Node> consumers = new HashSet<com.github.kayak.core.description.Node>();
+
+                        for(NodeRef nr : signalRef) {
+                            for(com.github.kayak.core.description.Node n : nodes) {
+                                if(n.getId().equals(nr.getId())) {
+                                    consumers.add(n);
+                                    break;
+                                }
+                            }
+                        }
+                        signalDescription.setConsumers(consumers);
+                    }
 
                     Value value = s.getValue();
                     if(value != null) {
@@ -137,8 +174,10 @@ public class KCDLoader implements DescriptionLoader {
 
                     signalDescription.setLength(s.getLength());
                     signalDescription.setName(s.getName());
-                    /* TODO set notes */
+                    signalDescription.setNotes(s.getNotes());
                     signalDescription.setOffset(s.getOffset()); 
+                    
+                    /* TODO add labels */
 
                     messageDescription.getSignals().add(signalDescription);
                 }

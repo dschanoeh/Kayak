@@ -30,7 +30,7 @@ public class MessageDescription {
     private int id;
     private int interval;
     private String name;
-    private String producer;
+    private Node producer;
     private HashSet<SignalDescription> signals;
     private BusDescription bus;
 
@@ -38,11 +38,11 @@ public class MessageDescription {
         return bus;
     }
 
-    public String getProducer() {
+    public Node getProducer() {
         return producer;
     }
 
-    public void setProducer(String producer) {
+    public void setProducer(Node producer) {
         this.producer = producer;
     }
 
@@ -86,7 +86,7 @@ public class MessageDescription {
         m.setId(id);
         m.setInterval(interval);
         m.setName(name);
-        m.setProducer(producer);
+        m.setProducer(producer.getName());
         HashSet<Signal> ret = m.getSignals();
 
         for(SignalDescription s : signals) {

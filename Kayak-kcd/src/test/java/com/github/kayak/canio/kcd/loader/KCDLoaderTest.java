@@ -18,6 +18,7 @@
 
 package com.github.kayak.canio.kcd.loader;
 
+import com.github.kayak.core.description.Node;
 import java.util.HashSet;
 import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.core.description.Document;
@@ -64,11 +65,16 @@ public class KCDLoaderTest {
         assertEquals("Powell Motors", document.getCompany());
         
         System.out.println("nodes");
-        HashSet<String> nodes = document.getNodes();
-        assertTrue(nodes.contains("Motor ACME"));
-        assertTrue(nodes.contains("Crypto"));
-        assertTrue(nodes.contains("ParkDistance"));
-
+        HashSet<Node> nodes = document.getNodes();
+        
+        boolean foundMotor = false;
+        for(Node n : nodes) {
+            if(n.getName().equals("Motor ACME"))
+                foundMotor = true;
+            
+        }
+        
+        assertTrue(foundMotor);
 
         HashSet<BusDescription> busses = document.getBusses();
         assertEquals(3, busses.size());
