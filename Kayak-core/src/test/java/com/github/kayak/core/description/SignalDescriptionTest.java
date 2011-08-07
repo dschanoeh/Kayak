@@ -113,13 +113,13 @@ public class SignalDescriptionTest {
     public void tearDown() {
     }
 
-    /*@Test
+    @Test
     public void testValue() {
 
         System.out.println("Testing value 1");
-        long expResult = 1653;
-        String result = data.getValue();
-        assertEquals(expResult, Long.parseLong(result));
+        double expResult = 1653;
+        double result = data.getValue();
+        assertEquals(expResult, result, 0.1);
     }
 
     @Test
@@ -147,27 +147,27 @@ public class SignalDescriptionTest {
     }
 
     @Test
-    public void testValue2() {
+    public void testIntegerValue() {
         System.out.println("Testing value 2");
-        long expResult = -88;
-        long result = Long.parseLong(data2.getValue());
+        String expResult = "-88";
+        String result = data2.getIntegerString();
         assertEquals(expResult, result);
     }
 
     @Test
     public void testValue4() {
         System.out.println("Testing value 4");
-        long expResult = 1113;
-        long result = Long.parseLong(data4.getValue());
-        assertEquals(expResult, result);
+        double expResult = 1113;
+        double result = data4.getValue();
+        assertEquals(expResult, result, 0.1);
     }
 
     @Test
     public void testValue5() {
         System.out.println("Testing value 5");
-        long expResult = -17;
-        long result = Long.parseLong(data5.getValue());
-        assertEquals(expResult, result);
-    }*/
+        double expResult = -17;
+        double result = data5.getValue();
+        assertEquals(expResult, result, 0.1);
+    }
 
 }
