@@ -20,8 +20,6 @@ package com.github.kayak.ui.rawview;
 
 import com.github.kayak.core.Frame;
 import com.github.kayak.core.FrameReceiver;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
 import javax.swing.table.AbstractTableModel;
@@ -32,9 +30,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class RawViewTableModel extends AbstractTableModel implements FrameReceiver {
 
-    private TreeMap<Integer, FrameData> data;
-    private final Set<Integer> refreshedRows = Collections.synchronizedSet(new HashSet<Integer>());
-    private final Set<Integer> addedRows = Collections.synchronizedSet(new HashSet<Integer>());
+    private final TreeMap<Integer, FrameData> data;
     private Thread refreshThread;
     private boolean colorize = false;
 
@@ -43,37 +39,18 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
         @Override
         public void run() {
             while (true) {
-                if (!refreshedRows.isEmpty()) {
-                    Integer[] rows;
-
-                    synchronized (refreshedRows) {
-                        rows = refreshedRows.toArray(new Integer[refreshedRows.size()]);
-                    }
-
-                    java.util.Arrays.sort(rows);
-
-                    for (int i = 0; i < rows.length; i++) {
-                        int sequenceLength = 0;
-                        for (; sequenceLength < rows.length - i - 1; sequenceLength++) {
-                            if (rows[i + sequenceLength + 1] != rows[i + 1] + sequenceLength) {
-                                break;
-                            }
+                synchronized (data) {
+                    Set<Integer> keys = data.keySet();
+                    Integer[] keyArray = keys.toArray(new Integer[0]);
+                    for(int i=0;i<keyArray.length;i++) {
+                        FrameData element = data.get(keyArray[i]);
+                        if(!element.isInTable()) {
+                            fireTableRowsInserted(i, i);
+                            element.setInTable(true);
+                        } else if(element.isDataChanged()) {
+                            fireTableRowsUpdated(i, i);
+                            element.setDataChanged(false);
                         }
-                        fireTableRowsUpdated(rows[i], rows[i + sequenceLength]);
-                        i += sequenceLength;
-                    }
-                    
-                    synchronized (refreshedRows) {
-                        refreshedRows.clear();
-                    }
-                }
-
-                if (!addedRows.isEmpty()) {
-                    synchronized (addedRows) {
-                        for (Integer row : addedRows) {
-                            fireTableRowsInserted(row, row);
-                        }
-                        addedRows.clear();
                     }
                 }
 
@@ -103,7 +80,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
     }
 
     public void clear() {
-        synchronized(this) {
+        synchronized(data) {
             int length = data.size();
             data.clear();
             fireTableRowsDeleted(0, length);
@@ -112,7 +89,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
 
     @Override
     public int getRowCount() {
-        synchronized(this) {
+        synchronized(data) {
             return data.size();
         }
     }
@@ -123,18 +100,20 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
     }
 
     private int getRowForKey(int key) {
-        Integer[] keys = data.keySet().toArray(new Integer[] {});
+        synchronized(data) {
+            Integer[] keys = data.keySet().toArray(new Integer[] {});
 
-        for(int i=0;i<keys.length;i++)
-            if(keys[i] == key)
-                return i;
+            for(int i=0;i<keys.length;i++)
+                if(keys[i] == key)
+                    return i;
 
-        return -1;
+            return -1;
+        }
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        synchronized (this) {
+        synchronized (data) {
             Integer[] keys = data.keySet().toArray(new Integer[]{});
 
             switch (columnIndex) {
@@ -192,16 +171,13 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
 
     @Override
     public void newFrame(Frame frame) {
-        synchronized(this) {
+        synchronized(data) {
             int row = getRowForKey(frame.getIdentifier());
             if (row != -1) {
                 FrameData old = data.get(frame.getIdentifier());
                 old.updateWith(frame);
-                refreshedRows.add(row);
             } else {
                 data.put(frame.getIdentifier(), new FrameData(frame));
-                int newRow = getRowForKey(frame.getIdentifier());
-                addedRows.add(newRow);
             }
         }
     }
