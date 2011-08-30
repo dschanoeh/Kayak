@@ -44,7 +44,7 @@ public class BusChildFactory extends Children.Keys<BusChildFactory.Folders> {
     @Override
     protected Node[] createNodes(Folders key) {
         if (key == Folders.CONNECTION) {
-            return new Node[]{new ConnectedBusURLNode(null, bus)};
+            return new Node[]{new ConnectedBusURLNode(bus.getConnection(), bus)};
         } else if (key == Folders.DESCRIPTION) {
             return new Node[]{ new ConnectedDescriptionNode(bus) };
         }
