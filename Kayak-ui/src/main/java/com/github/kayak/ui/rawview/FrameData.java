@@ -86,8 +86,8 @@ public class FrameData {
         byte[] newData = frame.getData();
         if(newData.length == data.length) {
             for(int i=0;i<data.length;i++) {
-                if(data[i] != newData[i] && frequency[i] < 255)
-                    frequency[i] += 2;
+                if(data[i] != newData[i] && frequency[i] < 253)
+                    frequency[i] += 4;
                 if(frequency[i]>=1)
                     frequency[i]--;
             }

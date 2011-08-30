@@ -93,6 +93,8 @@ public class Bus implements SubscriptionChangeReceiver {
 
             if(rawConnection != null && rawConnection.isConnected())
                 rawConnection.close();
+                                    
+            delta = 0;
         }
     };
 
