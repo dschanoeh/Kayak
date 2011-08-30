@@ -19,6 +19,7 @@
 package com.github.kayak.ui.connections;
 
 import com.github.kayak.core.BusURL;
+import java.util.Set;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 
@@ -35,13 +36,13 @@ public class ConnectionChildrenFactory extends Children.Keys<BusURL> implements 
     public void addNotify() {
         switch(type) {
             case DISCOVERY:
-                setKeys(manager.getAutoDiscovery().toArray(new BusURL[0]));
+               setKeys(manager.getAutoDiscovery());
                 break;
             case FAVOURITE:
-                setKeys(manager.getFavourites().toArray(new BusURL[0]));
+                setKeys(manager.getFavourites());
                 break;
             case RECENT:
-                setKeys(manager.getRecent().toArray(new BusURL[0]));
+                setKeys(manager.getRecent());
                 break;
         }
     }
@@ -60,13 +61,13 @@ public class ConnectionChildrenFactory extends Children.Keys<BusURL> implements 
     public void connectionsChanged() {
         switch(type) {
             case DISCOVERY:
-                setKeys(manager.getAutoDiscovery().toArray(new BusURL[0]));
+                setKeys(manager.getAutoDiscovery());
                 break;
             case FAVOURITE:
-                setKeys(manager.getFavourites().toArray(new BusURL[0]));
+                setKeys(manager.getFavourites());
                 break;
             case RECENT:
-                setKeys(manager.getRecent().toArray(new BusURL[0]));
+                setKeys(manager.getRecent());
                 break;
         }
     }
