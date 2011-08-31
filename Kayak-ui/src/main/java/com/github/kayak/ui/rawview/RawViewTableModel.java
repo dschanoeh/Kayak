@@ -176,6 +176,12 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
             return frameData.getData();
         }
     }
+    
+    public byte[] getDataForID(int id) {
+        synchronized(data) {
+            return data.get(id).getData();
+        }
+    }
 
     @Override
     public void newFrame(Frame frame) {

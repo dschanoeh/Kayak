@@ -8,11 +8,14 @@ import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.core.Util;
+import java.awt.Color;
+import java.awt.Component;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -33,6 +36,29 @@ public final class RawViewTopComponent extends TopComponent {
     private Subscription subscription;
     private RawViewTableModel model;
     private SelectionListener selectionListener;
+    private ColorRenderer colorRenderer;
+    
+    private class ColorRenderer extends DefaultTableCellRenderer {
+            
+        private final Color color = new Color(210, 210, 210);
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object object, boolean isSelected, boolean hasFocus, int row, int column) {
+            
+            Component component = super.getTableCellRendererComponent(table, object, isSelected, hasFocus, row, column);
+            if(!isSelected) {
+                if((row % 2) == 0) {
+                    component.setBackground(color);
+                } else {
+                    component.setBackground(table.getBackground());
+                }
+            } else {
+                component.setBackground(table.getSelectionBackground());
+            }
+            
+            return component;
+        }
+    };
     
     private BusChangeListener listener = new BusChangeListener() {
 
@@ -74,16 +100,22 @@ public final class RawViewTopComponent extends TopComponent {
             
             if (e.getSource() == table.getSelectionModel()){
                 int row = table.getSelectedRow();
+                
+                
                 if(row != -1) {
+                    String idString = (String) model.getValueAt(row, 2);
+                    int id = Integer.parseInt(idString.substring(2),16);
+                    
+                    byte[] bytes = model.getDataForID(id);
+                    
                     StringBuilder sb = new StringBuilder();
                     
                     sb.append("ID: ");
-                    sb.append(model.getValueAt(row, 2));
+                    sb.append(idString);
                     sb.append(" | ");
-
-                    byte[] bytes = model.getData(row);                  
+                 
                     for(byte b : bytes) {
-                        sb.append(Util.hexStringToBinaryString(Integer.toHexString(b)));
+                        sb.append(Util.hexStringToBinaryString(Util.byteToHexString(b)));
                         sb.append(' ');
                     }
                     sb.deleteCharAt(sb.length()-1);
@@ -99,6 +131,9 @@ public final class RawViewTopComponent extends TopComponent {
         model = new RawViewTableModel();
         initComponents();
         selectionListener = new SelectionListener(jTable1);
+        colorRenderer = new ColorRenderer();
+        jTable1.setDefaultRenderer(String.class, colorRenderer);
+        jTable1.setDefaultRenderer(Integer.class, colorRenderer);
         jTable1.getSelectionModel().addListSelectionListener(selectionListener);
         setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent"));
         setToolTipText(NbBundle.getMessage(RawViewTopComponent.class, "HINT_RawViewTopComponent"));
