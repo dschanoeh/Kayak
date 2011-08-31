@@ -7,8 +7,12 @@ package com.github.kayak.ui.rawview;
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.Subscription;
+import com.github.kayak.core.Util;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -28,6 +32,7 @@ public final class RawViewTopComponent extends TopComponent {
     private Bus bus;
     private Subscription subscription;
     private RawViewTableModel model;
+    private SelectionListener selectionListener;
     
     private BusChangeListener listener = new BusChangeListener() {
 
@@ -51,12 +56,70 @@ public final class RawViewTopComponent extends TopComponent {
             
         }
     };
+    
+    private class SelectionListener implements ListSelectionListener {
+        JTable table;
+
+        // It is necessary to keep the table since it is not possible
+        // to determine the table from the event's source
+        SelectionListener(JTable table) {
+            this.table = table;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+             if (e.getValueIsAdjusting()) {
+                return;
+            }
+            
+            if (e.getSource() == table.getSelectionModel()){
+                int row = table.getSelectedRow();
+                if(row != -1) {
+                    StringBuilder sb = new StringBuilder();
+                    
+                    sb.append("ID: ");
+                    sb.append(model.getValueAt(row, 2));
+                    sb.append(" | ");
+
+                    byte[] bytes = model.getData(row);                  
+                    for(byte b : bytes) {
+                        sb.append(Util.hexStringToBinaryString(Integer.toHexString(b)));
+                        sb.append(' ');
+                    }
+                    sb.deleteCharAt(sb.length()-1);
+                    jTextField2.setText(sb.toString());
+                } else {
+                    jTextField2.setText("");
+                }
+            }
+        }
+    };
 
     public RawViewTopComponent() {
         model = new RawViewTableModel();
         initComponents();
+        selectionListener = new SelectionListener(jTable1);
+        jTable1.getSelectionModel().addListSelectionListener(selectionListener);
         setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent"));
         setToolTipText(NbBundle.getMessage(RawViewTopComponent.class, "HINT_RawViewTopComponent"));
+    }
+    
+    private void filter(String filterString) {
+        subscription.setSubscribeAll(Boolean.FALSE);
+        model.clear();
+        String[] idStrings = filterString.split("\\s");
+
+        for (int i = 0; i < idStrings.length; i++) {
+            try {
+                if (idStrings[i].matches("0x[a-fA-F0-9]+")) {
+                    subscription.subscribe(Integer.parseInt(idStrings[i].substring(2), 16));
+                } else if (idStrings[i].matches("[a-fA-F0-9]+")) {
+                    subscription.subscribe(Integer.parseInt(idStrings[i], 16));
+                }
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Error while parsing filter string", ex);
+            }
+        }
     }
 
     /** This method is called from within the constructor to
@@ -70,12 +133,14 @@ public final class RawViewTopComponent extends TopComponent {
         jToolBar1 = new javax.swing.JToolBar();
         jToggleButton1 = new javax.swing.JToggleButton();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jCheckBox1 = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jTextField2 = new javax.swing.JTextField();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS));
 
@@ -84,6 +149,7 @@ public final class RawViewTopComponent extends TopComponent {
         jToolBar1.setMaximumSize(new java.awt.Dimension(32767, 31));
 
         org.openide.awt.Mnemonics.setLocalizedText(jToggleButton1, org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jToggleButton1.text")); // NOI18N
+        jToggleButton1.setToolTipText(org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jToggleButton1.toolTipText")); // NOI18N
         jToggleButton1.setFocusable(false);
         jToggleButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jToggleButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -95,6 +161,7 @@ public final class RawViewTopComponent extends TopComponent {
         jToolBar1.add(jToggleButton1);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jButton1.text")); // NOI18N
+        jButton1.setToolTipText(org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jButton1.toolTipText")); // NOI18N
         jButton1.setFocusable(false);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -105,6 +172,18 @@ public final class RawViewTopComponent extends TopComponent {
         });
         jToolBar1.add(jButton1);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jButton2.text")); // NOI18N
+        jButton2.setToolTipText(org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jButton2.toolTipText")); // NOI18N
+        jButton2.setFocusable(false);
+        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton2);
+
         add(jToolBar1);
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.X_AXIS));
@@ -113,10 +192,12 @@ public final class RawViewTopComponent extends TopComponent {
         jPanel1.add(jLabel1);
 
         jTextField1.setText(org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jTextField1.text")); // NOI18N
+        jTextField1.setToolTipText(org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jTextField1.toolTipText")); // NOI18N
         jTextField1.setMaximumSize(new java.awt.Dimension(2147483647, 31));
         jPanel1.add(jTextField1);
 
         org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jCheckBox1.text")); // NOI18N
+        jCheckBox1.setToolTipText(org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jCheckBox1.toolTipText")); // NOI18N
         jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBox1ActionPerformed(evt);
@@ -138,27 +219,17 @@ public final class RawViewTopComponent extends TopComponent {
         jScrollPane1.setViewportView(jTable1);
 
         add(jScrollPane1);
+
+        jTextField2.setEditable(false);
+        jTextField2.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
+        jTextField2.setText(org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jTextField2.text")); // NOI18N
+        add(jTextField2);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
 
         if(jCheckBox1.isSelected()) {
-            subscription.setSubscribeAll(Boolean.FALSE);
-            model.clear();
-            String filterString = jTextField1.getText();
-            String[] idStrings = filterString.split("\\s");
-
-            for (int i = 0; i < idStrings.length; i++) {
-                try {
-                    if (idStrings[i].matches("0x[a-fA-F0-9]+")) {
-                        subscription.subscribe(Integer.parseInt(idStrings[i].substring(2), 16));
-                    } else if (idStrings[i].matches("[a-fA-F0-9]+")) {
-                        subscription.subscribe(Integer.parseInt(idStrings[i], 16));
-                    }
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, "Error while parsing filter string", ex);
-                }
-            }
+            filter(jTextField1.getText());
         } else {
             subscription.clear();
             subscription.setSubscribeAll(Boolean.TRUE);
@@ -176,14 +247,36 @@ public final class RawViewTopComponent extends TopComponent {
         model.clear();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        int[] rows = jTable1.getSelectedRows();
+        
+        if(rows.length == 0)
+            return;
+        
+        StringBuilder sb = new StringBuilder();
+        
+        for(int i=0;i<rows.length;i++) {
+            String id = (String) model.getValueAt(rows[i], 2);
+            sb.append(id);
+            if(i != rows.length-1)
+                sb.append(" ");
+        }
+        
+        jTextField1.setText(sb.toString());
+        jToggleButton1.setSelected(true);
+        filter(jTextField1.getText());
+}//GEN-LAST:event_jButton2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToolBar jToolBar1;
     // End of variables declaration//GEN-END:variables

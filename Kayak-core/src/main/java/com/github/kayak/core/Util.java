@@ -26,6 +26,7 @@ package com.github.kayak.core;
 public class Util {
 
     static final String HEXES = "0123456789ABCDEF";
+    static final String[] binary = {"0000","0001","0010","0011","0100","0101","0110","0111","1000","1001","1010","1011","1100","1101","1110","1111"}; 
 
     /**
      * Convert a hex string to a byte array.
@@ -55,5 +56,26 @@ public class Util {
             hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
         }
         return hex.toString();
+    }
+    
+    public static String hexStringToBinaryString(String s) {
+        StringBuilder sb = new StringBuilder();
+        
+        for(int i=0;i<s.length();i++) {
+            char c = s.charAt(i);
+            int index=0;
+            if(c >= '0' && c <= '9') {
+                index = c - '0';
+            } else if(c >= 'a' && c <= 'f') {
+                index = c - 'a' + 10;
+            } else if(c >= 'A' && c <= 'F') {
+                index = c - 'A' + 10;
+            } else {
+                return null;
+            }
+            sb.append(binary[index]);
+        }
+        
+        return sb.toString();
     }
 }

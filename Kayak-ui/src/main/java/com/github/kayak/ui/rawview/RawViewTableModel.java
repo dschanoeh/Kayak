@@ -168,6 +168,14 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
             }
         }
     }
+    
+    public byte[] getData(int row) {
+        synchronized(data) {
+            Integer[] keys = data.keySet().toArray(new Integer[]{});
+            FrameData frameData = data.get(keys[row]);
+            return frameData.getData();
+        }
+    }
 
     @Override
     public void newFrame(Frame frame) {
