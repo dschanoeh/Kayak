@@ -40,7 +40,7 @@ public final class RawViewTopComponent extends TopComponent {
     
     private class ColorRenderer extends DefaultTableCellRenderer {
             
-        private final Color color = new Color(210, 210, 210);
+        private final Color color = new Color(230, 230, 230);
         
         @Override
         public Component getTableCellRendererComponent(JTable table, Object object, boolean isSelected, boolean hasFocus, int row, int column) {
