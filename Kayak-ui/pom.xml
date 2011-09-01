@@ -112,12 +112,13 @@
                         <publicPackage>com.github.kayak.ui.time</publicPackage>
                     </publicPackages>
                 </configuration>
+                <version>3.6</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.3.2</version>
                 <configuration>
                     <!-- to have the jar plugin pickup the nbm generated manifest -->
                     <useDefaultManifestFile>true</useDefaultManifestFile>

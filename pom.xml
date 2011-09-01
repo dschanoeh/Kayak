@@ -40,7 +40,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -57,6 +57,7 @@
                         <cluster>kayak</cluster>
                         <etcConfFile>${basedir}/kayak.conf</etcConfFile>
                     </configuration>
+                    <version>3.6</version>
                 </plugin>
 
                 <plugin>
@@ -71,11 +72,12 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>2.0.1</version>
+                    <version>2.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
+                    <version>2.2.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -101,7 +103,7 @@
                     <debug>false</debug>
                     <xmlOutput>true</xmlOutput>
                 </configuration>
-                <version>2.3.1</version>
+                <version>2.3.2</version>
             </plugin>
         </plugins>
     </reporting>
