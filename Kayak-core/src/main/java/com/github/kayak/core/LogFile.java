@@ -281,4 +281,25 @@ public class LogFile {
 
         /* TODO: get length of file */
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LogFile other = (LogFile) obj;
+        if(other.getFileName().equals(getFileName()))
+            return true;
+        
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getFileName().hashCode();
+    }
+    
 }

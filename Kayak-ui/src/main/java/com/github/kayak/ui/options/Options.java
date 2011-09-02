@@ -13,7 +13,7 @@ import org.openide.util.NbPreferences;
 public class Options {
     public static String getDescriptionsFolder() {
         String homeFolder = System.getProperty("user.home");
-        return NbPreferences.forModule(Options.class).get("Log file directory", homeFolder + "/kayak/descriptions/");
+        return NbPreferences.forModule(Options.class).get("Bus description directory", homeFolder + "/kayak/descriptions/");
     }
 
     public static boolean getShowStartPage() {

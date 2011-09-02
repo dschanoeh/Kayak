@@ -49,7 +49,7 @@ public class LogFilesNodeFactory extends ChildFactory<LogFilesNodeFactory.Folder
         } else if(key == Folders.FAVOURTIES) {
             AbstractNode node = new AbstractNode(Children.create(new LogFavouritesFactory(), true));
             node.setDisplayName("Favourites");
-            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
+            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/bookmark-new.png");
             return new Node[] {node};
         }
 

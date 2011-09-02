@@ -27,27 +27,14 @@ final class FoldersPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jLabel1 = new javax.swing.JLabel();
-        logFilesTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         busDescriptionTextField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jTextField3 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(FoldersPanel.class, "FoldersPanel.jLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        add(jLabel1, gridBagConstraints);
-
-        logFilesTextField.setEditable(false);
-        logFilesTextField.setText(org.openide.util.NbBundle.getMessage(FoldersPanel.class, "FoldersPanel.logFilesTextField.text")); // NOI18N
-        logFilesTextField.setPreferredSize(new java.awt.Dimension(400, 31));
-        add(logFilesTextField, new java.awt.GridBagConstraints());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FoldersPanel.class, "FoldersPanel.jLabel2.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -79,14 +66,6 @@ final class FoldersPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 2;
         add(jTextField3, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(FoldersPanel.class, "FoldersPanel.jButton1.text")); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        add(jButton1, new java.awt.GridBagConstraints());
-
         org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(FoldersPanel.class, "FoldersPanel.jButton2.text")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -110,15 +89,6 @@ final class FoldersPanel extends javax.swing.JPanel {
         add(jButton3, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        JFileChooser chooser = new JFileChooser(logFilesTextField.getText());
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            logFilesTextField.setText(chooser.getSelectedFile().getAbsolutePath());
-        }
-        
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         JFileChooser chooser = new JFileChooser(busDescriptionTextField.getText());
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -134,23 +104,17 @@ final class FoldersPanel extends javax.swing.JPanel {
     void load() {
         String homeFolder = System.getProperty("user.home");
         
-        logFilesTextField.setText(NbPreferences.forModule(FoldersPanel.class).get("Log file directory", homeFolder + "/kayak/log/"));
         busDescriptionTextField.setText(Options.getDescriptionsFolder());
     }
 
     void store() {
-        NbPreferences.forModule(FoldersPanel.class).put("Log file directory", logFilesTextField.getText());
         NbPreferences.forModule(FoldersPanel.class).put("Bus description directory", busDescriptionTextField.getText()); 
     }
 
     boolean valid() {
-        File logDir = new File(logFilesTextField.getText());
         File descriptionDir = new File(busDescriptionTextField.getText());
         
-        if(logDir.isDirectory() &&
-                descriptionDir.isDirectory() &&
-                logDir.canRead() &&
-                logDir.canWrite() &&
+        if(descriptionDir.isDirectory() &&
                 descriptionDir.canRead() &&
                 descriptionDir.canWrite())
             return true;
@@ -159,13 +123,10 @@ final class FoldersPanel extends javax.swing.JPanel {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField busDescriptionTextField;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField logFilesTextField;
     // End of variables declaration//GEN-END:variables
 }

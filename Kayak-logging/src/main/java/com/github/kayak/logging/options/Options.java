@@ -21,7 +21,7 @@ import org.openide.util.NbPreferences;
 
 /**
  *
- * @author dschanoeh
+ * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class Options {
     

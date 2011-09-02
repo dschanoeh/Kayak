@@ -22,8 +22,6 @@ import com.github.kayak.core.LogFile;
 import com.github.kayak.logging.input.LogInputTopComponent;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
@@ -32,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.GZIPOutputStream;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -70,13 +67,13 @@ public class LogFileNode extends AbstractNode {
     public Action[] getActions(boolean foo) {
         ArrayList<Action> actions = new ArrayList<Action>();
         
-        actions.add(new OpenAction());
-        actions.add(new DeleteAction());
+        actions.add(new OpenLogFileAction(logFile));
+        actions.add(new DeleteLogFileAction(logFile));
         if(!logFile.getCompressed())
-            actions.add(new CompressAction());
+            actions.add(new CompressLogFileAction(logFile));
         
         if(!manager.getFavouries().contains(logFile))
-            actions.add(new BookmarkAction());
+            actions.add(new BookmarkLogFileAction(logFile));
             
         return actions.toArray(new Action[0]);
     }
@@ -221,102 +218,4 @@ public class LogFileNode extends AbstractNode {
 
         return s;
     }
-
-    private class OpenAction extends AbstractAction {
-        
-        public OpenAction() {
-            putValue (NAME, "Open");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            LogInputTopComponent tc = new LogInputTopComponent();
-            tc.setLogFile(logFile);
-            tc.open();
-            tc.requestActive();
-        }
-    };
-    
-    private class DeleteAction extends AbstractAction {
-        
-        public DeleteAction() {
-            putValue (NAME, "Delete...");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            LogFile lf = getLookup().lookup (LogFile.class);
-            
-            if(lf != null) {
-                int res = JOptionPane.showConfirmDialog(null, "", "Are you sure?", JOptionPane.YES_NO_OPTION);
-                
-                if(res == JOptionPane.YES_OPTION) {
-                    File f = lf.getFile();
-                    f.delete();
-                    try {
-                        destroy();
-                    } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
-                    LogFileManager.getGlobalLogFileManager().removeLogFile(lf);
-                }
-            }
-
-        }
-    };
-    
-    private class CompressAction extends AbstractAction {
-        
-        public CompressAction() {
-            putValue (NAME, "Compress");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            LogFile lf = getLookup().lookup(LogFile.class);
-
-            if (lf != null) {
-                File f = lf.getFile();
-
-                try {
-
-                    File newFile = new File(f.getAbsolutePath() + ".gz");
-                    GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(newFile));
-                    FileInputStream in = new FileInputStream(f);
-
-                    byte[] buf = new byte[1024];
-                    int len;
-                    while ((len = in.read(buf)) > 0) {
-                        out.write(buf, 0, len);
-                    }
-                    in.close();
-
-                    out.finish();
-                    out.close();
-                    f.delete();
-                    LogFileManager.getGlobalLogFileManager().removeLogFile(lf);
-                    LogFileManager.getGlobalLogFileManager().addLogFile(new LogFile(newFile));
-                } catch (IOException ex) {
-                    logger.log(Level.WARNING, "Could not compress log file");
-                }
-            }
-        }
-    };
-    
-    private class BookmarkAction extends AbstractAction {
-        
-        public BookmarkAction() {
-            putValue (NAME, "Bookmark");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            LogFile lf = getLookup().lookup(LogFile.class);
-
-            if (lf != null) {
-                manager.addFavourite(lf);
-            }
-        }
-    };
-
 }

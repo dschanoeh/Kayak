@@ -46,7 +46,7 @@ autostore = false)
 iconBase="org/freedesktop/tango/16x16/devices/camera-photo.png", 
 persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "properties", openAtStartup = false)
-@ActionID(category = "Window", id = "com.github.kayak.logging.snapshots.SnapshotBufferTopComponent")
+@ActionID(category = "Log files", id = "com.github.kayak.logging.snapshots.SnapshotBufferTopComponent")
 @ActionReference(path = "Menu/Log files" , position = 30 )
 @TopComponent.OpenActionRegistration(displayName = "#CTL_SnapshotBufferTopComponent",
 preferredID = "SnapshotBufferTopComponent")

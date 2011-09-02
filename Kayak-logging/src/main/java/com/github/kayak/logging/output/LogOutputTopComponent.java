@@ -44,7 +44,7 @@ autostore = false)
 iconBase="org/freedesktop/tango/16x16/actions/go-next.png", 
 persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "properties", openAtStartup = false)
-@ActionID(category = "Window", id = "com.github.kayak.logging.LogOutputTopComponent")
+@ActionID(category = "Log files", id = "com.github.kayak.logging.LogOutputTopComponent")
 @ActionReference(path = "Menu/Log files", position = 20)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_LogOutputAction",
 preferredID = "LogOutputTopComponent")

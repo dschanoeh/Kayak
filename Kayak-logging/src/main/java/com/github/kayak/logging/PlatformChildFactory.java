@@ -19,7 +19,7 @@
 package com.github.kayak.logging;
 
 import com.github.kayak.core.LogFile;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
@@ -59,7 +59,7 @@ public class PlatformChildFactory extends ChildFactory<LogFile> {
 
     @Override
     protected boolean createKeys(List<LogFile> toPopulate) {
-        ArrayList<LogFile> logFiles = manager.getFilesForPlatform(platform);
+        HashSet<LogFile> logFiles = manager.getFilesForPlatform(platform);
         toPopulate.addAll(logFiles);
 
         return true;
