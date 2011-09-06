@@ -8,6 +8,8 @@ import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.core.Util;
+import com.github.kayak.ui.projects.Project;
+import com.github.kayak.ui.projects.ProjectManager;
 import java.awt.Color;
 import java.awt.Component;
 import java.util.logging.Level;
@@ -17,9 +19,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
  * Top component which displays something.
@@ -27,8 +29,8 @@ import org.netbeans.api.settings.ConvertAsProperties;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.rawview//RawView//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "RawViewTopComponent",
-iconBase="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png", 
-persistenceType = TopComponent.PERSISTENCE_NEVER)
+iconBase="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png",
+persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 public final class RawViewTopComponent extends TopComponent {
 
@@ -38,14 +40,14 @@ public final class RawViewTopComponent extends TopComponent {
     private RawViewTableModel model;
     private SelectionListener selectionListener;
     private ColorRenderer colorRenderer;
-    
+
     private class ColorRenderer extends DefaultTableCellRenderer {
-            
+
         private final Color color = new Color(230, 230, 230);
-        
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object object, boolean isSelected, boolean hasFocus, int row, int column) {
-            
+
             Component component = super.getTableCellRendererComponent(table, object, isSelected, hasFocus, row, column);
             if(!isSelected) {
                 if((row % 2) == 0) {
@@ -56,16 +58,16 @@ public final class RawViewTopComponent extends TopComponent {
             } else {
                 component.setBackground(table.getSelectionBackground());
             }
-            
+
             return component;
         }
     };
-    
+
     private BusChangeListener listener = new BusChangeListener() {
 
         @Override
         public void connectionChanged() {
-            
+
         }
 
         @Override
@@ -80,10 +82,10 @@ public final class RawViewTopComponent extends TopComponent {
 
         @Override
         public void descriptionChanged() {
-            
+
         }
     };
-    
+
     private class SelectionListener implements ListSelectionListener {
         JTable table;
 
@@ -98,34 +100,25 @@ public final class RawViewTopComponent extends TopComponent {
             if (e.getValueIsAdjusting()) {
                 return;
             }
-            
+
             ListSelectionModel selectionModel = table.getSelectionModel();
-            
+
             if (e.getSource() == table.getSelectionModel()){
-                int first = e.getFirstIndex();
-                int last = e.getLastIndex();
-                
-                int row = -1;
-                
-                for(int i=first;i<=last;i++) {
-                    if(selectionModel.isSelectedIndex(i)) {
-                        row = i;
-                        break;
-                    }
-                }
-                
+                int row = table.getSelectedRow();
+
                 if(row != -1) {
+                    row = table.convertRowIndexToModel(row);
                     String idString = (String) model.getValueAt(row, 2);
                     int id = Integer.parseInt(idString.substring(2),16);
-                    
+
                     byte[] bytes = model.getDataForID(id);
-                    
+
                     StringBuilder sb = new StringBuilder();
-                    
+
                     sb.append("ID: ");
                     sb.append(idString);
                     sb.append(" | ");
-                 
+
                     for(byte b : bytes) {
                         sb.append(Util.hexStringToBinaryString(Util.byteToHexString(b)));
                         sb.append(' ');
@@ -150,7 +143,7 @@ public final class RawViewTopComponent extends TopComponent {
         setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent"));
         setToolTipText(NbBundle.getMessage(RawViewTopComponent.class, "HINT_RawViewTopComponent"));
     }
-    
+
     private void filter(String filterString) {
         subscription.setSubscribeAll(Boolean.FALSE);
         model.clear();
@@ -296,19 +289,19 @@ public final class RawViewTopComponent extends TopComponent {
 
 private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         int[] rows = jTable1.getSelectedRows();
-        
+
         if(rows.length == 0)
             return;
-        
+
         StringBuilder sb = new StringBuilder();
-        
+
         for(int i=0;i<rows.length;i++) {
             String id = (String) model.getValueAt(rows[i], 2);
             sb.append(id);
             if(i != rows.length-1)
                 sb.append(" ");
         }
-        
+
         jTextField1.setText(sb.toString());
         jToggleButton1.setSelected(true);
         filter(jTextField1.getText());
@@ -338,10 +331,51 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
+
+        p.setProperty("busName", bus.getName());
+        ProjectManager manager = ProjectManager.getGlobalProjectManager();
+        p.setProperty("projectName", manager.getOpenedProject().getName());
+
     }
 
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
+
+        String busName = p.getProperty("busName");
+        String projectName = p.getProperty("projectName");
+
+        logger.log(Level.INFO, "Trying to restore raw view with project {0} and bus {1}", new String[]{projectName, busName});
+
+        Project project = null;
+
+        for (Project pr : ProjectManager.getGlobalProjectManager().getProjects()) {
+            if (pr.getName().equals(projectName)) {
+                project = pr;
+                break;
+            }
+        }
+
+        if (project == null || project.isOpened() == false) {
+            this.close();
+            return;
+        }
+
+        Bus newBus = null;
+
+        for (Bus b : project.getBusses()) {
+            if (b.getName().equals(busName)) {
+                newBus = b;
+                break;
+            }
+        }
+
+        if (newBus == null) {
+            this.close();
+            return;
+        }
+
+        setBus(newBus);
+
     }
 
     public void setBus(Bus bus) {

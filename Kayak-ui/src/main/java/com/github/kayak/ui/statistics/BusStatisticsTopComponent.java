@@ -33,6 +33,10 @@ import org.netbeans.api.settings.ConvertAsProperties;
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.statistics//BusStatistics//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "BusStatisticsTopComponent",
+iconBase="org/freedesktop/tango/16x16/apps/utilities-system-monitor.png",
+persistenceType = TopComponent.PERSISTENCE_NEVER)
+@TopComponent.Registration(mode = "statistics", openAtStartup = false)
 public final class BusStatisticsTopComponent extends TopComponent {
 
     private static BusStatisticsTopComponent instance;
@@ -62,7 +66,7 @@ public final class BusStatisticsTopComponent extends TopComponent {
 
         @Override
         public void descriptionChanged() {
-            
+
         }
     };
 

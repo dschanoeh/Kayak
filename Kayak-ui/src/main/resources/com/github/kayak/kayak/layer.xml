@@ -38,7 +38,7 @@
         <folder name="Log files">
             <attr name="position" intvalue="60"/>
         </folder>
-        
+
         <file name="GoTo_hidden"/>
         <folder name="Tools">
             <attr name="position" intvalue="70"/>
@@ -57,16 +57,9 @@
         </folder>
     </folder>
     <folder name="Windows2">
-        <folder name="Components">
-            <file name="BusStatisticsTopComponent.settings" url="BusStatisticsTopComponentSettings.xml"/>
-        </folder>
         <folder name="Modes">
             <file name="management.wsmode" url="management.wsmode"/>
-           <!--<file name="statistics.wsmode" url="statistics.wsmode"/>-->
 
-            <!--<folder name="statistics">
-                <file name="BusStatisticsTopComponent.wstcref" url="BusStatisticsTopComponentWstcref.xml"/>
-            </folder>-->
             <folder name="properties">
                 <file name="properties.wstcref" url="propertiesWstcref.xml"/>
             </folder>
