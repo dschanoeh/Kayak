@@ -25,9 +25,10 @@ import com.github.kayak.core.description.DescriptionLoader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -54,16 +55,16 @@ public class ProjectManager {
     private static final Logger logger = Logger.getLogger(ProjectManager.class.getCanonicalName());
 
     private static ProjectManager projectManagement;
-    private ArrayList<Project> projects;
+    private HashSet<Project> projects = new HashSet<Project>();
     private Project openedProject;
-    private ArrayList<ProjectManagementListener> listeners;
+    private HashSet<ProjectManagementListener> listeners = new HashSet<ProjectManagementListener>();
 
     public Project getOpenedProject() {
         return openedProject;
     }
 
-    public ArrayList<Project> getProjects() {
-        return projects;
+    public Set<Project> getProjects() {
+        return Collections.unmodifiableSet(projects);
     }
 
     public void addProject(Project e) {
@@ -114,11 +115,6 @@ public class ProjectManager {
         for(ProjectManagementListener listener : listeners) {
             listener.projectsUpdated();
         }
-    }
-
-    public ProjectManager() {
-        projects = new ArrayList<Project>();
-        listeners = new ArrayList<ProjectManagementListener>();
     }
 
     public static ProjectManager getGlobalProjectManager() {

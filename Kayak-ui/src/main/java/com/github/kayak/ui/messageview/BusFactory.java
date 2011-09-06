@@ -11,8 +11,8 @@ import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManagementListener;
 import com.github.kayak.ui.projects.ProjectManager;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Children;
@@ -112,7 +112,7 @@ public class BusFactory extends ChildFactory<BusDescription> {
     @Override
     protected boolean createKeys(List<BusDescription> list) {
         if(project != null) {
-            ArrayList<Bus> busses = project.getBusses();
+            Set<Bus> busses = project.getBusses();
 
             for(Bus b : busses) {
                 BusDescription desc = b.getDescription();

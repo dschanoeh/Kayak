@@ -34,9 +34,23 @@ public final class NewBusAction extends AbstractAction {
         String name = JOptionPane.showInputDialog("Please give a name for the Bus", "newBus");
 
         if (name != null) {
+            while(!nameValid(name)) {
+                name = JOptionPane.showInputDialog("Bus name is already used. Please give a correct name for the Bus", "newBus");
+                if(name == null)
+                    return;
+            }
             Bus b = new Bus();
             b.setName(name);
             context.addBus(b);
         }
+    }
+    
+    private boolean nameValid(String name) {
+        for(Bus b : context.getBusses()) {
+            if(b.getName().equals(name))
+                return false;
+        }
+        
+        return true;
     }
 }

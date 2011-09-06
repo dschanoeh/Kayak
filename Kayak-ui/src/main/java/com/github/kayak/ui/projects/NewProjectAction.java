@@ -20,16 +20,32 @@ import org.openide.awt.ActionRegistration;
     @ActionReference(path = "Menu/File", name = "com-github-kayak-ui-projects-NewProject", position = 100)})
 public final class NewProjectAction implements ActionListener {
 
+    ProjectManager manager = ProjectManager.getGlobalProjectManager();
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         String name = JOptionPane.showInputDialog("Please give a name for the Project", "myProject");
 
         if(name != null) {
-            ProjectManager manager = ProjectManager.getGlobalProjectManager();
+            while(!nameValid(name)) {
+                name = JOptionPane.showInputDialog("Project name already used. Please give a valid name for the Project", "myProject");
+                if(name == null)
+                    return;
+            } 
+                
             Project p = new Project(name);
             manager.addProject(p);
             if(manager.getOpenedProject() == null)
                 manager.openProject(p);
         }
+    }
+    
+    private boolean nameValid(String name) {
+        for(Project p : manager.getProjects()) {
+            if(p.getName().equals(name)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

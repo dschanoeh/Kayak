@@ -20,7 +20,9 @@ package com.github.kayak.ui.projects;
 
 import com.github.kayak.core.*;
 import com.github.kayak.ui.time.TimeSourceManager;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -28,9 +30,9 @@ import java.util.ArrayList;
  */
 public class Project {
     
-    private ArrayList<Bus> busses;
+    private HashSet<Bus> busses = new HashSet<Bus>();
     private String name;
-    private ArrayList<ProjectChangeListener> listeners;
+    private HashSet<ProjectChangeListener> listeners = new HashSet<ProjectChangeListener>();
     private boolean opened = false;
 
     public boolean isOpened() {
@@ -65,8 +67,8 @@ public class Project {
         listeners.remove(listener);
     }
 
-    public ArrayList<Bus> getBusses() {
-        return busses;
+    public Set<Bus> getBusses() {
+        return Collections.unmodifiableSet(busses);
     }
 
     public void addBus(Bus b) {
@@ -120,9 +122,6 @@ public class Project {
 
     public Project(String name) {
         this.name = name;
-        busses = new ArrayList<Bus>();
-        listeners = new ArrayList<ProjectChangeListener>();
     }
-
 
 }

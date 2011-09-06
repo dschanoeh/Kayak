@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -94,13 +95,24 @@ public final class RawViewTopComponent extends TopComponent {
 
         @Override
         public void valueChanged(ListSelectionEvent e) {
-             if (e.getValueIsAdjusting()) {
+            if (e.getValueIsAdjusting()) {
                 return;
             }
             
+            ListSelectionModel selectionModel = table.getSelectionModel();
+            
             if (e.getSource() == table.getSelectionModel()){
-                int row = table.getSelectedRow();
+                int first = e.getFirstIndex();
+                int last = e.getLastIndex();
                 
+                int row = -1;
+                
+                for(int i=first;i<=last;i++) {
+                    if(selectionModel.isSelectedIndex(i)) {
+                        row = i;
+                        break;
+                    }
+                }
                 
                 if(row != -1) {
                     String idString = (String) model.getValueAt(row, 2);
