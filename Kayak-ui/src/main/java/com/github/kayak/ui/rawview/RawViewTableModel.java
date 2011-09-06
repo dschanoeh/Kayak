@@ -20,9 +20,12 @@ package com.github.kayak.ui.rawview;
 
 import com.github.kayak.core.Frame;
 import com.github.kayak.core.FrameReceiver;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import javax.swing.table.AbstractTableModel;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -30,8 +33,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class RawViewTableModel extends AbstractTableModel implements FrameReceiver {
 
-    private final TreeMap<Integer, FrameData> data;
-    private Thread refreshThread;
+    private final Map<Integer, FrameData> data = Collections.synchronizedMap(new TreeMap<Integer, FrameData>());    private Thread refreshThread;
     private boolean colorize = false;
 
     private Runnable refreshRunnable = new Runnable() {
@@ -72,18 +74,26 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
         this.colorize = colorize;
     }
 
-    public RawViewTableModel() {
-        data = new TreeMap<Integer, FrameData>();
-
+    public void startRefresh() {
         refreshThread = new Thread(refreshRunnable);
         refreshThread.start();
+    }
+
+    public void stopRefresh() {
+        refreshThread.interrupt();
+        try {
+            refreshThread.join();
+        } catch (InterruptedException ex) {
+            return;
+        }
+        refreshThread = null;
     }
 
     public void clear() {
         synchronized(data) {
             int length = data.size();
             data.clear();
-            fireTableRowsDeleted(0, length);
+            fireTableRowsDeleted(0, length-1);
         }
     }
 
@@ -168,7 +178,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
             }
         }
     }
-    
+
     public byte[] getData(int row) {
         synchronized(data) {
             Integer[] keys = data.keySet().toArray(new Integer[]{});
@@ -176,7 +186,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
             return frameData.getData();
         }
     }
-    
+
     public byte[] getDataForID(int id) {
         synchronized(data) {
             return data.get(id).getData();

@@ -23,9 +23,6 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 
-/**
- * Top component which displays something.
- */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.rawview//RawView//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "RawViewTopComponent",
@@ -35,6 +32,7 @@ persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 public final class RawViewTopComponent extends TopComponent {
 
     private static final Logger logger = Logger.getLogger(RawViewTopComponent.class.getName());
+    
     private Bus bus;
     private Subscription subscription;
     private RawViewTableModel model;
@@ -248,7 +246,7 @@ public final class RawViewTopComponent extends TopComponent {
         add(jPanel1);
 
         jTable1.setAutoCreateRowSorter(true);
-        jTable1.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Monospaced", 0, 14));
         jTable1.setModel(model);
         jTable1.setDoubleBuffered(true);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -261,7 +259,7 @@ public final class RawViewTopComponent extends TopComponent {
         add(jScrollPane1);
 
         jTextField2.setEditable(false);
-        jTextField2.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
+        jTextField2.setFont(new java.awt.Font("Monospaced", 0, 11));
         jTextField2.setText(org.openide.util.NbBundle.getMessage(RawViewTopComponent.class, "RawViewTopComponent.jTextField2.text")); // NOI18N
         add(jTextField2);
     }// </editor-fold>//GEN-END:initComponents
@@ -296,7 +294,7 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         StringBuilder sb = new StringBuilder();
 
         for(int i=0;i<rows.length;i++) {
-            String id = (String) model.getValueAt(rows[i], 2);
+            String id = (String) model.getValueAt(jTable1.convertRowIndexToModel(rows[i]), 2);
             sb.append(id);
             if(i != rows.length-1)
                 sb.append(" ");
@@ -327,6 +325,18 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             subscription.Terminate();
     }
 
+    @Override
+    protected void componentHidden() {
+        super.componentHidden();
+        model.stopRefresh();
+    }
+
+    @Override
+    protected void componentShowing() {
+        super.componentShowing();
+        model.startRefresh();
+    }
+
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
@@ -335,6 +345,9 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         p.setProperty("busName", bus.getName());
         ProjectManager manager = ProjectManager.getGlobalProjectManager();
         p.setProperty("projectName", manager.getOpenedProject().getName());
+        p.setProperty("filterString", jTextField1.getText());
+        p.setProperty("filterEnabled", Boolean.toString(jCheckBox1.isSelected()));
+        p.setProperty("colorized", Boolean.toString(jToggleButton1.isSelected()));
 
     }
 
@@ -343,6 +356,9 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
         String busName = p.getProperty("busName");
         String projectName = p.getProperty("projectName");
+        String filterString = p.getProperty("filterString", "");
+        String filterEnabled = p.getProperty("filterEnabled", "false");
+        String colorized = p.getProperty("colorized", "false");
 
         logger.log(Level.INFO, "Trying to restore raw view with project {0} and bus {1}", new String[]{projectName, busName});
 
@@ -376,6 +392,15 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
         setBus(newBus);
 
+        jTextField1.setText(filterString);
+
+        if(Boolean.parseBoolean(filterEnabled)) {
+            jCheckBox1.setSelected(true);
+        }
+
+        if(Boolean.parseBoolean(colorized)) {
+            jToggleButton1.setSelected(true);
+        }
     }
 
     public void setBus(Bus bus) {
