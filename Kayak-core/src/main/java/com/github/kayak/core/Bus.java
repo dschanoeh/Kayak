@@ -19,7 +19,6 @@
 package com.github.kayak.core;
 
 import com.github.kayak.core.description.BusDescription;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -35,19 +34,20 @@ import java.util.logging.Logger;
 public class Bus implements SubscriptionChangeReceiver {
 
     private static final Logger logger = Logger.getLogger(Bus.class.getName());
-    private ArrayList<Subscription> subscriptionsRAW;
-    private ArrayList<Subscription> subscriptionsBCM;
+    
+    private HashSet<Subscription> subscriptionsRAW;
+    private HashSet<Subscription> subscriptionsBCM;
     private TimeSource timeSource;
     private RAWConnection rawConnection;
     private BCMConnection bcmConnection;
     private ControlConnection controlConnection;
     private String name;
     private BusURL url;
-    private final ArrayList<BusChangeListener> listeners;
-    private final ArrayList<EventFrameReceiver> eventFrameReceivers;
+    private final HashSet<BusChangeListener> listeners;
+    private final HashSet<EventFrameReceiver> eventFrameReceivers;
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
     private HashSet<Integer> subscribedIDs;
-    private ArrayList<StatisticsReceiver> statisticsReceivers;
+    private HashSet<StatisticsReceiver> statisticsReceivers;
     private BusDescription description;
     private long delta=0; /* delta between socketcand system time and local timesource */
 
@@ -220,12 +220,12 @@ public class Bus implements SubscriptionChangeReceiver {
     }
 
     public Bus() {
-        subscriptionsRAW = new ArrayList<Subscription>();
-        subscriptionsBCM = new ArrayList<Subscription>();
-        listeners = new ArrayList<BusChangeListener>();
+        subscriptionsRAW = new HashSet<Subscription>();
+        subscriptionsBCM = new HashSet<Subscription>();
+        listeners = new HashSet<BusChangeListener>();
         subscribedIDs = new HashSet<Integer>();
-        statisticsReceivers = new ArrayList<StatisticsReceiver>();
-        eventFrameReceivers = new ArrayList<EventFrameReceiver>();
+        statisticsReceivers = new HashSet<StatisticsReceiver>();
+        eventFrameReceivers = new HashSet<EventFrameReceiver>();
     }
 
 

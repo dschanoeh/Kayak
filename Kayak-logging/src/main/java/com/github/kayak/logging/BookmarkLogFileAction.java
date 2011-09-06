@@ -24,7 +24,7 @@ public class BookmarkLogFileAction extends AbstractAction {
     LogFile file;
 
     public BookmarkLogFileAction(LogFile context) {
-            putValue (NAME, "Bookmark");
+            putValue (NAME, "Bookmark");            
             file = context;
         }
 
