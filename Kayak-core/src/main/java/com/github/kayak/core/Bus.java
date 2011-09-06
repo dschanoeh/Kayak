@@ -1,19 +1,19 @@
 /**
  * 	This file is part of Kayak.
- *	
+ *
  *	Kayak is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU Lesser General Public License as published by
  *	the Free Software Foundation, either version 3 of the License, or
  *	(at your option) any later version.
- *	
+ *
  *	Kayak is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
- *	
+ *
  *	You should have received a copy of the GNU Lesser General Public License
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
- *	
+ *
  */
 
 package com.github.kayak.core;
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 public class Bus implements SubscriptionChangeReceiver {
 
     private static final Logger logger = Logger.getLogger(Bus.class.getName());
-    
+
     private HashSet<Subscription> subscriptionsRAW;
     private HashSet<Subscription> subscriptionsBCM;
     private TimeSource timeSource;
@@ -60,7 +60,7 @@ public class Bus implements SubscriptionChangeReceiver {
             }
         }
     };
-    
+
     private TimeEventReceiver timeReceiver = new TimeEventReceiver() {
 
         @Override
@@ -93,7 +93,7 @@ public class Bus implements SubscriptionChangeReceiver {
 
             if(rawConnection != null && rawConnection.isConnected())
                 rawConnection.close();
-                                    
+
             delta = 0;
         }
     };
@@ -145,7 +145,7 @@ public class Bus implements SubscriptionChangeReceiver {
         this.name = name;
         notifyListenersName();
     }
-    
+
     /**
      * Shall be called if the bus is removed. This will inform all components
      * using the bus that it will not be present any more. Also all connections
@@ -212,9 +212,9 @@ public class Bus implements SubscriptionChangeReceiver {
     public void setTimeSource(TimeSource timeSource) {
         if(this.timeSource != null)
             this.timeSource.deregister(timeReceiver);
-        
+
         this.timeSource = timeSource;
-        
+
         if(timeSource != null)
             timeSource.register(timeReceiver);
     }
@@ -310,7 +310,7 @@ public class Bus implements SubscriptionChangeReceiver {
     public void subscriptionTerminated(Subscription s) {
         removeSubscription(s);
     }
-    
+
     /**
      * Try to unsubscribe from the identifier. First all other subscriptions
      * are checked if they subscribe to this identifier. If so nothing will
@@ -381,7 +381,7 @@ public class Bus implements SubscriptionChangeReceiver {
      */
     public void setConnection(BusURL url) {
         disconnect();
-        
+
         this.url = url;
 
         rawConnection = new RAWConnection(url);
@@ -405,8 +405,6 @@ public class Bus implements SubscriptionChangeReceiver {
             bcmConnection.close();
         }
 
-        url = null;
-
         notifyListenersConnection();
     }
 
@@ -418,10 +416,10 @@ public class Bus implements SubscriptionChangeReceiver {
         /* Try to open BCM connection if not present */
         if(url != null) {
             openBCMConnection();
-            
+
             if (bcmConnection != null) {
                 bcmConnection.sendFrame(frame);
-            }  
+            }
         /* If no BCM connection is present we have to do loopback locally */
         } else {
             frame.setTimestamp(timeSource.getTime());
@@ -465,7 +463,7 @@ public class Bus implements SubscriptionChangeReceiver {
             }
         }
     }
-    
+
     private void notifyListenersDescriptionChanged() {
         synchronized(listeners) {
             for(BusChangeListener listener : listeners) {
@@ -491,8 +489,8 @@ public class Bus implements SubscriptionChangeReceiver {
                 logger.log(Level.WARNING, "Could not open BCM connection because no url was set");
                 return;
             }
-        } 
-       
+        }
+
         if (bcmConnection.isConnected()) {
             return;
         } else {
@@ -534,24 +532,24 @@ public class Bus implements SubscriptionChangeReceiver {
             rawConnection.open();
         }
     }
-    
+
     public void addEventFrameReceiver(EventFrameReceiver receiver) {
         eventFrameReceivers.add(receiver);
     }
-    
+
     public void removeEventFrameReceiver(EventFrameReceiver receiver) {
         eventFrameReceivers.remove(receiver);
     }
-    
+
     public void sendEventFrame(EventFrame f) {
         f.setTimestamp(timeSource.getTime());
         f.setBus(this);
-        
+
         for(EventFrameReceiver receiver : eventFrameReceivers) {
             if(receiver != null)
                 receiver.newEventFrame(f);
         }
-        
+
         logger.log(Level.INFO, "received event frame{0}", f.getMessage());
     }
 
@@ -559,9 +557,9 @@ public class Bus implements SubscriptionChangeReceiver {
         this.description = desc;
         notifyListenersDescriptionChanged();
     }
-    
+
     public BusDescription getDescription() {
         return description;
     }
-    
+
 }

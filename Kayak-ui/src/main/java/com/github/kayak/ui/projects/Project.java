@@ -18,18 +18,18 @@
 
 package com.github.kayak.ui.projects;
 
-import com.github.kayak.core.*;
 import com.github.kayak.ui.time.TimeSourceManager;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import com.github.kayak.core.Bus;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class Project {
-    
+
     private HashSet<Bus> busses = new HashSet<Bus>();
     private String name;
     private HashSet<ProjectChangeListener> listeners = new HashSet<ProjectChangeListener>();
@@ -41,28 +41,28 @@ public class Project {
 
     public void open() {
         this.opened = true;
-        
+
         for(Bus b : busses) {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
         }
         notifyListenersOpened();
     }
-    
+
     public void close() {
         this.opened = false;
-        
+
         for(Bus b : busses) {
             b.setTimeSource(null);
             b.destroy();
         }
-        
+
         notifyListenersClosed();
     }
 
     public void addProjectChangeListener(ProjectChangeListener listener) {
         listeners.add(listener);
     }
-    
+
     public void removeProjectChangeListener(ProjectChangeListener listener) {
         listeners.remove(listener);
     }
