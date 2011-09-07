@@ -30,10 +30,10 @@ import javax.swing.table.AbstractTableModel;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class SendFramesTableModel extends AbstractTableModel {
-    
+
     private static final Logger logger = Logger.getLogger(SendFramesTableModel.class.getCanonicalName());
-    
-    private class TableRow {
+
+    public static class TableRow {
         private int id = 0;
         private int interval = 100;
         private byte[] data = new byte[] { 0x00 };
@@ -41,12 +41,12 @@ public class SendFramesTableModel extends AbstractTableModel {
         private Bus bus;
         private String note = "";
         private Thread thread;
-        
+
         private Runnable runnable = new Runnable() {
 
             @Override
             public void run() {
-                
+
                 while(true) {
                     Frame f = new Frame(id, data);
                     bus.sendFrame(f);
@@ -70,17 +70,17 @@ public class SendFramesTableModel extends AbstractTableModel {
         public Bus getBus() {
             return bus;
         }
-        
+
         public void setLength(int i) {
             byte[] newData = new byte[i];
-            
+
             for(int j=0;j<newData.length && j<data.length;j++) {
                 newData[j] = data[j];
             }
-            
+
             data = newData;
         }
-        
+
         public TableRow(Bus bus) {
             this.bus = bus;
         }
@@ -108,18 +108,18 @@ public class SendFramesTableModel extends AbstractTableModel {
         public void setId(int id) {
             this.id = id;
         }
-        
-        
+
+
         public void sendSingle() {
             logger.log(Level.INFO, "sending frame");
             Frame frame = new Frame(id, data);
             bus.sendFrame(frame);
         }
-        
+
         public boolean isSending() {
             return sending;
         }
-        
+
         public void setSending(boolean val) {
             if(val && !sending) {
                 thread = new Thread(runnable);
@@ -137,32 +137,32 @@ public class SendFramesTableModel extends AbstractTableModel {
             }
         }
     }
-    
+
     private ArrayList<TableRow> rows = new ArrayList<TableRow>();
-    
+
     public void remove(int i) {
         try {
             if(rows.size() <= i || i < 0)
                 return;
-            
+
             TableRow row = rows.get(i);
-            
+
             if(row.isSending())
                 row.setSending(false);
-        
+
             rows.remove(row);
             fireTableRowsDeleted(i, i);
         } catch(Exception ex) {
             logger.log(Level.WARNING, "Could not delete row.", ex);
         }
-        
+
     }
-    
+
     public void send(int row) {
         rows.get(row).sendSingle();
         fireTableRowsUpdated(row, row);
     }
-    
+
     public void toggleSendInterval(int i) {
         TableRow row = rows.get(i);
 
@@ -170,11 +170,25 @@ public class SendFramesTableModel extends AbstractTableModel {
             row.setSending(false);
         else
             row.setSending(true);
-        
+
         fireTableRowsUpdated(i, i);
     }
-    
+
+    public TableRow getRow(int index) {
+        return rows.get(index);
+    }
+
     public void add(Bus bus) {
+        rows.add(new TableRow(bus));
+        fireTableRowsInserted(rows.size(), rows.size());
+    }
+
+    public void add(Bus bus, int id, int interval, byte[] data, String note) {
+        TableRow row = new TableRow(bus);
+        row.setData(data);
+        row.setId(id);
+        row.setInterval(interval);
+        row.setNote(note);
         rows.add(new TableRow(bus));
         fireTableRowsInserted(rows.size(), rows.size());
     }
@@ -209,7 +223,7 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 7:
                 return String.class;
         }
-        
+
         return super.getColumnClass(columnIndex);
     }
 
@@ -247,7 +261,7 @@ public class SendFramesTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         TableRow row = rows.get(rowIndex);
-        
+
         switch(columnIndex) {
             case 1:
                 try {
@@ -286,7 +300,7 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 7:
                 row.setNote((String) aValue);
                 return;
-                
+
             default:
         }
     }
@@ -314,5 +328,5 @@ public class SendFramesTableModel extends AbstractTableModel {
                 return "";
         }
     }
-    
+
 }

@@ -32,7 +32,7 @@ persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 public final class RawViewTopComponent extends TopComponent {
 
     private static final Logger logger = Logger.getLogger(RawViewTopComponent.class.getName());
-    
+
     private Bus bus;
     private Subscription subscription;
     private RawViewTableModel model;
@@ -362,28 +362,8 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
         logger.log(Level.INFO, "Trying to restore raw view with project {0} and bus {1}", new String[]{projectName, busName});
 
-        Project project = null;
 
-        for (Project pr : ProjectManager.getGlobalProjectManager().getProjects()) {
-            if (pr.getName().equals(projectName)) {
-                project = pr;
-                break;
-            }
-        }
-
-        if (project == null || project.isOpened() == false) {
-            this.close();
-            return;
-        }
-
-        Bus newBus = null;
-
-        for (Bus b : project.getBusses()) {
-            if (b.getName().equals(busName)) {
-                newBus = b;
-                break;
-            }
-        }
+        Bus newBus = ProjectManager.getGlobalProjectManager().findBus(projectName, busName);
 
         if (newBus == null) {
             this.close();

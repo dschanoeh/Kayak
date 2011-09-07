@@ -51,7 +51,7 @@ import org.w3c.dom.NodeList;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ProjectManager {
-    
+
     private static final Logger logger = Logger.getLogger(ProjectManager.class.getCanonicalName());
 
     private static ProjectManager projectManagement;
@@ -89,7 +89,7 @@ public class ProjectManager {
 
         openedProject = p;
         p.open();
-        
+
         for(ProjectManagementListener l : listeners) {
             l.openProjectChanged(p);
         }
@@ -115,6 +115,31 @@ public class ProjectManager {
         for(ProjectManagementListener listener : listeners) {
             listener.projectsUpdated();
         }
+    }
+
+    /**
+     * Returns the bus with the name busName if the project with the name
+     * projectName is currently opened.
+     * This may be used by persistent components that want to reconnect to
+     * a bus.
+     * @param projectName
+     * @param busName
+     * @return
+     */
+    public Bus findBus(String projectName, String busName) {
+
+        if(openedProject != null && openedProject.getName().equals(projectName)) {
+            Bus newBus = null;
+
+            for (Bus b : openedProject.getBusses()) {
+                if (b != null && b.getName() != null && b.getName().equals(busName)) {
+                    newBus = b;
+                    break;
+                }
+            }
+            return newBus;
+        }
+        return null;
     }
 
     public static ProjectManager getGlobalProjectManager() {
@@ -241,7 +266,7 @@ public class ProjectManager {
                     }
 
                     BusDescription desc = bus.getDescription();
-                    
+
                     if(desc != null) {
                         Element descriptionElement = doc.createElement("Description");
                         descriptionElement.setAttribute("fileName", desc.getDocument().getFileName());

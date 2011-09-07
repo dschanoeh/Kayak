@@ -72,7 +72,11 @@ public class Project {
     }
 
     public void addBus(Bus b) {
+        if(b == null)
+            return;
+
         busses.add(b);
+
         if(isOpened()) {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
         }

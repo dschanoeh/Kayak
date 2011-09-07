@@ -20,14 +20,11 @@ package com.github.kayak.ui.statistics;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
-import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectManager;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
@@ -140,28 +137,7 @@ public final class BusStatisticsTopComponent extends TopComponent {
 
         logger.log(Level.INFO, "Trying to restore statistics view with project {0} and bus {1}", new String[]{projectName, busName});
 
-        Project project = null;
-
-        for (Project pr : ProjectManager.getGlobalProjectManager().getProjects()) {
-            if (pr.getName().equals(projectName)) {
-                project = pr;
-                break;
-            }
-        }
-
-        if (project == null || project.isOpened() == false) {
-            this.close();
-            return;
-        }
-
-        Bus newBus = null;
-
-        for (Bus b : project.getBusses()) {
-            if (b.getName().equals(busName)) {
-                newBus = b;
-                break;
-            }
-        }
+        Bus newBus = ProjectManager.getGlobalProjectManager().findBus(projectName, busName);
 
         if (newBus == null) {
             this.close();
