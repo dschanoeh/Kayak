@@ -19,7 +19,7 @@ package com.github.kayak.core;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -36,7 +36,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
 
     private static final Logger logger = Logger.getLogger(RAWConnection.class.getName());
     private Socket socket;
-    private PrintWriter output;
+    private OutputStreamWriter output;
     private Thread thread;
     private InputStreamReader input;
     private Boolean connected = false;
@@ -59,17 +59,17 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
             socket.connect(address);
             socket.setSoTimeout(1000);
 
-            input = new InputStreamReader(socket.getInputStream());
+            input = new InputStreamReader(socket.getInputStream(), "ASCII");
             setInput(input);
 
-            output = new PrintWriter(socket.getOutputStream(), true);
+            output = new OutputStreamWriter(socket.getOutputStream(), "ASCII");
 
             String ret = getElement();
             if (!ret.equals("< hi >")) {
                 logger.log(Level.SEVERE, "Did not receive greeting from host.");
             }
 
-            output.print("< open " + busName + " >");
+            output.write("< open " + busName + " >");
             output.flush();
 
             ret = getElement();
@@ -77,7 +77,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
                 logger.log(Level.SEVERE, "Could not open bus");
             }
 
-            output.print("< rawmode >");
+            output.write("< rawmode >");
             output.flush();
 
             ret = getElement();
@@ -117,7 +117,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
     @Override
     public void run() {
         StringBuilder sb;
-        
+
         while (true) {
             if (Thread.interrupted()) {
                 break;
@@ -151,7 +151,7 @@ public class RAWConnection extends SocketcandConnection implements Runnable {
                         logger.log(Level.WARNING, "Could not properly deliver CAN frame", ex);
                     }
                 } else if (fields[1].equals("error")) {
-                    logger.log(Level.WARNING, "Received error from socketcand: " + frame);
+                    logger.log(Level.WARNING, "Received error from socketcand: {0}", frame);
                 }
             }catch(InterruptedException ex) {
                 logger.log(Level.WARNING, "Interrupted exception. Shutting down connection thread", ex);

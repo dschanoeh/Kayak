@@ -35,20 +35,11 @@ public class Subscription {
 
     private static final Logger logger = Logger.getLogger(Subscription.class.getName());
 
-    private Set<Integer> ids = Collections.synchronizedSet(new HashSet<Integer>());
+    private final Set<Integer> ids = Collections.synchronizedSet(new HashSet<Integer>());
     private Boolean muted;
     private Boolean subscribeAll;
     private FrameReceiver receiver;
     private SubscriptionChangeReceiver changeReceiver;
-
-    private void logStatus() {
-        if(!subscribeAll)
-            logger.log(Level.INFO, "[{0} | {1}] Subscribed IDs: {2}", new String[]{receiver.toString(), changeReceiver.toString(), ids.toString()});
-        else
-            logger.log(Level.INFO, "[{0} | {1}] Subscribed IDs: ALL", new String[]{receiver.toString(), changeReceiver.toString()});
-
-
-    }
 
     /**
      * Creates a new Subscription. The new Subscription is automatically
@@ -70,12 +61,11 @@ public class Subscription {
      * @param id identifier
      */
     public void subscribe(int id) {
-        synchronized(this) {
+        synchronized(ids) {
             if (!ids.contains(id)) {
                 ids.add(id);
-                changeReceiver.subscribed(id, this);
-                logStatus();
             }
+            changeReceiver.subscribed(id, this);
         }
     }
 
@@ -86,14 +76,13 @@ public class Subscription {
      * @param to
      */
     public void subscribeRange(int from, int to) {
-        synchronized(this) {
+        synchronized(ids) {
             for (int i = from; i <= to; i++) {
                 if(!ids.contains(i)) {
                     ids.add(i);
                     changeReceiver.subscribed(i, this);
                 }
             }
-            logStatus();
         }
     }
 
@@ -101,14 +90,15 @@ public class Subscription {
      * Remove all identifiers from the subscription.
      */
     public void clear() {
-        Integer[] identifiers = new Integer[0];
-        synchronized(this) {
+        Integer[] identifiers = null;
+        synchronized(ids) {
             identifiers = ids.toArray(new Integer[ids.size()]);
+            ids.clear();
         }
+
         for (int i=0;i<identifiers.length;i++) {
-            unsubscribe(identifiers[i]);
+            changeReceiver.unsubscribed(identifiers[i], this);
         }
-        logStatus();
     }
 
     /**
@@ -116,13 +106,12 @@ public class Subscription {
      * @param id
      */
     public void unsubscribe(int id) {
-        synchronized(this) {
+        synchronized(ids) {
             if(ids.contains(id)) {
                 ids.remove(id);
-                changeReceiver.unsubscribed(id, this);
-                logStatus();
             }
         }
+        changeReceiver.unsubscribed(id, this);
     }
 
     /**
@@ -132,7 +121,7 @@ public class Subscription {
      * @param to
      */
     public void unsubscribeRange(int from, int to) {
-        synchronized(this) {
+        synchronized(ids) {
             for (int i = from; i <= to; i++) {
                 if(ids.contains(i)) {
                     ids.remove(i);
@@ -140,7 +129,6 @@ public class Subscription {
                 }
             }
         }
-        logStatus();
     }
 
     public Boolean isMuted() {
@@ -153,11 +141,9 @@ public class Subscription {
 
     public boolean includes(int id) {
         if (subscribeAll) {
-            return true;
-        } else if (ids.contains(id)) {
-            return true;
-        }
-        return false;
+            return Boolean.TRUE;
+        } else
+            return ids.contains(id);
     }
 
     public void deliverFrame(Frame frame, Bus bus) {
@@ -173,7 +159,6 @@ public class Subscription {
     public void setSubscribeAll(Boolean subscribeAll) {
         this.subscribeAll = subscribeAll;
         changeReceiver.subscriptionAllChanged(subscribeAll, this);
-        logStatus();
     }
 
     /**

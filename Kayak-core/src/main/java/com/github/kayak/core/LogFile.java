@@ -42,7 +42,7 @@ import java.util.zip.GZIPOutputStream;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class LogFile {
-    
+
     private static final Logger logger = Logger.getLogger(LogFile.class.getCanonicalName());
 
     private Boolean compressed;
@@ -52,7 +52,7 @@ public class LogFile {
     private String platform;
     private HashMap<String, String> deviceAlias;
     private long length;
-    
+
     public static final Pattern platformPattern = Pattern.compile("[A-Z0-9_]+");
     public static final Pattern descriptionPattern = Pattern.compile("[a-zA-Z0-9\\s]+");
     public static final Pattern descriptionLinePattern = Pattern.compile("DESCRIPTION \"[a-zA-Z0-9\\s]+\"");
@@ -102,7 +102,7 @@ public class LogFile {
     public String getFileName() {
         return file.getName();
     }
-    
+
     public void setPlatform(String platform) throws FileNotFoundException, IOException {
         if(!platformPattern.matcher(platform).matches())
             throw new IllegalArgumentException("Platform must match " + platformPattern.pattern());
@@ -110,7 +110,7 @@ public class LogFile {
         File tempFile = new File(file.getAbsolutePath() + ".tmp");
         BufferedReader br;
         PrintWriter pw;
-        
+
         if(compressed) {
             GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
             br = new BufferedReader(new InputStreamReader(zipStream));
@@ -140,7 +140,7 @@ public class LogFile {
                 pw.flush();
             }
         }
-        
+
         pw.close();
         br.close();
 
@@ -152,10 +152,10 @@ public class LogFile {
         if (!tempFile.renameTo(file)) {
             logger.log(Level.WARNING, "Could not rename new file to old filename");
         }
-        
+
         this.platform = platform;
     }
-    
+
     public void setDescription(String description) throws FileNotFoundException, IOException {
         if(!descriptionPattern.matcher(description).matches())
             throw new IllegalArgumentException("Description must match " + descriptionPattern.pattern());
@@ -163,7 +163,7 @@ public class LogFile {
         File tempFile = new File(file.getAbsolutePath() + ".tmp");
         BufferedReader br;
         PrintWriter pw;
-        
+
         if(compressed) {
             GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
             br = new BufferedReader(new InputStreamReader(zipStream));
@@ -193,7 +193,7 @@ public class LogFile {
                 pw.flush();
             }
         }
-        
+
         pw.close();
         br.close();
 
@@ -205,7 +205,7 @@ public class LogFile {
         if (!tempFile.renameTo(file)) {
             logger.log(Level.WARNING, "Could not rename new file to old filename");
         }
-        
+
         this.description = description;
     }
 
@@ -231,34 +231,26 @@ public class LogFile {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         try {
             while (true) {
-
                 String line = reader.readLine();
 
-                if (line.startsWith("DESCRIPTION")) {
-                    if (descriptionLinePattern.matcher(line).matches()) {
-                        int start = line.indexOf('\"') + 1;
-                        int stop = line.lastIndexOf("\"");
-                        description = line.substring(start, stop);
-                    }
-                } else if (line.startsWith("PLATFORM")) {
-                    if(platformLinePattern.matcher(line).matches()) {
-                        int start = line.indexOf(' ') + 1;
-                        platform = line.substring(start);
-                    }
-                } else if (line.startsWith("DEVICE_ALIAS")) {
-                    if (deviceAliasLinePattern.matcher(line).matches()) {
-                        int start = line.indexOf(' ') + 1;
-                        int stop = line.lastIndexOf(' ');
-                        String alias = line.substring(start, stop);
-                        String bus = line.substring(stop + 1);
-                        deviceAlias.put(bus, alias);
-                    }
-                    /*
-                     * All lines that are not recognized and not pure whitespace cause
-                     * the header parsing to abort.
-                     */
-                } else {
-                    if (!line.matches("\\s")) {
+                if(descriptionLinePattern.matcher(line).matches()) {
+                    int start = line.indexOf('\"') + 1;
+                    int stop = line.lastIndexOf("\"");
+                    description = line.substring(start, stop);
+                } else if(platformLinePattern.matcher(line).matches()) {
+                    int start = line.indexOf(' ') + 1;
+                    platform = line.substring(start);
+                } else if (deviceAliasLinePattern.matcher(line).matches()) {
+                    int start = line.indexOf(' ') + 1;
+                    int stop = line.lastIndexOf(' ');
+                    String alias = line.substring(start, stop);
+                    String bus = line.substring(stop + 1);
+                    deviceAlias.put(bus, alias);
+                /*
+                 * All lines that are not recognized and not pure whitespace cause
+                 * the header parsing to abort.
+                 */
+                } else if (!line.matches("\\s")) {
                         if (description.equals("")) {
                             description = file.getName();
                         }
@@ -266,17 +258,16 @@ public class LogFile {
                             platform = "No platform";
                         }
                         break;
-                    }
                 }
             }
         } catch (IOException ex) {
-            return;
+            logger.log(Level.WARNING, "IOException while loading log file.", ex);
         } finally {
             try {
                 reader.close();
             } catch (Exception ex) {
+                logger.log(Level.WARNING, "Could not close reader.", ex);
             }
-            ;
         }
 
         /* TODO: get length of file */
@@ -293,7 +284,7 @@ public class LogFile {
         final LogFile other = (LogFile) obj;
         if(other.getFileName().equals(getFileName()))
             return true;
-        
+
         return false;
     }
 
@@ -301,5 +292,5 @@ public class LogFile {
     public int hashCode() {
         return getFileName().hashCode();
     }
-    
+
 }

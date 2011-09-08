@@ -1,24 +1,26 @@
 /**
  * 	This file is part of Kayak.
- *	
+ *
  *	Kayak is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU Lesser General Public License as published by
  *	the Free Software Foundation, either version 3 of the License, or
  *	(at your option) any later version.
- *	
+ *
  *	Kayak is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
- *	
+ *
  *	You should have received a copy of the GNU Lesser General Public License
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
- *	
+ *
  */
 
 package com.github.kayak.core;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class is used to synchronize the time between different busses or other
@@ -35,41 +37,41 @@ public class TimeSource {
     private long reference;
     private long pauseReference;
     private Mode mode = Mode.STOP;
-    private final ArrayList<TimeEventReceiver> receivers= new ArrayList<TimeEventReceiver>();;
+    private final Set<TimeEventReceiver> receivers= Collections.synchronizedSet(new HashSet<TimeEventReceiver>());
 
     public Mode getMode() {
         return mode;
     }
-    
+
     public TimeSource() {
         reference = System.currentTimeMillis();
     }
-    
+
     public void reset() {
         reference = System.currentTimeMillis();
     }
 
     /**
      * Returns the time (in milliseconds) since the creation of the TimeSource
-     * (or since the last stop). A static value is returned if the TimeSource 
+     * (or since the last stop). A static value is returned if the TimeSource
      * is paused. If the TimeSource is stopped '0' is returned.
      */
     public long getTime() {
         switch(mode) {
             case PLAY:
                 return System.currentTimeMillis() - reference;
-            
+
             case STOP:
                 return 0;
-                    
+
             case PAUSE:
                 return pauseReference;
-                    
+
             default:
                 return 0;
         }
     }
-    
+
     /**
      * Register a {@link TimeEventReceiver} to receive information about
      * changes of the TimeSource.
@@ -79,13 +81,13 @@ public class TimeSource {
             receivers.add(receiver);
         }
     }
-    
+
     public void deregister(TimeEventReceiver receiver) {
         synchronized(receivers) {
             receivers.remove(receiver);
         }
     }
-    
+
     /**
      * If the TimeSource is not already running start the time. If the
      * TimeSource was paused before continue with the paused Time.
@@ -109,18 +111,18 @@ public class TimeSource {
             }
         }
     }
-    
+
     /**
      * Pauses the time.
      */
     public void pause() {
         if(mode == Mode.STOP)
             return;
-        
+
         mode = Mode.PAUSE;
-        
+
         pauseReference = System.currentTimeMillis() - reference;
-        
+
         synchronized(receivers) {
             for(TimeEventReceiver receiver : receivers) {
                 if(receiver != null)
@@ -128,10 +130,10 @@ public class TimeSource {
             }
         }
     }
-    
+
     public void stop() {
         mode = Mode.STOP;
-        
+
         synchronized(receivers) {
             for(TimeEventReceiver receiver : receivers) {
                 if(receiver != null)

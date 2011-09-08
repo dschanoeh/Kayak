@@ -19,6 +19,7 @@
 package com.github.kayak.core;
 
 import com.github.kayak.core.description.BusDescription;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -35,8 +36,8 @@ public class Bus implements SubscriptionChangeReceiver {
 
     private static final Logger logger = Logger.getLogger(Bus.class.getName());
 
-    private HashSet<Subscription> subscriptionsRAW;
-    private HashSet<Subscription> subscriptionsBCM;
+    private final Set<Subscription> subscriptionsRAW = Collections.synchronizedSet(new HashSet<Subscription>());
+    private final Set<Subscription> subscriptionsBCM = Collections.synchronizedSet(new HashSet<Subscription>());
     private TimeSource timeSource;
     private RAWConnection rawConnection;
     private BCMConnection bcmConnection;
@@ -46,8 +47,8 @@ public class Bus implements SubscriptionChangeReceiver {
     private final HashSet<BusChangeListener> listeners;
     private final HashSet<EventFrameReceiver> eventFrameReceivers;
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
-    private HashSet<Integer> subscribedIDs;
-    private HashSet<StatisticsReceiver> statisticsReceivers;
+    private final Set<Integer> subscribedIDs = Collections.synchronizedSet(new HashSet<Integer>());;
+    private final HashSet<StatisticsReceiver> statisticsReceivers;
     private BusDescription description;
     private long delta=0; /* delta between socketcand system time and local timesource */
 
@@ -220,10 +221,7 @@ public class Bus implements SubscriptionChangeReceiver {
     }
 
     public Bus() {
-        subscriptionsRAW = new HashSet<Subscription>();
-        subscriptionsBCM = new HashSet<Subscription>();
         listeners = new HashSet<BusChangeListener>();
-        subscribedIDs = new HashSet<Integer>();
         statisticsReceivers = new HashSet<StatisticsReceiver>();
         eventFrameReceivers = new HashSet<EventFrameReceiver>();
     }
@@ -232,11 +230,15 @@ public class Bus implements SubscriptionChangeReceiver {
     @Override
     public void addSubscription(Subscription s) {
         if(s.getSubscribeAll()) {
-            subscriptionsRAW.add(s);
+            synchronized(subscriptionsRAW) {
+                subscriptionsRAW.add(s);
+            }
             if(mode == TimeSource.Mode.PLAY)
                 openRAWConnection();
         } else {
-            subscriptionsBCM.add(s);
+            synchronized(subscriptionsBCM) {
+                subscriptionsBCM.add(s);
+            }
             if(mode == TimeSource.Mode.PLAY)
                 openBCMConnection();
         }
@@ -246,14 +248,18 @@ public class Bus implements SubscriptionChangeReceiver {
     public void subscribed(int id, Subscription s) {
         if (subscriptionsBCM.contains(s)) {
             /* Check if the ID was already subscribed in any subscription */
-            if(!subscribedIDs.contains(id)) {
-                subscribedIDs.add(id);
-                if (bcmConnection != null && bcmConnection.isConnected()) {
-                    bcmConnection.subscribeTo(id, 0, 0);
-                } else {
-                    logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+            synchronized(subscribedIDs) {
+                if(!subscribedIDs.contains(id)) {
+                    subscribedIDs.add(id);
+                    if (bcmConnection != null && bcmConnection.isConnected()) {
+                        bcmConnection.subscribeTo(id, 0, 0);
+                    } else {
+                        logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+                    }
                 }
             }
+        } else {
+            logger.log(Level.WARNING, "Unregistered subscription tried to subscribe!");
         }
     }
 
@@ -261,6 +267,8 @@ public class Bus implements SubscriptionChangeReceiver {
     public void unsubscribed(int id, Subscription s) {
         if(subscriptionsBCM.contains(s)) {
             safeUnsubscribe(id);
+        } else {
+            logger.log(Level.WARNING, "Unregistered subscription tried to unsubscribe!");
         }
     }
 
@@ -299,9 +307,10 @@ public class Bus implements SubscriptionChangeReceiver {
                     bcmConnection.subscribeTo(identifier, 0, 0);
                 }
             }
-
-            for(Integer identifier : s.getAllIdentifiers()) {
-                subscribedIDs.add(identifier);
+            synchronized(subscribedIDs) {
+                for(Integer identifier : s.getAllIdentifiers()) {
+                    subscribedIDs.add(identifier);
+                }
             }
         }
     }
@@ -318,15 +327,19 @@ public class Bus implements SubscriptionChangeReceiver {
      * @param identifier
      */
     private void safeUnsubscribe(Integer identifier) {
-        Boolean found = false;
-        for (Subscription subscription : subscriptionsBCM) {
-            if (subscription.includes(identifier)) {
-                found = true;
-                break;
+        Boolean found = Boolean.FALSE;
+        synchronized(subscriptionsBCM) {
+            for (Subscription subscription : subscriptionsBCM) {
+                if (subscription.includes(identifier)) {
+                    found = Boolean.TRUE;
+                    break;
+                }
             }
         }
         if (!found) {
-            subscribedIDs.remove(identifier);
+            synchronized(subscribedIDs) {
+                subscribedIDs.remove(identifier);
+            }
             if(bcmConnection != null && bcmConnection.isConnected()) {
                 bcmConnection.unsubscribeFrom(identifier);
             }
@@ -500,8 +513,10 @@ public class Bus implements SubscriptionChangeReceiver {
             /* Check for all present BCM subscriptions and bring the connection
              * up to date.
              */
-            for (Integer identifier : subscribedIDs) {
-                bcmConnection.subscribeTo(identifier, 0, 0);
+            synchronized(subscribedIDs) {
+                for (Integer identifier : subscribedIDs) {
+                    bcmConnection.subscribeTo(identifier, 0, 0);
+                }
             }
         }
 
