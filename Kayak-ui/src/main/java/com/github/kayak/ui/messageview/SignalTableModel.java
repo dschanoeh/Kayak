@@ -1,25 +1,25 @@
 /**
  *      This file is part of Kayak.
- *      
+ *
  *      Kayak is free software: you can redistribute it and/or modify
  *      it under the terms of the GNU Lesser General Public License as published by
  *      the Free Software Foundation, either version 3 of the License, or
  *      (at your option) any later version.
- *      
+ *
  *      Kayak is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *      GNU General Public License for more details.
- *      
+ *
  *      You should have received a copy of the GNU Lesser General Public License
  *      along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
- *      
+ *
  */
 package com.github.kayak.ui.messageview;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.Frame;
-import com.github.kayak.core.FrameReceiver;
+import com.github.kayak.core.FrameListener;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.core.description.Message;
 import com.github.kayak.core.description.MessageDescription;
@@ -84,12 +84,12 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
         }
     };
 
-    private FrameReceiver receiver = new FrameReceiver() {
+    private FrameListener receiver = new FrameListener() {
 
         @Override
         public void newFrame(Frame frame) {
             Bus bus = frame.getBus();
-            
+
             Message m = bus.getDescription().decodeFrame(frame);
             HashSet<Signal> frameSignals = m.getSignals();
 
@@ -99,7 +99,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
                         if(s.getDescription().equals(entry.getDescription())) {
                             entry.setSignal(s);
                             entry.setRefresh(true);
-                        }   
+                        }
                     }
                 }
             }
@@ -172,7 +172,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             fireTableRowsDeleted(i, i);
         }
     }
-    
+
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         SignalTableEntry entry = entries.get(rowIndex);
@@ -218,7 +218,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
                 break;
             }
         }
-        
+
         if(!found) {
             SignalTableEntry entry = new SignalTableEntry();
             entry.setDescription(desc);
@@ -227,7 +227,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
                 entries.add(entry);
             }
             fireTableRowsInserted(entries.size()-1, entries.size()-1);
-            
+
             Subscription s;
             if(subscriptions.containsKey(bus)) {
                 s = subscriptions.get(bus);
@@ -250,5 +250,5 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
         for(SignalDescription s : message.getSignals())
             addSignal(s, bus);
     }
-    
+
 }

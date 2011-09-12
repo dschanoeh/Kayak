@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  *
  */
-public class Bus implements SubscriptionChangeReceiver {
+public class Bus implements SubscriptionChangeListener {
 
     private static final Logger logger = Logger.getLogger(Bus.class.getName());
 
@@ -45,18 +45,18 @@ public class Bus implements SubscriptionChangeReceiver {
     private String name;
     private BusURL url;
     private final HashSet<BusChangeListener> listeners;
-    private final HashSet<EventFrameReceiver> eventFrameReceivers;
+    private final HashSet<EventFrameListener> eventFrameListeners;
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
     private final Set<Integer> subscribedIDs = Collections.synchronizedSet(new HashSet<Integer>());;
-    private final HashSet<StatisticsReceiver> statisticsReceivers;
+    private final HashSet<StatisticsListener> statisticsListeners;
     private BusDescription description;
     private long delta=0; /* delta between socketcand system time and local timesource */
 
-    private StatisticsReceiver statisticsReceiver = new StatisticsReceiver() {
+    private StatisticsListener statisticsReceiver = new StatisticsListener() {
 
         @Override
         public void statisticsUpdated(long rxBytes, long rxPackets, long tBytes, long tPackets) {
-            for(StatisticsReceiver s : statisticsReceivers) {
+            for(StatisticsListener s : statisticsListeners) {
                 s.statisticsUpdated(rxBytes, rxPackets, tBytes, tPackets);
             }
         }
@@ -115,13 +115,13 @@ public class Bus implements SubscriptionChangeReceiver {
         return name;
     }
 
-    public void registerStatisticsReceiver(StatisticsReceiver receiver) {
-        if(!statisticsReceivers.contains(receiver))
-            statisticsReceivers.add(receiver);
+    public void registerStatisticsReceiver(StatisticsListener receiver) {
+        if(!statisticsListeners.contains(receiver))
+            statisticsListeners.add(receiver);
     }
 
-    public void removeStatisticsReceiver(StatisticsReceiver receiver) {
-            statisticsReceivers.remove(receiver);
+    public void removeStatisticsReceiver(StatisticsListener receiver) {
+            statisticsListeners.remove(receiver);
     }
 
     public void enableStatistics(int interval) {
@@ -162,7 +162,7 @@ public class Bus implements SubscriptionChangeReceiver {
         }
     }
 
-    private FrameReceiver rawReceiver = new FrameReceiver() {
+    private FrameListener rawReceiver = new FrameListener() {
 
         @Override
         public void newFrame(Frame f) {
@@ -182,7 +182,7 @@ public class Bus implements SubscriptionChangeReceiver {
         }
     };
 
-    private FrameReceiver bcmReceiver = new FrameReceiver() {
+    private FrameListener bcmReceiver = new FrameListener() {
 
         @Override
         public void newFrame(Frame f) {
@@ -222,8 +222,8 @@ public class Bus implements SubscriptionChangeReceiver {
 
     public Bus() {
         listeners = new HashSet<BusChangeListener>();
-        statisticsReceivers = new HashSet<StatisticsReceiver>();
-        eventFrameReceivers = new HashSet<EventFrameReceiver>();
+        statisticsListeners = new HashSet<StatisticsListener>();
+        eventFrameListeners = new HashSet<EventFrameListener>();
     }
 
 
@@ -400,8 +400,8 @@ public class Bus implements SubscriptionChangeReceiver {
         rawConnection = new RAWConnection(url);
         bcmConnection = new BCMConnection(url);
 
-        rawConnection.setReceiver(rawReceiver);
-        bcmConnection.setReceiver(bcmReceiver);
+        rawConnection.setListener(rawReceiver);
+        bcmConnection.setListener(bcmReceiver);
 
         notifyListenersConnection();
     }
@@ -497,7 +497,7 @@ public class Bus implements SubscriptionChangeReceiver {
             if(url != null) {
                 logger.log(Level.INFO, "Creating new BCM connection");
                 bcmConnection = new BCMConnection(url);
-                bcmConnection.setReceiver(bcmReceiver);
+                bcmConnection.setListener(bcmReceiver);
             } else {
                 logger.log(Level.WARNING, "Could not open BCM connection because no url was set");
                 return;
@@ -532,7 +532,7 @@ public class Bus implements SubscriptionChangeReceiver {
             if(url != null) {
                 logger.log(Level.INFO, "Creating new RAW connection");
                 rawConnection = new RAWConnection(url);
-                rawConnection.setReceiver(rawReceiver);
+                rawConnection.setListener(rawReceiver);
             } else {
                 logger.log(Level.WARNING, "Could not open RAW connection because no url was set");
                 return;
@@ -548,19 +548,19 @@ public class Bus implements SubscriptionChangeReceiver {
         }
     }
 
-    public void addEventFrameReceiver(EventFrameReceiver receiver) {
-        eventFrameReceivers.add(receiver);
+    public void addEventFrameListener(EventFrameListener listener) {
+        eventFrameListeners.add(listener);
     }
 
-    public void removeEventFrameReceiver(EventFrameReceiver receiver) {
-        eventFrameReceivers.remove(receiver);
+    public void removeEventFrameListener(EventFrameListener listener) {
+        eventFrameListeners.remove(listener);
     }
 
     public void sendEventFrame(EventFrame f) {
         f.setTimestamp(timeSource.getTime());
         f.setBus(this);
 
-        for(EventFrameReceiver receiver : eventFrameReceivers) {
+        for(EventFrameListener receiver : eventFrameListeners) {
             if(receiver != null)
                 receiver.newEventFrame(f);
         }

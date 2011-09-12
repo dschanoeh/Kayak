@@ -19,7 +19,7 @@ package com.github.kayak.mapview;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.Frame;
-import com.github.kayak.core.FrameReceiver;
+import com.github.kayak.core.FrameListener;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.core.description.Signal;
 import com.github.kayak.core.description.SignalDescription;
@@ -63,7 +63,7 @@ preferredID = "MapViewTopComponent")
 public final class MapViewTopComponent extends TopComponent {
 
     private static final Logger logger = Logger.getLogger(MapViewTopComponent.class.getName());
-    
+
     private JXMapKit mapKit = new JXMapKit();
     private final List<Waypoint> waypoints = Collections.synchronizedList(new ArrayList<Waypoint>());
     double latitude, longitude;
@@ -88,7 +88,7 @@ public final class MapViewTopComponent extends TopComponent {
             jTextField3.setText(desc.getName());
             description = desc;
 
-            FrameReceiver latitudeReceiver = new FrameReceiver() {
+            FrameListener latitudeReceiver = new FrameListener() {
 
                 @Override
                 public void newFrame(Frame frame) {
@@ -106,7 +106,7 @@ public final class MapViewTopComponent extends TopComponent {
                     }
                 }
             };
-            
+
             int id = desc.getMessage().getId();
             s = new Subscription(latitudeReceiver, b);
             s.subscribe(id);
@@ -129,7 +129,7 @@ public final class MapViewTopComponent extends TopComponent {
             jTextField4.setText(desc.getName());
             description = desc;
 
-            FrameReceiver longitudeReceiver = new FrameReceiver() {
+            FrameListener longitudeReceiver = new FrameListener() {
 
                 @Override
                 public void newFrame(Frame frame) {
@@ -147,7 +147,7 @@ public final class MapViewTopComponent extends TopComponent {
                     }
                 }
             };
-            
+
             int id = desc.getMessage().getId();
             s = new Subscription(longitudeReceiver, b);
             s.subscribe(id);
@@ -158,19 +158,19 @@ public final class MapViewTopComponent extends TopComponent {
         initComponents();
         setName(NbBundle.getMessage(MapViewTopComponent.class, "CTL_MapViewTopComponent"));
         setToolTipText(NbBundle.getMessage(MapViewTopComponent.class, "HINT_MapViewTopComponent"));
-        
+
         mapKit.setDefaultProvider(JXMapKit.DefaultProviders.OpenStreetMaps);
-       
+
         GeoPosition p = new GeoPosition(52.42182, 10.78498);
         mapKit.setAddressLocation(p);
         mapKit.setMiniMapVisible(false);
         mapKit.setZoomSliderVisible(false);
         mapKit.setZoom(0);
-        
+
         Painter<JXMapViewer> textOverlay = new Painter<JXMapViewer>() {
 
             @Override
-            public void paint(Graphics2D g, JXMapViewer t, int i, int i1) {  
+            public void paint(Graphics2D g, JXMapViewer t, int i, int i1) {
                 /* Draw latitude longitude information */
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
                 String s = String.format("Latitude: %f Longitude: %f", latitude, longitude);
@@ -178,8 +178,8 @@ public final class MapViewTopComponent extends TopComponent {
                 g.fillRoundRect(10, 10, 220 , 30, 10, 10);
                 g.setPaint(Color.WHITE);
                 g.drawString(s, 10+10, 10+20);
-                
-                /* Draw waypoints */ 
+
+                /* Draw waypoints */
                 g.setPaint(Color.RED);
                 Rectangle rect =  t.getViewportBounds();
                 g.translate(-rect.x, -rect.y);
@@ -189,12 +189,12 @@ public final class MapViewTopComponent extends TopComponent {
 
                 int lastX = -1;
                 int lastY = -1;
-                synchronized(waypoints) {    
+                synchronized(waypoints) {
                     for(Waypoint w : waypoints) {
                         Point2D pt = t.getTileFactory().geoToPixel(w.getPosition(), t.getZoom());
 
                         if(lastX != -1 && lastY != -1) {
-                            g.drawLine(lastX, lastY, (int) pt.getX(), (int) pt.getY()); 
+                            g.drawLine(lastX, lastY, (int) pt.getX(), (int) pt.getY());
                         }
 
                         lastX = (int) pt.getX();
@@ -203,18 +203,18 @@ public final class MapViewTopComponent extends TopComponent {
                 }
             }
         };
-        
+
         mapKit.getMainMap().setOverlayPainter(textOverlay);
-   
+
         jPanel2.setLayout(new BorderLayout());
         jPanel2.add(mapKit, BorderLayout.CENTER);
-        
+
         DropTarget latitudeDropTarget = new DropTarget(jTextField3, new SignalDescriptionDropTargetAdapter(latitudeDropReceiver));
         jTextField3.setDropTarget(latitudeDropTarget);
-        
+
         DropTarget longitudeDropTarget = new DropTarget(jTextField4, new SignalDescriptionDropTargetAdapter(longitudeDropReceiver));
         jTextField4.setDropTarget(longitudeDropTarget);
-        
+
     }
 
     /** This method is called from within the constructor to
@@ -354,7 +354,7 @@ public final class MapViewTopComponent extends TopComponent {
         }//GEN-LAST:event_jButton1ActionPerformed
 
         private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
-            
+
         }//GEN-LAST:event_jButton2MouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

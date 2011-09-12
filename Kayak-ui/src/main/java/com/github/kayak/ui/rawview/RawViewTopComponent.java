@@ -107,7 +107,7 @@ public final class RawViewTopComponent extends TopComponent {
                 if(row != -1) {
                     row = table.convertRowIndexToModel(row);
                     String idString = (String) model.getValueAt(row, 2);
-                    int id = Integer.parseInt(idString.substring(2),16);
+                    int id = Integer.parseInt(idString,16);
 
                     byte[] bytes = model.getDataForID(id);
 
@@ -301,7 +301,7 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         }
 
         jTextField1.setText(sb.toString());
-        jToggleButton1.setSelected(true);
+        jCheckBox1.setSelected(true);
         filter(jTextField1.getText());
 }//GEN-LAST:event_jButton2ActionPerformed
 

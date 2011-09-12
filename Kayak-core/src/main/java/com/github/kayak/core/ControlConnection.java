@@ -39,13 +39,13 @@ public class ControlConnection extends SocketcandConnection implements Runnable 
     private Thread thread;
     private InputStreamReader input;
     private Boolean connected = false;
-    private StatisticsReceiver statisticsReceiver;
+    private StatisticsListener statisticsReceiver;
 
-    public void setStatisticsReceiver(StatisticsReceiver receiver) {
+    public void setStatisticsReceiver(StatisticsListener receiver) {
         this.statisticsReceiver = receiver;
     }
 
-    public StatisticsReceiver getStatisticsReceiver() {
+    public StatisticsListener getStatisticsReceiver() {
         return statisticsReceiver;
     }
 

@@ -19,19 +19,18 @@
 package com.github.kayak.ui.rawview;
 
 import com.github.kayak.core.Frame;
-import com.github.kayak.core.FrameReceiver;
+import com.github.kayak.core.FrameListener;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import javax.swing.table.AbstractTableModel;
-import org.openide.util.Exceptions;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class RawViewTableModel extends AbstractTableModel implements FrameReceiver {
+public class RawViewTableModel extends AbstractTableModel implements FrameListener {
 
     private final Map<Integer, FrameData> data = Collections.synchronizedMap(new TreeMap<Integer, FrameData>());    private Thread refreshThread;
     private boolean colorize = false;
@@ -133,7 +132,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
                 case 1:
                     return data.get(keys[rowIndex]).getInterval() / 1000;
                 case 2:
-                    return "0x" + Integer.toHexString(data.get(keys[rowIndex]).getIdentifier());
+                    return Integer.toHexString(data.get(keys[rowIndex]).getIdentifier());
                 case 3:
                     return data.get(keys[rowIndex]).getData().length;
                 case 4:
@@ -189,7 +188,11 @@ public class RawViewTableModel extends AbstractTableModel implements FrameReceiv
 
     public byte[] getDataForID(int id) {
         synchronized(data) {
-            return data.get(id).getData();
+            FrameData d = data.get(id);
+            if(d != null)
+                return d.getData();
+            else
+                return null;
         }
     }
 

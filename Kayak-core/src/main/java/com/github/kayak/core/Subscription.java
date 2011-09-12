@@ -38,8 +38,8 @@ public class Subscription {
     private final Set<Integer> ids = Collections.synchronizedSet(new HashSet<Integer>());
     private Boolean muted;
     private Boolean subscribeAll;
-    private FrameReceiver receiver;
-    private SubscriptionChangeReceiver changeReceiver;
+    private FrameListener receiver;
+    private SubscriptionChangeListener changeReceiver;
 
     /**
      * Creates a new Subscription. The new Subscription is automatically
@@ -47,7 +47,7 @@ public class Subscription {
      * @param receiver
      * @param changeReceiver
      */
-    public Subscription(FrameReceiver receiver, SubscriptionChangeReceiver changeReceiver) {
+    public Subscription(FrameListener receiver, SubscriptionChangeListener changeReceiver) {
         muted = false;
         subscribeAll = false;
         this.receiver = receiver;

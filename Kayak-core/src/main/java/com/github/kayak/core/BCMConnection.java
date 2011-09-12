@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  *
  */
-public class BCMConnection extends SocketcandConnection implements Runnable {
+public class BCMConnection extends SocketcandConnection {
 
     private static final Logger logger = Logger.getLogger(BCMConnection.class.getName());
 
@@ -42,6 +42,61 @@ public class BCMConnection extends SocketcandConnection implements Runnable {
     private Thread thread;
     private InputStreamReader input;
     private Boolean connected = false;
+
+    private Runnable runnable = new Runnable() {
+
+        @Override
+        public void run() {
+            StringBuilder sb = new StringBuilder(40);
+
+            while (true) {
+                if(Thread.interrupted())
+                    return;
+
+                try {
+                    String frame = getElement();
+
+                    String[] fields = frame.split("\\s");
+
+                    /* We received a frame */
+                    if (fields[1].equals("frame")) {
+                        try {
+                            sb.setLength(0);
+                            for (int i = 4; i < fields.length-1; i++) {
+                                sb.append(fields[i]);
+                            }
+                            Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(sb.toString()));
+                            int pos = 0;
+                            for(;pos<fields[3].length();pos++) {
+                                if(fields[3].charAt(pos) =='.')
+                                    break;
+                            }
+                            long timestamp = 1000000 * Long.parseLong(fields[3].substring(0, pos)) + Long.parseLong(fields[3].substring(pos+1));
+                            f.setTimestamp(timestamp);
+                            FrameListener receiver = getListener();
+                            if (receiver != null) {
+                                receiver.newFrame(f);
+                            }
+
+                        } catch (Exception ex) {
+                            logger.log(Level.WARNING, "Could not properly deliver CAN frame", ex);
+                        }
+                    } else if (fields[1].equals("error")) {
+                        logger.log(Level.WARNING, "Received error from socketcand: {0}", frame);
+                    }
+                } catch(InterruptedException ex) {
+                    logger.log(Level.WARNING, "Interrupted exception. Shutting down connection thread");
+                    return;
+                } catch (IOException ex) {
+                    /*
+                     * A read from the socket may time out if there are very few frames.
+                     * this will cause an IOException. This is ok so we will ignore these
+                     * exceptions
+                     */
+                }
+            }
+        }
+    };
 
     public Boolean isConnected() {
         return connected;
@@ -60,6 +115,7 @@ public class BCMConnection extends SocketcandConnection implements Runnable {
             socket = new Socket();
             socket.connect(address);
             socket.setSoTimeout(1000);
+            socket.setTcpNoDelay(Boolean.TRUE);
 
             input = new InputStreamReader(socket.getInputStream(), "ASCII");
             setInput(input);
@@ -85,7 +141,8 @@ public class BCMConnection extends SocketcandConnection implements Runnable {
         }
 
         /* Start worker thread for frame reception */
-        thread = new Thread(this);
+        thread = new Thread(runnable);
+        thread.setName("BCMConnection thread");
         thread.start();
         connected = true;
     }
@@ -180,56 +237,4 @@ public class BCMConnection extends SocketcandConnection implements Runnable {
         send(sb.toString());
     }
 
-    @Override
-    public void run() {
-        StringBuilder sb = new StringBuilder(40);
-
-        while (true) {
-            if(Thread.interrupted())
-                return;
-
-            try {
-                String frame = getElement();
-
-                String[] fields = frame.split("\\s");
-
-                /* We received a frame */
-                if (fields[1].equals("frame")) {
-                    try {
-                        sb.setLength(0);
-                        for (int i = 4; i < fields.length-1; i++) {
-                            sb.append(fields[i]);
-                        }
-                        Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(sb.toString()));
-                        int pos = 0;
-                        for(;pos<fields[3].length();pos++) {
-                            if(fields[3].charAt(pos) =='.')
-                                break;
-                        }
-                        long timestamp = 1000000 * Long.parseLong(fields[3].substring(0, pos)) + Long.parseLong(fields[3].substring(pos+1));
-                        f.setTimestamp(timestamp);
-                        FrameReceiver receiver = this.getReceiver();
-                        if (receiver != null) {
-                            receiver.newFrame(f);
-                            logger.log(Level.INFO, "Frame {0}", f.toString());
-                        }
-
-                    } catch (Exception ex) {
-                        logger.log(Level.WARNING, "Could not properly deliver CAN frame", ex);
-                    }
-                } else if (fields[1].equals("error")) {
-                    logger.log(Level.WARNING, "Received error from socketcand: {0}", frame);
-                }
-            } catch(InterruptedException ex) {
-                logger.log(Level.WARNING, "Interrupted exception. Shutting down connection thread");
-                return;
-            } catch (IOException ex) {
-                /*
-                 * A read from the socket may time out if there are very few frames.
-                 * this will cause an IOException. This is ok so we will ignore these
-                 * exceptions
-                 */
-            }
-        }
-    }
 }

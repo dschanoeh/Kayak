@@ -1,25 +1,25 @@
 /**
  * 	This file is part of Kayak.
- *	
+ *
  *	Kayak is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU Lesser General Public License as published by
  *	the Free Software Foundation, either version 3 of the License, or
  *	(at your option) any later version.
- *	
+ *
  *	Kayak is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
- *	
+ *
  *	You should have received a copy of the GNU Lesser General Public License
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
- *	
+ *
  */
 package com.github.kayak.logging.snapshots;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.Frame;
-import com.github.kayak.core.FrameReceiver;
+import com.github.kayak.core.FrameListener;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.core.TimeSource;
 import com.github.kayak.logging.options.Options;
@@ -49,7 +49,7 @@ import org.openide.util.Exceptions;
  *
  */
 public class SnapshotBuffer {
-    
+
     private static final Logger logger = Logger.getLogger(SnapshotBuffer.class.getCanonicalName());
 
     private static final int depth = Options.getSnapshotBufferDepth();
@@ -66,12 +66,12 @@ public class SnapshotBuffer {
     private Project currentProject;
     private String path;
     private boolean wasWritten = false;
-    
+
     private ProjectManagementListener managementListener = new ProjectManagementListener() {
 
         @Override
         public void projectsUpdated() {
-            
+
         }
 
         @Override
@@ -79,26 +79,26 @@ public class SnapshotBuffer {
             logger.log(Level.INFO, "Switching snapshot buffer to new project");
             if(currentProject != null)
                 currentProject.removeProjectChangeListener(projectListener);
-            
+
             p.addProjectChangeListener(projectListener);
         }
     };
-    
+
     private ProjectChangeListener projectListener = new ProjectChangeListener() {
 
         @Override
         public void projectNameChanged(Project p, String name) {
-            
+
         }
 
         @Override
         public void projectClosed(Project p) {
             currentProject.removeProjectChangeListener(projectListener);
-            
+
             for(Subscription s : subscriptions) {
                 s.Terminate();
             }
-            
+
             busses.clear();
             subscriptions.clear();
         }
@@ -110,7 +110,7 @@ public class SnapshotBuffer {
 
         @Override
         public void projectBusAdded(Project p, Bus bus) {
-            
+
         }
 
         @Override
@@ -143,7 +143,7 @@ public class SnapshotBuffer {
         this.platform = platform;
     }
 
-    private FrameReceiver receiver = new FrameReceiver() {
+    private FrameListener receiver = new FrameListener() {
 
         @Override
         public void newFrame(Frame frame) {
@@ -154,13 +154,13 @@ public class SnapshotBuffer {
     };
 
     private Runnable cleanupRunnable = new Runnable() {
-        
+
         private TimeSource ts = TimeSourceManager.getGlobalTimeSource();
 
         @Override
         public void run() {
             while (!stopRequest) {
-                
+
                 try {
                     Thread.sleep(finish);
                 } catch (InterruptedException e) {
@@ -171,7 +171,7 @@ public class SnapshotBuffer {
                         logger.log(Level.WARNING, "Snapshot buffer interrupted without stop request");
                     }
                 }
-                
+
                 long currentTime = ts.getTime();
                 synchronized (frames) {
                     Frame[] frameArray = new Frame[0];
@@ -183,10 +183,10 @@ public class SnapshotBuffer {
                     }
                 }
             }
-            
+
             cleanup();
         }
-        
+
         private void cleanup() {
             try {
                 Thread.sleep(stopTimeout);
@@ -211,7 +211,7 @@ public class SnapshotBuffer {
         frames = new ArrayList<Frame>(500);
         busses = new ArrayList<Bus>();
         subscriptions = new ArrayList<Subscription>();
-        
+
         ProjectManager.getGlobalProjectManager().addListener(managementListener);
         currentProject = ProjectManager.getGlobalProjectManager().getOpenedProject();
         if(currentProject != null)
@@ -258,7 +258,7 @@ public class SnapshotBuffer {
                 logger.log(Level.SEVERE, "was not able to stop cleanup thread!", ex);
             }
         }
-        
+
         for(Subscription s : subscriptions) {
             s.Terminate();
         }
@@ -271,11 +271,11 @@ public class SnapshotBuffer {
         OutputStream os = null;
         try {
             os = fo.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(os);            
+            OutputStreamWriter osw = new OutputStreamWriter(os);
             BufferedWriter out = new BufferedWriter(osw);
             out.write("PLATFORM " + platform + "\n");
             out.write("DESCRIPTION \"" + description + "\"\n");
-            
+
             HashSet<String> busNames = new HashSet<String>();
             for(Frame frame : frames) {
                 busNames.add(frame.getBus().getName());
@@ -283,7 +283,7 @@ public class SnapshotBuffer {
             for(String name : busNames) {
                 out.write("DEVICE_ALIAS " + name + " " + name + "\n");
             }
-            
+
             for(Frame frame : frames) {
                 out.write(frame.toLogFileNotation());
             }
@@ -298,7 +298,7 @@ public class SnapshotBuffer {
                 Exceptions.printStackTrace(ex);
             }
         }
-        
+
         wasWritten = true;
     }
 
@@ -309,6 +309,6 @@ public class SnapshotBuffer {
         else
             return super.toString();
     }
-    
-    
+
+
 }

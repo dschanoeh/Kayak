@@ -189,7 +189,7 @@ public class SendFramesTableModel extends AbstractTableModel {
         row.setId(id);
         row.setInterval(interval);
         row.setNote(note);
-        rows.add(new TableRow(bus));
+        rows.add(row);
         fireTableRowsInserted(rows.size(), rows.size());
     }
 
@@ -240,7 +240,7 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 0:
                 return rows.get(rowIndex).getBus().getName();
             case 1:
-                return "0x" + Integer.toHexString(rows.get(rowIndex).getId());
+                return Integer.toHexString(rows.get(rowIndex).getId());
             case 2:
                 return rows.get(rowIndex).getData().length;
             case 3:
@@ -311,7 +311,7 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 0:
                 return "Bus";
             case 1:
-                return "ID";
+                return "ID [hex]";
             case 2:
                 return "Length";
             case 3:
@@ -319,7 +319,7 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 4:
                 return "Send";
             case 5:
-                return "Interval (ms)";
+                return "Interval [ms]";
             case 6:
                 return "Send interval";
             case 7:
