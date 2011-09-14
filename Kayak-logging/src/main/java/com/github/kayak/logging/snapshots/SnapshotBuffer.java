@@ -25,22 +25,26 @@ import com.github.kayak.core.TimeSource;
 import com.github.kayak.logging.options.Options;
 import com.github.kayak.ui.projects.Project;
 import java.io.IOException;
-import java.util.ArrayList;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManagementListener;
 import com.github.kayak.ui.projects.ProjectManager;
 import com.github.kayak.ui.time.TimeSourceManager;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 
 /**
@@ -55,96 +59,82 @@ import org.openide.util.Exceptions;
 public class SnapshotBuffer {
 
     private static final Logger logger = Logger.getLogger(SnapshotBuffer.class.getCanonicalName());
-
+    private static final Calendar cal = Calendar.getInstance();
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
     private static final int depth = Options.getSnapshotBufferDepth();
     private static final int finish = Options.getSnapshotBufferFinish();
     private final Set<Frame> frames = Collections.synchronizedSet(new TreeSet<Frame>(new Frame.TimestampComparator()));
     private Thread cleanupThread;
     private int stopTimeout = 0;
     private boolean stopRequest = false;
-    private Set<Bus> busses = new HashSet<Bus>();
-    private Set<Subscription> subscriptions = new HashSet<Subscription>();
-    private String name;
-    private String platform;
-    private String description;
+    private final Map<Bus, Subscription> subscriptions = Collections.synchronizedMap(new HashMap<Bus, Subscription>());
     private Project currentProject;
-    private String path;
-    private boolean wasWritten = false;
-
+    private boolean isBuffering = false;
     private ProjectManagementListener managementListener = new ProjectManagementListener() {
 
         @Override
         public void projectsUpdated() {
-
         }
 
         @Override
         public void openProjectChanged(Project p) {
             logger.log(Level.INFO, "Switching snapshot buffer to new project");
-            if(currentProject != null)
+            if (currentProject != null) {
                 currentProject.removeProjectChangeListener(projectListener);
+            }
 
-            p.addProjectChangeListener(projectListener);
+            currentProject = p;
+
+            for (Bus b : currentProject.getBusses()) {
+                connectBus(b);
+            }
+
+            currentProject.addProjectChangeListener(projectListener);
         }
     };
-
     private ProjectChangeListener projectListener = new ProjectChangeListener() {
 
         @Override
         public void projectNameChanged(Project p, String name) {
-
         }
 
         @Override
         public void projectClosed(Project p) {
             currentProject.removeProjectChangeListener(projectListener);
 
-            for(Subscription s : subscriptions) {
-                s.Terminate();
+            synchronized (subscriptions) {
+                Set<Bus> busses = subscriptions.keySet();
+                for (Subscription s : subscriptions.values()) {
+                    s.Terminate();
+                }
+                subscriptions.clear();
             }
-
-            busses.clear();
-            subscriptions.clear();
         }
 
         @Override
         public void projectOpened(Project p) {
-
         }
 
         @Override
         public void projectBusAdded(Project p, Bus bus) {
-
+            connectBus(bus);
         }
 
         @Override
         public void projectBusRemoved(Project p, Bus bus) {
-            busses.remove(bus);
+            synchronized (subscriptions) {
+                Subscription s = subscriptions.get(bus);
+
+                if (s != null) {
+                    s.Terminate();
+                }
+                subscriptions.remove(bus);
+            }
         }
     };
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPlatform() {
-        return platform;
-    }
-
-    public void setPlatform(String platform) {
-        this.platform = platform;
+    public boolean isBuffering() {
+        return isBuffering;
     }
 
     private FrameListener receiver = new FrameListener() {
@@ -156,7 +146,6 @@ public class SnapshotBuffer {
             }
         }
     };
-
     private Runnable cleanupRunnable = new Runnable() {
 
         private TimeSource ts = TimeSourceManager.getGlobalTimeSource();
@@ -208,15 +197,22 @@ public class SnapshotBuffer {
     public SnapshotBuffer() {
         ProjectManager.getGlobalProjectManager().addListener(managementListener);
         currentProject = ProjectManager.getGlobalProjectManager().getOpenedProject();
-        if(currentProject != null)
+        if (currentProject != null) {
+            for (Bus b : currentProject.getBusses()) {
+                connectBus(b);
+            }
+
             currentProject.addProjectChangeListener(projectListener);
+        }
     }
 
-    public void connectBus(Bus bus) {
-        busses.add(bus);
-        Subscription s = new Subscription(receiver, bus);
-        bus.addSubscription(s);
-        subscriptions.add(s);
+    private void connectBus(Bus bus) {
+        Subscription s = subscriptions.get(bus);
+
+        if (s == null) {
+            Subscription sn = new Subscription(receiver, bus);
+            subscriptions.put(bus, sn);
+        }
     }
 
     /**
@@ -227,7 +223,7 @@ public class SnapshotBuffer {
     public void startBuffering() {
 
         frames.clear();
-        for(Subscription s : subscriptions) {
+        for (Subscription s : subscriptions.values()) {
             s.setSubscribeAll(true);
         }
 
@@ -235,6 +231,8 @@ public class SnapshotBuffer {
         cleanupThread = new Thread(cleanupRunnable);
         cleanupThread.setName("Snapshot buffer thread");
         cleanupThread.start();
+
+        isBuffering = true;
     }
 
     /**
@@ -253,56 +251,50 @@ public class SnapshotBuffer {
             }
         }
 
-        for(Subscription s : subscriptions) {
+        for (Subscription s : subscriptions.values()) {
             s.Terminate();
         }
         subscriptions.clear();
-        busses.clear();
+
+        isBuffering = false;
     }
 
-    public void writeToFile(FileObject fo) {
-        path = fo.getPath();
+    public void writeToFile() {
+        String fileName = "Snapshot_" + sdf.format(cal.getTime()) + ".log";
+
+        FileObject logFolder = FileUtil.toFileObject(new File(Options.getLogFilesFolder()));
+
         OutputStream os = null;
         try {
+            FileObject fo = logFolder.createData(fileName);
+
             os = fo.getOutputStream();
             OutputStreamWriter osw = new OutputStreamWriter(os);
             BufferedWriter out = new BufferedWriter(osw);
-            out.write("PLATFORM " + platform + "\n");
-            out.write("DESCRIPTION \"" + description + "\"\n");
+            out.write("PLATFORM SNAPSHOTS\n");
+            out.write("DESCRIPTION \"Snapshot of project " + currentProject.getName() + "\"\n");
 
             HashSet<String> busNames = new HashSet<String>();
-            for(Frame frame : frames) {
+            for (Frame frame : frames) {
                 busNames.add(frame.getBus().getName());
             }
-            for(String name : busNames) {
-                out.write("DEVICE_ALIAS " + name + " " + name + "\n");
+            for (String n : busNames) {
+                out.write("DEVICE_ALIAS " + n + " " + n + "\n");
             }
 
-            for(Frame frame : frames) {
+            for (Frame frame : frames) {
                 out.write(frame.toLogFileNotation());
             }
             out.close();
-            wasWritten = true;
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         } finally {
             try {
-                os.close();
+                if(os != null)
+                    os.close();
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
         }
-
-        wasWritten = true;
     }
-
-    @Override
-    public String toString() {
-        if(name != null)
-            return name;
-        else
-            return super.toString();
-    }
-
-
 }
