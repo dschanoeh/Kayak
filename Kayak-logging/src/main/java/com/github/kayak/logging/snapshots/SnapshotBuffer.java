@@ -33,7 +33,11 @@ import com.github.kayak.ui.time.TimeSourceManager;
 import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.filesystems.FileObject;
@@ -54,12 +58,12 @@ public class SnapshotBuffer {
 
     private static final int depth = Options.getSnapshotBufferDepth();
     private static final int finish = Options.getSnapshotBufferFinish();
-    private final ArrayList<Frame> frames;
+    private final Set<Frame> frames = Collections.synchronizedSet(new TreeSet<Frame>(new Frame.TimestampComparator()));
     private Thread cleanupThread;
     private int stopTimeout = 0;
     private boolean stopRequest = false;
-    private ArrayList<Bus> busses;
-    private ArrayList<Subscription> subscriptions;
+    private Set<Bus> busses = new HashSet<Bus>();
+    private Set<Subscription> subscriptions = new HashSet<Subscription>();
     private String name;
     private String platform;
     private String description;
@@ -174,7 +178,7 @@ public class SnapshotBuffer {
 
                 long currentTime = ts.getTime();
                 synchronized (frames) {
-                    Frame[] frameArray = new Frame[0];
+                    Frame[] frameArray = new Frame[frames.size()];
                     frameArray = frames.toArray(frameArray);
                     for (Frame f : frameArray) {
                         if (f.getTimestamp() < currentTime - depth) {
@@ -193,12 +197,6 @@ public class SnapshotBuffer {
             } catch (InterruptedException ex) {
                 logger.log(Level.INFO, "Snapshot buffer interrupted while waiting.", ex);
             }
-
-            for (Subscription s : subscriptions) {
-                s.Terminate();
-            }
-            subscriptions.clear();
-            busses.clear();
             return;
         }
     };
@@ -208,10 +206,6 @@ public class SnapshotBuffer {
     }
 
     public SnapshotBuffer() {
-        frames = new ArrayList<Frame>(500);
-        busses = new ArrayList<Bus>();
-        subscriptions = new ArrayList<Subscription>();
-
         ProjectManager.getGlobalProjectManager().addListener(managementListener);
         currentProject = ProjectManager.getGlobalProjectManager().getOpenedProject();
         if(currentProject != null)

@@ -6,7 +6,7 @@ package com.github.kayak.logging.output;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.Frame;
-import com.github.kayak.core.FrameReceiver;
+import com.github.kayak.core.FrameListener;
 import com.github.kayak.core.LogFile;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.logging.input.BusDropTargetAdapter;
@@ -28,8 +28,6 @@ import javax.swing.AbstractListModel;
 import javax.swing.JFileChooser;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
-import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -41,7 +39,7 @@ import org.openide.util.NbPreferences;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.logfiles//LogOutput//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "LogOutputTopComponent",
-iconBase="org/freedesktop/tango/16x16/actions/go-next.png", 
+iconBase="org/freedesktop/tango/16x16/actions/go-next.png",
 persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "properties", openAtStartup = false)
 @ActionID(category = "Log files", id = "com.github.kayak.logging.LogOutputTopComponent")
@@ -49,17 +47,17 @@ persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_LogOutputAction",
 preferredID = "LogOutputTopComponent")
 public final class LogOutputTopComponent extends TopComponent implements ExplorerManager.Provider, BusDropTargetAdapter.BusDropReceiver  {
-    
+
     private static final Logger logger = Logger.getLogger(LogOutputTopComponent.class.getCanonicalName());
 
-    private ExplorerManager manager;  
+    private ExplorerManager manager;
     private BusListModel model = new BusListModel();
     private boolean recording = false;
     private BufferedWriter out;
     private ArrayList<Subscription> subscriptions = new ArrayList<Subscription>();
-    
+
     private class BusListModel extends AbstractListModel {
-        
+
         private ArrayList<Bus> busses = new ArrayList<Bus>();
 
         @Override
@@ -71,20 +69,20 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
         public Object getElementAt(int index) {
             return busses.get(index);
         }
-        
+
         public void addBus(Bus bus) {
             busses.add(bus);
             fireIntervalAdded(this, busses.indexOf(bus), busses.indexOf(bus));
         }
-        
+
         public void removeBus(int i) {
             Bus bus = busses.get(i);
             fireIntervalRemoved(this, i, i);
             busses.remove(bus);
         }
     };
-    
-    private FrameReceiver receiver = new FrameReceiver() {
+
+    private FrameListener receiver = new FrameListener() {
 
         @Override
         public void newFrame(Frame frame) {
@@ -104,10 +102,10 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
         setToolTipText(NbBundle.getMessage(LogOutputTopComponent.class, "HINT_LogOutputTopComponent"));
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
-        
+
         DropTarget dt = new DropTarget(jList1, new BusDropTargetAdapter(this, 0));
         jList1.setDropTarget(dt);
-        
+
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
         FileObject logFolder = FileUtil.toFileObject(new File(Options.getLogFilesFolder()));
@@ -301,10 +299,10 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         File file = new File(jTextField1.getText());
-        
+
         String platform = jTextField2.getText();
         String description = jTextField3.getText();
-        
+
         if(file.exists() || file.isDirectory()) {
             logger.log(Level.WARNING, "Can not open log file");
             return;
@@ -317,7 +315,7 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
             logger.log(Level.WARNING, "Bad description");
             return;
         }
-        
+
         try {
             OutputStreamWriter osw;
             if(file.getAbsolutePath().endsWith(".gz")) {
@@ -331,7 +329,7 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
             out = new BufferedWriter(osw);
             out.write("PLATFORM " + platform + "\n");
             out.write("DESCRIPTION \"" + description + "\"\n");
-            
+
             String[] busses = new String[model.getSize()];
             for(int i=0;i<model.getSize();i++) {
                 busses[i] = ((Bus) model.getElementAt(i)).getName();
@@ -339,7 +337,7 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
             for(String name : busses) {
                 out.write("DEVICE_ALIAS " + name + " " + name + "\n");
             }
-            
+
             jList1.setEnabled(false);
             jButton1.setEnabled(false);
             jButton2.setEnabled(false);
@@ -349,14 +347,14 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
             jTextField2.setEnabled(false);
             jTextField3.setEnabled(false);
             recording = true;
-            
+
             for(int i=0;i<model.getSize();i++) {
                 Bus bus = ((Bus) model.getElementAt(i));
                 Subscription s = new Subscription(receiver, bus);
                 s.setSubscribeAll(true);
                 subscriptions.add(s);
             }
-            
+
         } catch (IOException ex) {
             logger.log(Level.WARNING, "could not start logging", ex);
         }
@@ -372,18 +370,18 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
         jTextField1.setEnabled(true);
         jTextField2.setEnabled(true);
         jTextField3.setEnabled(true);
-        
+
         for(Subscription s : subscriptions) {
             s.Terminate();
         }
         subscriptions.clear();
-        
+
         try {
             out.close();
         } catch (IOException ex) {
             logger.log(Level.WARNING, "Could not close log file");
         }
-        
+
     }//GEN-LAST:event_jButton4ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
