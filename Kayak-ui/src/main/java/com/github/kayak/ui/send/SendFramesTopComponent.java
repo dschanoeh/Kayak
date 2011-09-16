@@ -251,7 +251,7 @@ public final class SendFramesTopComponent extends TopComponent {
             String is = Integer.toString(i);
             p.setProperty("note" + is, row.getNote());
             p.setProperty("busName" + is, row.getBus().getName());
-            p.setProperty("data" + is, Util.byteArrayToHexString(row.getData()));
+            p.setProperty("data" + is, Util.byteArrayToHexString(row.getData(), false));
             p.setProperty("id" + is, Integer.toString(row.getId()));
             p.setProperty("interval" + is, Integer.toString(row.getInterval()));
             p.setProperty("projectName", project.getName());

@@ -39,7 +39,7 @@ import org.netbeans.api.settings.ConvertAsProperties;
 @ConvertAsProperties(dtd = "-//com.github.kayak.logging.input//LogInput//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "LogInputTopComponent",
-iconBase="org/freedesktop/tango/16x16/actions/go-previous.png", 
+iconBase="org/freedesktop/tango/16x16/actions/go-previous.png",
 persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "properties", openAtStartup = false)
 public final class LogInputTopComponent extends TopComponent implements BusDropTargetAdapter.BusDropReceiver {
@@ -270,7 +270,8 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
         this.setName(NbBundle.getMessage(LogInputTopComponent.class, "CTL_LogInputTopComponent") + " - " + logFile.getDescription());
         this.setToolTipText(NbBundle.getMessage(LogInputTopComponent.class, "CTL_LogInputTopComponent") + " - " + logFile.getDescription());
 
-        busses = logFile.getBusses();
+        busses = new ArrayList<String>();
+        busses.addAll(logFile.getBusses());
         java.awt.GridLayout layout = new java.awt.GridLayout();
         layout.setColumns(3);
         layout.setRows(busses.size());

@@ -18,16 +18,16 @@
 package com.github.kayak.core;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
@@ -75,16 +75,9 @@ public class LogFile {
         return deviceAlias.get(s);
     }
 
-    public ArrayList<String> getBusses() {
-        ArrayList<String> busNames = new ArrayList<String>();
+    public Set<String> getBusses() {
         Set<String> keys = deviceAlias.keySet();
-
-        for (String bus : keys) {
-            busNames.add(deviceAlias.get(bus));
-        }
-
-        return busNames;
-
+        return keys;
     }
 
     public String getDescription() {
@@ -107,106 +100,16 @@ public class LogFile {
         if(!platformPattern.matcher(platform).matches())
             throw new IllegalArgumentException("Platform must match " + platformPattern.pattern());
 
-        File tempFile = new File(file.getAbsolutePath() + ".tmp");
-        BufferedReader br;
-        PrintWriter pw;
-
-        if(compressed) {
-            GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
-            br = new BufferedReader(new InputStreamReader(zipStream));
-            GZIPOutputStream outStream = new GZIPOutputStream(new FileOutputStream(tempFile));
-            pw = new PrintWriter(outStream);
-        } else {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            pw = new PrintWriter(new FileWriter(tempFile));
-        }
-
-        String line = null;
-        boolean written = false;
-
-        while ((line = br.readLine()) != null) {
-            /* If line is found overwrite it */
-            if (!written && line.startsWith(("PLATFORM"))) {
-                pw.println("PLATFORM " + platform);
-                written = true;
-            /* If header has no such field add it */
-            } else if(!written && line.startsWith("(")) {
-                pw.println("PLATFORM " + platform);
-                pw.println(line);
-                written = true;
-            /* Write all other header lines */
-            } else {
-                pw.println(line);
-                pw.flush();
-            }
-        }
-
-        pw.close();
-        br.close();
-
-        if (!file.delete()) {
-            logger.log(Level.WARNING, "Could not delete old file");
-            return;
-        }
-
-        if (!tempFile.renameTo(file)) {
-            logger.log(Level.WARNING, "Could not rename new file to old filename");
-        }
-
         this.platform = platform;
+        rewriteHeader();
     }
 
     public void setDescription(String description) throws FileNotFoundException, IOException {
         if(!descriptionPattern.matcher(description).matches())
             throw new IllegalArgumentException("Description must match " + descriptionPattern.pattern());
 
-        File tempFile = new File(file.getAbsolutePath() + ".tmp");
-        BufferedReader br;
-        PrintWriter pw;
-
-        if(compressed) {
-            GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
-            br = new BufferedReader(new InputStreamReader(zipStream));
-            GZIPOutputStream outStream = new GZIPOutputStream(new FileOutputStream(tempFile));
-            pw = new PrintWriter(outStream);
-        } else {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            pw = new PrintWriter(new FileWriter(tempFile));
-        }
-
-        String line = null;
-        boolean written = false;
-
-        while ((line = br.readLine()) != null) {
-            /* If line is found overwrite it */
-            if (!written && line.startsWith(("DESCRIPTION"))) {
-                pw.println("DESCRIPTION \"" + description + "\"");
-                written = true;
-            /* If header has no such field add it */
-            } else if(!written && line.startsWith("(")) {
-                pw.println("DESCRIPTION \"" + description + "\"");
-                pw.println(line);
-                written = true;
-            /* Write all other header lines */
-            } else {
-                pw.println(line);
-                pw.flush();
-            }
-        }
-
-        pw.close();
-        br.close();
-
-        if (!file.delete()) {
-            logger.log(Level.WARNING, "Could not delete old file");
-            return;
-        }
-
-        if (!tempFile.renameTo(file)) {
-            logger.log(Level.WARNING, "Could not rename new file to old filename");
-        }
-
         this.description = description;
+        rewriteHeader();
     }
 
     public LogFile(File file) throws FileNotFoundException, IOException {
@@ -227,8 +130,82 @@ public class LogFile {
         parseHeader();
     }
 
+    private void rewriteHeader() throws FileNotFoundException, IOException {
+        BufferedWriter wr = null;
+        BufferedReader br = null;
+        File tempFile = new File(file.getAbsolutePath() + ".tmp");
+        if(compressed) {
+            GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
+            br = new BufferedReader(new InputStreamReader(zipStream));
+            GZIPOutputStream outStream = new GZIPOutputStream(new FileOutputStream(tempFile));
+            wr = new BufferedWriter(new OutputStreamWriter(outStream));
+        } else {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile)));
+        }
+
+        String line = null;
+        boolean descriptionWritten = false;
+        boolean platformWritten = false;
+
+        /* update header */
+        while ((line = br.readLine()) != null) {
+            if (descriptionLinePattern.matcher(line).matches()) {
+                wr.write("DESCRIPTION \"");
+                wr.write(description);
+                wr.write("\"\n");
+                descriptionWritten = true;
+            } else if(platformLinePattern.matcher(line).matches()) {
+                wr.write("PLATFORM ");
+                wr.write(platform);
+                wr.write("\n");
+                platformWritten = true;
+            } else if(line.startsWith("(")) {
+                if(!descriptionWritten) {
+                    wr.write("DESCRIPTION \"");
+                    wr.write(description);
+                    wr.write("\"\n");
+                }
+
+                if(!platformWritten) {
+                    wr.write("PLATFORM ");
+                    wr.write(platform);
+                    wr.write("\n");
+                }
+
+                wr.write(line);
+                wr.append('\n');
+                break;
+            /* Write all other lines */
+            } else {
+                wr.write(line);
+                wr.append('\n');
+            }
+        }
+
+        /* write rest of file without checking */
+        char[] buff = new char[4096];
+        int len;
+        while ((len = br.read(buff, 0, 4096)) > 0) {
+            wr.write(buff, 0, len);
+        }
+
+        wr.close();
+        br.close();
+
+        if (!file.delete()) {
+            logger.log(Level.WARNING, "Could not delete old file");
+            return;
+        }
+
+        if (!tempFile.renameTo(file)) {
+            logger.log(Level.WARNING, "Could not rename new file to old filename");
+        }
+    }
+
     private void parseHeader() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        long startTime = 0;
         try {
             while (true) {
                 String line = reader.readLine();
@@ -250,16 +227,20 @@ public class LogFile {
                  * All lines that are not recognized and not pure whitespace cause
                  * the header parsing to abort.
                  */
-                } else if (!line.matches("\\s")) {
-                        if (description.equals("")) {
-                            description = file.getName();
-                        }
-                        if (platform.equals("")) {
-                            platform = "No platform";
-                        }
-                        break;
+                } else if (line.startsWith("(")) {
+                    if (description.equals("")) {
+                        description = file.getName();
+                    }
+                    if (platform.equals("")) {
+                        platform = "No platform";
+                    }
+
+                    Frame f = Frame.fromLogFileNotation(line);
+                    startTime = f.getTimestamp();
+                    break;
                 }
             }
+
         } catch (IOException ex) {
             logger.log(Level.WARNING, "IOException while loading log file.", ex);
         } finally {
@@ -270,7 +251,37 @@ public class LogFile {
             }
         }
 
-        /* TODO: get length of file */
+        /*RandomAccessFile raf = null;
+        try {
+            raf = new RandomAccessFile(file, "r");
+
+            // try to find last valid content line
+            for(int i=1;;i++) {
+                raf.seek(raf.length()-i);
+                String line = raf.readLine();
+
+                if(line != null && !line.equals("")) {
+                    Frame f = Frame.fromLogFileNotation(line);
+                    if(f != null) {
+                        long stopTime = f.getTimestamp();
+
+                        length = stopTime - startTime;
+                    }
+                }
+            }
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(LogFile.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(LogFile.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if(raf != null)
+                try {
+                raf.close();
+            } catch (IOException ex) {
+                Logger.getLogger(LogFile.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }*/
     }
 
     @Override

@@ -140,7 +140,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameListen
                     byte[] dat = frameData.getData();
                     int[] frequency = frameData.getFrequency();
 
-                    String datString = com.github.kayak.core.Util.byteArrayToHexString(dat);
+                    String datString = com.github.kayak.core.Util.byteArrayToHexString(dat, false);
                     if (datString.length() % 2 != 0) {
                         datString = "0" + datString;
                     }

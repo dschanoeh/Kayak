@@ -203,7 +203,7 @@ public class BCMConnection extends SocketcandConnection {
         sb.append(' ');
         sb.append(Integer.toString(f.getLength()));
         sb.append(' ');
-        sb.append(Util.byteArrayToHexString(f.getData()));
+        sb.append(Util.byteArrayToHexString(f.getData(), true));
         sb.append(" >");
         send(sb.toString());
     }
@@ -215,7 +215,7 @@ public class BCMConnection extends SocketcandConnection {
         sb.append(' ');
         sb.append(Integer.toString(f.getLength()));
         sb.append(' ');
-        sb.append(Util.byteArrayToHexString(f.getData()));
+        sb.append(Util.byteArrayToHexString(f.getData(), true));
         sb.append(" >");
         send(sb.toString());
     }
@@ -227,13 +227,8 @@ public class BCMConnection extends SocketcandConnection {
         sb.append(' ');
         sb.append(Integer.toString(f.getLength()));
         sb.append(' ');
-        String data = Util.byteArrayToHexString(f.getData());
-        for(int i=0;i<data.length();i+=2) {
-            sb.append(data.charAt(i));
-            sb.append(data.charAt(i+1));
-            sb.append(' ');
-        }
-        sb.append(">");
+        sb.append(Util.byteArrayToHexString(f.getData(), true));
+        sb.append(" >");
         send(sb.toString());
     }
 

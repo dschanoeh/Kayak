@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -45,11 +46,11 @@ import org.openide.util.lookup.Lookups;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class LogFileNode extends AbstractNode {
-    
+
     private static final Logger logger = Logger.getLogger(LogFileNode.class.getCanonicalName());
     private LogFile logFile;
     private static final LogFileManager manager = LogFileManager.getGlobalLogFileManager();
-    
+
     private void setText(String text) {
         this.setDisplayName(text);
     }
@@ -66,15 +67,15 @@ public class LogFileNode extends AbstractNode {
     @Override
     public Action[] getActions(boolean foo) {
         ArrayList<Action> actions = new ArrayList<Action>();
-        
+
         actions.add(new OpenLogFileAction(logFile));
         actions.add(new DeleteLogFileAction(logFile));
         if(!logFile.getCompressed())
             actions.add(new CompressLogFileAction(logFile));
-        
+
         if(!manager.getFavouries().contains(logFile))
             actions.add(new BookmarkLogFileAction(logFile));
-            
+
         return actions.toArray(new Action[0]);
     }
 
@@ -95,7 +96,7 @@ public class LogFileNode extends AbstractNode {
                 try {
                     LogFileManager.getGlobalLogFileManager().removeLogFile(logFile);
                     logFile.setPlatform(t);
-                    LogFileManager.getGlobalLogFileManager().addLogFile(logFile);                    
+                    LogFileManager.getGlobalLogFileManager().addLogFile(logFile);
                 } catch(IllegalArgumentException ex) {
                     throw(ex);
                 } catch(Exception ex) {
@@ -141,29 +142,26 @@ public class LogFileNode extends AbstractNode {
                     logger.log(Level.WARNING, "Could not change value of log file", ex);
                 }
             }
-            
+
         };
-        
+
         Property busses = new PropertySupport.ReadOnly<String>("Busses", String.class, "Busses", "Busses that were logged into this file") {
 
             @Override
             public String getValue() throws IllegalAccessException, InvocationTargetException {
-                ArrayList<String> busses = logFile.getBusses();
-                
                 StringBuilder sb = new StringBuilder();
-                
-                for(int i=0;i<busses.size();i++) {
-                    sb.append(busses.get(i));
-                    if(i < (busses.size()-1)) {
-                        sb.append(", ");
-                    }
+
+                for(String bus : logFile.getBusses()) {
+                    sb.append(bus);
+                    sb.append(", ");
                 }
-                
+
+                sb.setLength(sb.length()-2);
                 return sb.toString();
             }
 
         };
-        
+
         Property size = new PropertySupport.ReadOnly<String>("Size", String.class, "Size", "Size of the file") {
 
             private final double BASE = 1024, KB = BASE, MB = KB * BASE, GB = MB * BASE;
@@ -194,7 +192,7 @@ public class LogFileNode extends AbstractNode {
             }
 
         };
-        
+
         Property edited = new PropertySupport.ReadOnly<String>("Edited", String.class, "Edited", "Time and date of the last file edit") {
 
             @Override
@@ -204,7 +202,7 @@ public class LogFileNode extends AbstractNode {
             }
 
         };
-        
+
         set.put(platform);
         set.put(description);
         set.put(fileName);

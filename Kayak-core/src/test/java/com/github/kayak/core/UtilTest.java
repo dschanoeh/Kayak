@@ -63,15 +63,21 @@ public class UtilTest {
         assertEquals(expResult[2], result[2]);
     }
 
-    /**
-     * Test of byteArrayToHexString method, of class Util.
-     */
     @Test
     public void testByteArrayToHexString() {
         System.out.println("byteArrayToHexString");
         byte[] raw = new byte[] {(byte)0xFF, (byte)0x12, (byte)0x4A};
         String expResult = "FF124A";
-        String result = Util.byteArrayToHexString(raw);
+        String result = Util.byteArrayToHexString(raw, false);
+        assertEquals(expResult, result);
+    }
+
+    @Test
+    public void testByteArrayToHexString2() {
+        System.out.println("byteArrayToHexString2");
+        byte[] raw = new byte[] {(byte)0xFF, (byte)0x12, (byte)0x4A};
+        String expResult = "FF 12 4A";
+        String result = Util.byteArrayToHexString(raw, true);
         assertEquals(expResult, result);
     }
 

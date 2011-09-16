@@ -19,6 +19,7 @@
 package com.github.kayak.core;
 
 import java.util.Comparator;
+import java.util.regex.Pattern;
 
 /**
  * A frame is a atomic unit of data on a CAN bus. It contains the raw data and is
@@ -34,6 +35,8 @@ public class Frame {
     private int identifier;
     private long timestamp;
     private Bus bus;
+
+    public static final Pattern LogFileNotationPattern = Pattern.compile("\\([0-9]+\\.[0-9]{6}\\)[\\s]+[a-zA-Z0-9]{1,16}[\\s]+[A-Za-z0-9]{3,8}#[A-Fa-f0-9rR]+");
 
     public static class IdentifierComparator implements Comparator<Frame> {
 
@@ -62,7 +65,6 @@ public class Frame {
 
             return 1;
         }
-
     };
 
     public Bus getBus() {
@@ -114,7 +116,7 @@ public class Frame {
 
     @Override
     public String toString() {
-        String s = "Frame [" + Integer.toHexString(identifier) + "] " + Util.byteArrayToHexString(data);
+        String s = "Frame [" + Integer.toHexString(identifier) + "] " + Util.byteArrayToHexString(data, true);
         return s;
     }
 
@@ -139,6 +141,84 @@ public class Frame {
         }
         sb.append('\n');
         return sb.toString();
+    }
+
+    public static Frame fromLogFileNotation(String line) {
+        if(!LogFileNotationPattern.matcher(line).matches())
+            return null;
+
+        int dotPos = -1;
+        for(int i=1;i<line.length();i++) {
+            if(line.charAt(i) == '.') {
+                dotPos = i;
+                break;
+            }
+        }
+
+        if(dotPos == -1)
+            return null;
+
+        int bracketPos = -1;
+
+        for(int i=dotPos;i<line.length();i++) {
+            if(line.charAt(i) == ')') {
+                bracketPos = i;
+                break;
+            }
+        }
+
+        if(bracketPos == -1)
+            return null;
+
+        long msecs = Long.parseLong(line.substring(1, dotPos)) * 1000000 + Long.parseLong(line.substring(dotPos+1, bracketPos));
+
+        int idPos = -3;
+
+        for(int i=bracketPos+1;i<line.length();i++) {
+            switch(idPos) {
+                case -3:
+                    if(line.charAt(i) != ' ') {
+                        idPos = -2;
+                    }
+                    break;
+                case -2:
+                    if(line.charAt(i) == ' ') {
+                        idPos = -1;
+                    }
+                    break;
+                case -1:
+                    if(line.charAt(i) != ' ') {
+                        idPos = i;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if(idPos >= 0)
+                break;
+        }
+
+        if(idPos < 0)
+            return null;
+
+        int hashPos = -1;
+
+        for(int i=idPos+1;i<line.length();i++) {
+            if(line.charAt(i) == '#') {
+                hashPos = i;
+                break;
+            }
+        }
+
+        int identifier = Integer.parseInt(line.substring(idPos, hashPos), 16);
+
+        byte[] message = Util.hexStringToByteArray(line.substring(hashPos+1, line.length()));
+
+        Frame frame = new Frame(identifier, message);
+        frame.setTimestamp(msecs);
+
+        return frame;
     }
 
     public boolean isExtendedIdentifier() {

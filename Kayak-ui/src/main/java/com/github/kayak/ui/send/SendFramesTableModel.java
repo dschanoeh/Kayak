@@ -244,7 +244,7 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 2:
                 return rows.get(rowIndex).getData().length;
             case 3:
-                return Util.byteArrayToHexString(rows.get(rowIndex).getData());
+                return Util.byteArrayToHexString(rows.get(rowIndex).getData(), false);
             case 4:
                 return "Send";
             case 5:
