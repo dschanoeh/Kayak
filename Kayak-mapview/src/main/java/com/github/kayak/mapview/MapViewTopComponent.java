@@ -92,7 +92,7 @@ public final class MapViewTopComponent extends TopComponent {
 
                 @Override
                 public void newFrame(Frame frame) {
-                    if(description != null && frame.getIdentifier() == description.getMessage().getId()) {
+                    if(description != null && frame.getIdentifier() == description.getMessageDescription().getId()) {
                         Signal s = description.decodeData(frame.getData());
                         latitude = s.getValue();
                         long timestamp = frame.getTimestamp();
@@ -107,7 +107,7 @@ public final class MapViewTopComponent extends TopComponent {
                 }
             };
 
-            int id = desc.getMessage().getId();
+            int id = desc.getMessageDescription().getId();
             s = new Subscription(latitudeReceiver, b);
             s.subscribe(id);
         }
@@ -133,7 +133,7 @@ public final class MapViewTopComponent extends TopComponent {
 
                 @Override
                 public void newFrame(Frame frame) {
-                    if(description != null && frame.getIdentifier() == description.getMessage().getId()) {
+                    if(description != null && frame.getIdentifier() == description.getMessageDescription().getId()) {
                         Signal s = description.decodeData(frame.getData());
                         longitude = s.getValue();
                         long timestamp = frame.getTimestamp();
@@ -148,7 +148,7 @@ public final class MapViewTopComponent extends TopComponent {
                 }
             };
 
-            int id = desc.getMessage().getId();
+            int id = desc.getMessageDescription().getId();
             s = new Subscription(longitudeReceiver, b);
             s.subscribe(id);
         }

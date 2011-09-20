@@ -18,8 +18,12 @@
 
 package com.github.kayak.canio.kcd.loader;
 
+import com.github.kayak.canio.kcd.BasicLabelType;
 import com.github.kayak.canio.kcd.Bus;
 import com.github.kayak.canio.kcd.Consumer;
+import com.github.kayak.canio.kcd.Label;
+import com.github.kayak.canio.kcd.LabelGroup;
+import com.github.kayak.canio.kcd.LabelSet;
 import com.github.kayak.canio.kcd.Message;
 import com.github.kayak.canio.kcd.Multiplex;
 import com.github.kayak.canio.kcd.MuxGroup;
@@ -40,7 +44,6 @@ import java.io.FileInputStream;
 import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -91,9 +94,9 @@ public class KCDLoader implements DescriptionLoader {
         doc.setName(documentInfo.getName());
         doc.setFileName(file.getAbsolutePath());
 
-        HashSet<com.github.kayak.core.description.Node> nodes = doc.getNodes();
+
         for(Node n : netdef.getNode()) {
-            nodes.add(new com.github.kayak.core.description.Node(n.getId(), n.getName()));
+            com.github.kayak.core.description.Node node = doc.createNode(n.getId(), n.getName());
         }
 
         for(Bus b : netdef.getBus()) {
@@ -110,22 +113,18 @@ public class KCDLoader implements DescriptionLoader {
                 /* set producer */
                 Producer producer = m.getProducer();
                 if(producer != null) {
-                    List<NodeRef> ref = m.getProducer().getNodeRef();
+                    List<NodeRef> ref = producer.getNodeRef();
                     if(ref.size() > 1) {
 
                     } else if (ref.size() == 1) {
                         String id = ref.get(0).getId();
-                        for(com.github.kayak.core.description.Node n : nodes) {
-                            if(n.getId().equals(id)) {
-                                messageDescription.setProducer(n);
-                                break;
-                            }
-                        }
+                        com.github.kayak.core.description.Node n = doc.getNodeWithID(id);
+                        if(n != null)
+                            messageDescription.setProducer(n);
                     }
                 }
 
-                List<Multiplex> multiplexes = m.getMultiplex();
-                for(Multiplex multiplex : multiplexes) {
+                for(Multiplex multiplex : m.getMultiplex()) {
                     MultiplexDescription multiplexDescription = messageDescription.createMultiplexDescription();
 
                     /* Set multiplex values */
@@ -145,17 +144,27 @@ public class KCDLoader implements DescriptionLoader {
                         for(Signal s : group.getSignal()) {
                             SignalDescription signalDescription = multiplexDescription.createMultiplexedSignal(value);
                             signalToSignalDescription(s, signalDescription);
+
+                            /* set consumers */
+                            Consumer c = s.getConsumer();
+                            if(c != null && c.getNodeRef() != null) {
+                                List<NodeRef> signalRef = c.getNodeRef();
+                                HashSet<com.github.kayak.core.description.Node> consumers = new HashSet<com.github.kayak.core.description.Node>();
+
+                                for(NodeRef nr : signalRef) {
+                                    com.github.kayak.core.description.Node n = doc.getNodeWithID(nr.getId());
+                                    if(n != null)
+                                        consumers.add(n);
+                                }
+                            }
                         }
                     }
                 }
 
                 for(Signal s : m.getSignal()) {
                     SignalDescription signalDescription = messageDescription.createSignalDescription();
-                    if(s.getEndianess().equals("motorola")) {
-                        signalDescription.setByteOrder(ByteOrder.BIG_ENDIAN);
-                    } else {
-                        signalDescription.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-                    }
+                    signalToSignalDescription(s, signalDescription);
+
 
                     /* set consumers */
                     Consumer c = s.getConsumer();
@@ -164,56 +173,15 @@ public class KCDLoader implements DescriptionLoader {
                         HashSet<com.github.kayak.core.description.Node> consumers = new HashSet<com.github.kayak.core.description.Node>();
 
                         for(NodeRef nr : signalRef) {
-                            for(com.github.kayak.core.description.Node n : nodes) {
-                                if(n.getId().equals(nr.getId())) {
-                                    consumers.add(n);
-                                    break;
-                                }
-                            }
+                            com.github.kayak.core.description.Node n = doc.getNodeWithID(nr.getId());
+                            if(n != null)
+                                consumers.add(n);
                         }
-                        signalDescription.setConsumers(consumers);
                     }
-
-                    Value value = s.getValue();
-                    if(value != null) {
-                        Double intercept = value.getIntercept();
-                        if(intercept != null)
-                            signalDescription.setIntercept(intercept);
-                        else
-                            signalDescription.setIntercept(0);
-
-                        Double slope = value.getSlope();
-                        if(slope != null)
-                            signalDescription.setSlope(slope);
-                        else
-                            signalDescription.setSlope(1);
-
-                        String typeString = value.getType();
-                        if(typeString.equals("signed")) {
-                            signalDescription.setType(SignalDescription.Type.SIGNED);
-                        } else if(typeString.equals("double")) {
-                            signalDescription.setType(SignalDescription.Type.DOUBLE);
-                        } else if(typeString.equals("float")) {
-                            signalDescription.setType(SignalDescription.Type.SINGLE);
-                        } else {
-                            signalDescription.setType(SignalDescription.Type.UNSIGNED);
-                        }
-
-                        signalDescription.setUnit(value.getUnit());
-                    }
-
-                    signalDescription.setLength(s.getLength());
-                    signalDescription.setName(s.getName());
-                    signalDescription.setNotes(s.getNotes());
-                    signalDescription.setOffset(s.getOffset());
-
-                    /* TODO add labels */
 
                 }
                 description.addMessageDescription(messageDescription);
             }
-
-            doc.getBusses().add(description);
         }
 
         return doc;
@@ -261,7 +229,23 @@ public class KCDLoader implements DescriptionLoader {
         signalDescription.setNotes(s.getNotes());
         signalDescription.setOffset(s.getOffset());
 
-        /* TODO add labels */
+        LabelSet ls = s.getLabelSet();
+        if(ls != null) {
+            List<BasicLabelType> labels = ls.getLabelOrLabelGroup();
+            if(labels != null) {
+                for(BasicLabelType basicLabel : labels) {
+                    if(basicLabel instanceof Label) {
+                        Label l = (Label) basicLabel;
+                        com.github.kayak.core.description.Label label = new com.github.kayak.core.description.Label(l.getValue().longValue(), l.getName());
+                        signalDescription.addLabel(label);
+                    } else if(basicLabel instanceof LabelGroup) {
+                        LabelGroup l = (LabelGroup) basicLabel;
+                        com.github.kayak.core.description.Label label = new com.github.kayak.core.description.Label(l.getFrom().longValue(), l.getTo().longValue(), l.getName());
+                        signalDescription.addLabel(label);
+                    }
+                }
+            }
+        }
 
         return signalDescription;
     }

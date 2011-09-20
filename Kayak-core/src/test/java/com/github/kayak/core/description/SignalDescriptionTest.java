@@ -18,6 +18,7 @@
 
 package com.github.kayak.core.description;
 
+import java.util.Set;
 import com.github.kayak.core.Util;
 import com.github.kayak.core.Frame;
 import java.nio.ByteOrder;
@@ -39,6 +40,7 @@ public class SignalDescriptionTest {
     private static SignalDescription description5;
     private static Frame frame;
     private static Signal data, data2, data3, data4, data5;
+    private static Label label;
 
 
     public SignalDescriptionTest() {
@@ -65,6 +67,8 @@ public class SignalDescriptionTest {
         description2.setOffset(0);
         description2.setIntercept(0);
         description2.setSlope(1);
+        label = new Label(168, "foo");
+        description2.addLabel(label);
 
         description3 = new SignalDescription(m);
         description3.setType(SignalDescription.Type.SIGNED);
@@ -168,4 +172,20 @@ public class SignalDescriptionTest {
         assertEquals(expResult, result, 0.1);
     }
 
+    @Test
+    public void labelTest() {
+        System.out.println("Testing label");
+        Set<Label> labels = description2.getAllLabels();
+        assertNotNull(labels);
+        assertEquals(1, labels.size());
+
+        Set<String> l = data2.getLabels();
+        assertNotNull(l);
+        assertEquals(1, l.size());
+        for(String label : l) {
+            assertEquals(label, "foo");
+        }
+
+        assertEquals("foo", data2.getReadableString());
+    }
 }

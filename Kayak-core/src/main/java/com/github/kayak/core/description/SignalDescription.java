@@ -18,8 +18,9 @@
 package com.github.kayak.core.description;
 
 import java.nio.ByteOrder;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A SignalDescription contains the parameters and methods to extract
@@ -40,14 +41,22 @@ public class SignalDescription {
     private String notes;
     private String name;
     private Type type;
-    private HashMap<Integer, String> labels;
-    private HashSet<Node> consumers;
+    private Set<Label> labels = new HashSet<Label>();
+    private Set<Node> consumers = new HashSet<Node>();
     private ByteOrder byteOrder;
     private Object parent;
     private boolean multiplexed = false;
     private MultiplexDescription multiplexDescription;
     private MessageDescription description;
     private long multiplexCount;
+
+    public void addLabel(Label l) {
+        labels.add(l);
+    }
+
+    public Set<Label> getAllLabels() {
+        return Collections.unmodifiableSet(labels);
+    }
 
     public MessageDescription getDescription() {
         return description;
@@ -73,12 +82,12 @@ public class SignalDescription {
         return parent;
     }
 
-    public HashSet<Node> getConsumers() {
-        return consumers;
+    public Set<Node> getConsumers() {
+        return Collections.unmodifiableSet(consumers);
     }
 
-    public void setConsumers(HashSet<Node> consumer) {
-        this.consumers = consumer;
+    public void addConsumer(Node consumer) {
+        consumers.add(consumer);
     }
 
     public ByteOrder getByteOrder() {
@@ -225,6 +234,16 @@ public class SignalDescription {
                 double doubleValue = (double) rawValue * slope + intercept;
                 signal.setValue(doubleValue);
                 break;
+        }
+
+        /* find all labels that match for the current raw value */
+        if(!labels.isEmpty()) {
+            Set<String> matchingLabels = new HashSet<String>();
+            for(Label l : labels) {
+                if(l.isInRange(rawValue))
+                    matchingLabels.add(l.getLabel());
+            }
+            signal.setLabels(matchingLabels);
         }
 
         return signal;

@@ -19,13 +19,14 @@ package com.github.kayak.ui.messageview;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.description.Node;
+import com.github.kayak.core.description.Label;
 import com.github.kayak.core.description.SignalDescription;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteOrder;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
@@ -204,7 +205,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
 
             @Override
             public String getValue() throws IllegalAccessException, InvocationTargetException {
-                HashSet<Node> consumers = description.getConsumers();
+                Set<Node> consumers = description.getConsumers();
                 StringBuilder sb = new StringBuilder();
 
                 Iterator<Node> it = consumers.iterator();
@@ -220,6 +221,27 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
 
         };
 
+        Property labels = new PropertySupport.ReadOnly<String>("Labels", String.class, "Labels", "Labels that are defined in the signal description") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                Set<Label> la = description.getAllLabels();
+
+                if(la != null && !la.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+
+                    for(Label l : la) {
+                        sb.append(l.getLabel());
+                        sb.append(", ");
+                    }
+
+                    sb.setLength(sb.length()-2);
+                    return sb.toString();
+                } else
+                    return "";
+            }
+        };
+
         set.put(notes);
         set.put(type);
         set.put(unit);
@@ -231,6 +253,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
         set.put(consumer);
         set.put(multiplexed);
         set.put(multiplexCount);
+        set.put(labels);
 
         s.put(set);
 

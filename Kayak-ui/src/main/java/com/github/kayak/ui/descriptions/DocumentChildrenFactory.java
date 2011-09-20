@@ -28,16 +28,16 @@ import org.openide.nodes.Node;
  * @author dschanoeh
  */
 public class DocumentChildrenFactory extends ChildFactory<BusDescription> {
-    
+
     private Document document;
-    
+
     public DocumentChildrenFactory(Document document) {
         this.document = document;
     }
 
     @Override
     protected boolean createKeys(List<BusDescription> list) {
-        list.addAll(document.getBusses());
+        list.addAll(document.getBusDescriptions());
         return true;
     }
 
@@ -45,6 +45,6 @@ public class DocumentChildrenFactory extends ChildFactory<BusDescription> {
     protected Node[] createNodesForKey(BusDescription key) {
         return new Node[] { new DescriptionNode(key) };
     }
-    
-    
+
+
 }

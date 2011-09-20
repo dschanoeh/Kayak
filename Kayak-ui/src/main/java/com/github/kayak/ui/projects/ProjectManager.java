@@ -205,7 +205,7 @@ public class ProjectManager {
                                         for(String ext : extensions) {
                                             if(ext.equals(fileObject.getExt())) {
                                                 com.github.kayak.core.description.Document parseFile = loader.parseFile(file);
-                                                HashSet<BusDescription> busDescriptions = parseFile.getBusses();
+                                                Set<BusDescription> busDescriptions = parseFile.getBusDescriptions();
 
                                                 for(BusDescription b : busDescriptions)  {
                                                     if(b.getName().equals(descriptionName)) {

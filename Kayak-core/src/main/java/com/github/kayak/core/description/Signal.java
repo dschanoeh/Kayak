@@ -19,6 +19,8 @@
 package com.github.kayak.core.description;
 
 import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * A signal is a single data value that can be extracted out of a {@link Frame}.
@@ -34,7 +36,7 @@ public class Signal {
     private long rawValue;
     private String unit;
     private double value;
-    private String label;
+    private Set<String> labels;
     private String notes;
     private SignalDescription description;
     private boolean multiplexed;
@@ -55,12 +57,12 @@ public class Signal {
         this.description = description;
     }
 
-    public String getLabel() {
-        return label;
+    public Set<String> getLabels() {
+        return Collections.unmodifiableSet(labels);
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setLabels(Set<String> labels) {
+        this.labels = labels;
     }
 
     public long getRawValue() {
@@ -100,6 +102,19 @@ public class Signal {
     }
 
     public String getReadableString() {
+        if(labels != null && !labels.isEmpty()) {
+            if(labels.size() == 1) {
+                return labels.iterator().next();
+            } else {
+                StringBuilder sb = new StringBuilder();
+                for(String label : labels) {
+                    sb.append(label);
+                    sb.append(", ");
+                }
+                sb.setLength(sb.length()-2);
+                return sb.toString();
+            }
+        }
         return readableFormat.format(value);
     }
 

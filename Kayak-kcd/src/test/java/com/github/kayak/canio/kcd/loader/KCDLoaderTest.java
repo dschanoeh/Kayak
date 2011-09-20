@@ -18,10 +18,10 @@
 
 package com.github.kayak.canio.kcd.loader;
 
+import com.github.kayak.core.description.Label;
 import com.github.kayak.core.description.MultiplexDescription;
 import java.util.Set;
 import com.github.kayak.core.description.Node;
-import java.util.HashSet;
 import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.core.description.Document;
 import com.github.kayak.core.description.MessageDescription;
@@ -69,7 +69,7 @@ public class KCDLoaderTest {
         assertEquals("Powell Motors", document.getCompany());
 
         System.out.println("nodes");
-        HashSet<Node> nodes = document.getNodes();
+        Set<Node> nodes = document.getNodes();
 
         boolean foundMotor = false;
         for(Node n : nodes) {
@@ -80,7 +80,7 @@ public class KCDLoaderTest {
 
         assertTrue(foundMotor);
 
-        HashSet<BusDescription> busses = document.getBusses();
+        Set<BusDescription> busses = document.getBusDescriptions();
         assertEquals(3, busses.size());
 
     }
@@ -88,7 +88,7 @@ public class KCDLoaderTest {
     @Test
     public void testMultiplexes() {
         boolean found = false;
-        Set<BusDescription> busses = document.getBusses();
+        Set<BusDescription> busses = document.getBusDescriptions();
 
         for(BusDescription bus : busses) {
             if(bus.getName().equals("Motor")) {
@@ -110,6 +110,31 @@ public class KCDLoaderTest {
         }
 
         assertTrue(found);
+    }
+
+    @Test
+    public void testLabels() {
+        Set<BusDescription> busses = document.getBusDescriptions();
+
+        for(BusDescription bus : busses) {
+            if(bus.getName().equals("Motor")) {
+                Set<SignalDescription> signals = bus.getMessages().get(0x0b2).getSignals();
+
+                boolean found = false;
+
+                for(SignalDescription s : signals) {
+                    if(s.getName().equals("OutsideTemp")) {
+                        found = true;
+
+                        Set<Label> labels = s.getAllLabels();
+                        assertNotNull(labels);
+                        assertEquals(2, labels.size());
+                    }
+                }
+
+                assertTrue(found);
+            }
+        }
     }
 
     /**
