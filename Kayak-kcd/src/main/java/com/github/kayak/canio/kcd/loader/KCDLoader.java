@@ -21,6 +21,8 @@ package com.github.kayak.canio.kcd.loader;
 import com.github.kayak.canio.kcd.Bus;
 import com.github.kayak.canio.kcd.Consumer;
 import com.github.kayak.canio.kcd.Message;
+import com.github.kayak.canio.kcd.Multiplex;
+import com.github.kayak.canio.kcd.MuxGroup;
 import com.github.kayak.canio.kcd.NetworkDefinition;
 import com.github.kayak.canio.kcd.Node;
 import com.github.kayak.canio.kcd.NodeRef;
@@ -31,12 +33,14 @@ import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.core.description.DescriptionLoader;
 import com.github.kayak.core.description.Document;
 import com.github.kayak.core.description.MessageDescription;
+import com.github.kayak.core.description.MultiplexDescription;
 import com.github.kayak.core.description.SignalDescription;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -97,11 +101,12 @@ public class KCDLoader implements DescriptionLoader {
             description.setName(b.getName());
             description.setBaudrate(b.getBaudrate());
 
+            /* Messages for each bus */
             for(Message m :  b.getMessage()) {
-                MessageDescription messageDescription = description.createMessage(Integer.parseInt(m.getId().substring(2),16));
+                MessageDescription messageDescription = new MessageDescription(Integer.parseInt(m.getId().substring(2),16));
                 messageDescription.setInterval(m.getInterval());
                 messageDescription.setName(m.getName());
-                
+
                 /* set producer */
                 Producer producer = m.getProducer();
                 if(producer != null) {
@@ -119,14 +124,39 @@ public class KCDLoader implements DescriptionLoader {
                     }
                 }
 
+                List<Multiplex> multiplexes = m.getMultiplex();
+                for(Multiplex multiplex : multiplexes) {
+                    MultiplexDescription multiplexDescription = messageDescription.createMultiplexDescription();
+
+                    /* Set multiplex values */
+                    if(multiplex.getEndianess().equals("motorola")) {
+                        multiplexDescription.setByteOrder(ByteOrder.BIG_ENDIAN);
+                    } else {
+                        multiplexDescription.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+                    }
+                    multiplexDescription.setLength(multiplex.getLength());
+                    multiplexDescription.setOffset(multiplex.getOffset());
+                    multiplexDescription.setName(multiplex.getName());
+
+                    /* Transform MuxGroups to Signal lists */
+                    for(MuxGroup group : multiplex.getMuxGroup()) {
+                        long value = (long) group.getCount();
+
+                        for(Signal s : group.getSignal()) {
+                            SignalDescription signalDescription = multiplexDescription.createMultiplexedSignal(value);
+                            signalToSignalDescription(s, signalDescription);
+                        }
+                    }
+                }
+
                 for(Signal s : m.getSignal()) {
-                    SignalDescription signalDescription = messageDescription.createSignal();
+                    SignalDescription signalDescription = messageDescription.createSignalDescription();
                     if(s.getEndianess().equals("motorola")) {
                         signalDescription.setByteOrder(ByteOrder.BIG_ENDIAN);
                     } else {
                         signalDescription.setByteOrder(ByteOrder.LITTLE_ENDIAN);
                     }
-                    
+
                     /* set consumers */
                     Consumer c = s.getConsumer();
                     if(c != null && c.getNodeRef() != null) {
@@ -151,13 +181,13 @@ public class KCDLoader implements DescriptionLoader {
                             signalDescription.setIntercept(intercept);
                         else
                             signalDescription.setIntercept(0);
-                        
+
                         Double slope = value.getSlope();
                         if(slope != null)
                             signalDescription.setSlope(slope);
-                        else 
+                        else
                             signalDescription.setSlope(1);
-                        
+
                         String typeString = value.getType();
                         if(typeString.equals("signed")) {
                             signalDescription.setType(SignalDescription.Type.SIGNED);
@@ -168,27 +198,72 @@ public class KCDLoader implements DescriptionLoader {
                         } else {
                             signalDescription.setType(SignalDescription.Type.UNSIGNED);
                         }
-                        
+
                         signalDescription.setUnit(value.getUnit());
                     }
 
                     signalDescription.setLength(s.getLength());
                     signalDescription.setName(s.getName());
                     signalDescription.setNotes(s.getNotes());
-                    signalDescription.setOffset(s.getOffset()); 
-                    
+                    signalDescription.setOffset(s.getOffset());
+
                     /* TODO add labels */
 
-                    messageDescription.getSignals().add(signalDescription);
                 }
-
-                description.getMessages().put(messageDescription.getId(), messageDescription);
+                description.addMessageDescription(messageDescription);
             }
 
             doc.getBusses().add(description);
         }
 
         return doc;
+    }
+
+    private com.github.kayak.core.description.SignalDescription signalToSignalDescription(Signal s, SignalDescription signalDescription) {
+        if (s.getEndianess().equals("motorola")) {
+            signalDescription.setByteOrder(ByteOrder.BIG_ENDIAN);
+        } else {
+            signalDescription.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+        }
+
+        Value value = s.getValue();
+        if (value != null) {
+            Double intercept = value.getIntercept();
+            if (intercept != null) {
+                signalDescription.setIntercept(intercept);
+            } else {
+                signalDescription.setIntercept(0);
+            }
+
+            Double slope = value.getSlope();
+            if (slope != null) {
+                signalDescription.setSlope(slope);
+            } else {
+                signalDescription.setSlope(1);
+            }
+
+            String typeString = value.getType();
+            if (typeString.equals("signed")) {
+                signalDescription.setType(SignalDescription.Type.SIGNED);
+            } else if (typeString.equals("double")) {
+                signalDescription.setType(SignalDescription.Type.DOUBLE);
+            } else if (typeString.equals("float")) {
+                signalDescription.setType(SignalDescription.Type.SINGLE);
+            } else {
+                signalDescription.setType(SignalDescription.Type.UNSIGNED);
+            }
+
+            signalDescription.setUnit(value.getUnit());
+        }
+
+        signalDescription.setLength(s.getLength());
+        signalDescription.setName(s.getName());
+        signalDescription.setNotes(s.getNotes());
+        signalDescription.setOffset(s.getOffset());
+
+        /* TODO add labels */
+
+        return signalDescription;
     }
 
     @Override

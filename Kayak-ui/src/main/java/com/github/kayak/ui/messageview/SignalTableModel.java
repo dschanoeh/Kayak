@@ -26,8 +26,11 @@ import com.github.kayak.core.description.MessageDescription;
 import com.github.kayak.core.description.Signal;
 import com.github.kayak.core.description.SignalDescription;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.table.AbstractTableModel;
 import org.openide.util.Exceptions;
 
@@ -57,7 +60,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
     };
 
     private Presentation activePresentation = Presentation.READABLE;
-    private HashMap<Bus, Subscription> subscriptions = new HashMap<Bus, Subscription>();
+    private Map<Bus, Subscription> subscriptions = new HashMap<Bus, Subscription>();
     private final ArrayList<SignalTableEntry> entries = new ArrayList<SignalTableEntry>();
     private Thread refreshThread;
 
@@ -66,13 +69,14 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
         @Override
         public void run() {
             while(true) {
-                for(int i=0;i<entries.size();i++) {
-                    synchronized(entries) {
-                        SignalTableEntry entry = entries.get(i);
-                        if(entry.isRefresh()) {
+                int i=0;
+                synchronized(entries) {
+                    for(SignalTableEntry e : entries) {
+                        if(e.isRefresh()) {
                             fireTableRowsUpdated(i, i);
-                            entry.setRefresh(false);
+                            e.setRefresh(false);
                         }
+                        i++;
                     }
                 }
                 try {
@@ -91,7 +95,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             Bus bus = frame.getBus();
 
             Message m = bus.getDescription().decodeFrame(frame);
-            HashSet<Signal> frameSignals = m.getSignals();
+            Set<Signal> frameSignals = m.getSignals();
 
             synchronized(entries) {
                 for(Signal s : frameSignals) {
@@ -197,7 +201,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             case 2:
                 return entry.getDescription().getUnit();
             case 3:
-                MessageDescription message = entry.getDescription().getMessage();
+                MessageDescription message = entry.getDescription().getMessageDescription();
                 return message.getName() + " (0x" + Integer.toHexString(message.getId()) + ")";
             case 4:
                 if(signal != null)
@@ -236,7 +240,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
                 subscriptions.put(bus, s);
             }
 
-            s.subscribe(desc.getMessage().getId());
+            s.subscribe(desc.getMessageDescription().getId());
         }
     }
 

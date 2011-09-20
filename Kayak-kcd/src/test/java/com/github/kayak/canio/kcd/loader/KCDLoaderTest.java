@@ -18,10 +18,14 @@
 
 package com.github.kayak.canio.kcd.loader;
 
+import com.github.kayak.core.description.MultiplexDescription;
+import java.util.Set;
 import com.github.kayak.core.description.Node;
 import java.util.HashSet;
 import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.core.description.Document;
+import com.github.kayak.core.description.MessageDescription;
+import com.github.kayak.core.description.SignalDescription;
 import java.io.File;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -63,22 +67,49 @@ public class KCDLoaderTest {
         assertEquals("1.23", document.getVersion());
         assertEquals("Herbert Powell", document.getAuthor());
         assertEquals("Powell Motors", document.getCompany());
-        
+
         System.out.println("nodes");
         HashSet<Node> nodes = document.getNodes();
-        
+
         boolean foundMotor = false;
         for(Node n : nodes) {
             if(n.getName().equals("Motor ACME"))
                 foundMotor = true;
-            
+
         }
-        
+
         assertTrue(foundMotor);
 
         HashSet<BusDescription> busses = document.getBusses();
         assertEquals(3, busses.size());
-        
+
+    }
+
+    @Test
+    public void testMultiplexes() {
+        boolean found = false;
+        Set<BusDescription> busses = document.getBusses();
+
+        for(BusDescription bus : busses) {
+            if(bus.getName().equals("Motor")) {
+                MessageDescription message = bus.getMessages().get(0x0b2);
+
+                Set<MultiplexDescription> multiplexes = message.getMultiplexes();
+                assertEquals(multiplexes.size(), 1);
+
+                for(MultiplexDescription multiplex : multiplexes) {
+                    Set<SignalDescription> signals = multiplex.getAllSignalDescriptions();
+                    for(SignalDescription signal : signals) {
+                        if(signal.getName().equals("Info3")) {
+                            assertEquals(signal.getOffset(), 8);
+                            found = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        assertTrue(found);
     }
 
     /**
@@ -87,7 +118,7 @@ public class KCDLoaderTest {
     @Test
     public void testGetSupportedExtensions() {
         System.out.println("getSupportedExtensions");
-        
+
         String[] expResult = new String[]{"kcd", "kcd.gz"};
         String[] result = loader.getSupportedExtensions();
         assertEquals(2, result.length);

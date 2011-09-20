@@ -18,7 +18,9 @@
 
 package com.github.kayak.core.description;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -26,7 +28,7 @@ import java.util.HashSet;
  */
 public class Message {
 
-    HashSet<Signal> signals;
+    Set<Signal> signals;
     private String name;
     private String producer;
     private int id;
@@ -64,11 +66,11 @@ public class Message {
         this.producer = producer;
     }
 
-    public HashSet<Signal> getSignals() {
-        return signals;
+    public Set<Signal> getSignals() {
+        return Collections.unmodifiableSet(signals);
     }
 
-    public void setSignals(HashSet<Signal> signals) {
+    public void setSignals(Set<Signal> signals) {
         this.signals = signals;
     }
 

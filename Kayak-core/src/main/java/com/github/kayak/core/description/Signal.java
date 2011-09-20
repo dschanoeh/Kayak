@@ -37,6 +37,15 @@ public class Signal {
     private String label;
     private String notes;
     private SignalDescription description;
+    private boolean multiplexed;
+
+    public boolean isMultiplexed() {
+        return multiplexed;
+    }
+
+    public void setMultiplexed(boolean multiplexed) {
+        this.multiplexed = multiplexed;
+    }
 
     public SignalDescription getDescription() {
         return description;

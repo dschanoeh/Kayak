@@ -34,13 +34,13 @@ import org.openide.util.lookup.Lookups;
 
 /**
  *
- * @author dschanoeh
+ * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class SignalDescriptionNode extends AbstractNode implements Transferable {
-    
-    public static final DataFlavor SIGNAL_DATA_FLAVOR = new DataFlavor(SignalDescription.class, "SignalDescription"); 
-    public static final DataFlavor BUS_DATA_FLAVOR = new DataFlavor(Bus.class, "Bus"); 
-    
+
+    public static final DataFlavor SIGNAL_DATA_FLAVOR = new DataFlavor(SignalDescription.class, "SignalDescription");
+    public static final DataFlavor BUS_DATA_FLAVOR = new DataFlavor(Bus.class, "Bus");
+
     private SignalDescription description;
     private Bus bus;
 
@@ -51,7 +51,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
     public Bus getBus() {
         return bus;
     }
-    
+
     public SignalDescriptionNode(SignalDescription signalDescription, Bus bus) {
 	super(Children.LEAF, Lookups.fixed(signalDescription, bus));
 
@@ -85,7 +85,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
             return description;
         }
         return null;
-    } 
+    }
 
     @Override
     protected Sheet createSheet() {
@@ -109,7 +109,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
             }
 
         };
-                
+
         Property byteOrder = new PropertySupport.ReadOnly<String>("Byte order", String.class, "Byte order", "Byte order of the signal") {
 
             @Override
@@ -141,7 +141,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
 		    default:
 			return "";
 		}
-			
+
             }
 
         };
@@ -154,7 +154,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
             }
 
         };
-        
+
         Property length = new PropertySupport.ReadOnly<Integer>("Length", Integer.class, "Length", "Length (in bit) of the signal in the frame") {
 
             @Override
@@ -173,6 +173,24 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
 
         };
 
+        Property multiplexed = new PropertySupport.ReadOnly<Boolean>("Multiplexed", Boolean.class, "Multiplexed", "Set if the signal is multiplexed") {
+
+            @Override
+            public Boolean getValue() throws IllegalAccessException, InvocationTargetException {
+                return description.isMultiplexed();
+            }
+
+        };
+
+        Property multiplexCount = new PropertySupport.ReadOnly<Long>("Multiplex count", Long.class, "Multiplex count", "Value the multiplex counter must have for this signal.") {
+
+            @Override
+            public Long getValue() throws IllegalAccessException, InvocationTargetException {
+                return description.getMultiplexCount();
+            }
+
+        };
+
         Property intercept = new PropertySupport.ReadOnly<Double>("Intercept", Double.class, "Intercept", "Intercept of the signal") {
 
             @Override
@@ -181,23 +199,23 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
             }
 
         };
-        
+
         Property consumer = new PropertySupport.ReadOnly<String>("Consumer", String.class, "Consumer", "Bus nodes that consume this signal") {
 
             @Override
             public String getValue() throws IllegalAccessException, InvocationTargetException {
                 HashSet<Node> consumers = description.getConsumers();
                 StringBuilder sb = new StringBuilder();
-                
+
                 Iterator<Node> it = consumers.iterator();
                 while(it.hasNext()) {
                     sb.append(it.next().getName());
-                
+
                     if(it.hasNext())
                         sb.append(", ");
                 }
- 
-		return sb.toString();	
+
+		return sb.toString();
             }
 
         };
@@ -211,10 +229,12 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
         set.put(slope);
         set.put(intercept);
         set.put(consumer);
+        set.put(multiplexed);
+        set.put(multiplexCount);
 
         s.put(set);
 
         return s;
     }
-    
+
 }

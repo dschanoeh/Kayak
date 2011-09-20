@@ -19,7 +19,9 @@
 package com.github.kayak.core.description;
 
 import com.github.kayak.core.Frame;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -31,12 +33,8 @@ public class MessageDescription {
     private int interval;
     private String name;
     private Node producer;
-    private HashSet<SignalDescription> signals;
-    private BusDescription bus;
-
-    public BusDescription getBus() {
-        return bus;
-    }
+    private final Set<SignalDescription> signals = Collections.synchronizedSet(new HashSet<SignalDescription>());
+    private final Set<MultiplexDescription> multiplexes = Collections.synchronizedSet(new HashSet<MultiplexDescription>());
 
     public Node getProducer() {
         return producer;
@@ -66,17 +64,27 @@ public class MessageDescription {
         this.name = name;
     }
 
-    public HashSet<SignalDescription> getSignals() {
-        return signals;
+    public Set<SignalDescription> getSignals() {
+        return Collections.unmodifiableSet(signals);
     }
 
-    public void setSignals(HashSet<SignalDescription> signals) {
-        this.signals = signals;
+    public Set<MultiplexDescription> getMultiplexes() {
+        return Collections.unmodifiableSet(multiplexes);
     }
 
-    protected MessageDescription(BusDescription bus, int id) {
-        signals = new HashSet<SignalDescription>();
-        this.bus = bus;
+    public void addMultiplex(MultiplexDescription m) {
+        synchronized(multiplexes) {
+            multiplexes.add(m);
+        }
+    }
+
+    public void addSignal(SignalDescription s) {
+        synchronized(signals) {
+            signals.add(s);
+        }
+    }
+
+    public MessageDescription(int id) {
         this.id = id;
     }
 
@@ -86,22 +94,37 @@ public class MessageDescription {
         m.setId(id);
         m.setInterval(interval);
         m.setName(name);
-        m.setProducer(producer.getName());
-        HashSet<Signal> ret = m.getSignals();
+        if(producer!=null)
+            m.setProducer(producer.getName());
+
+        byte[] data = f.getData();
+        HashSet<Signal> sig = new HashSet<Signal>();
 
         for(SignalDescription s : signals) {
-            Signal signal = s.decodeData(f.getData());
+            Signal signal = s.decodeData(data);
             if(s != null)
-                ret.add(signal);
+                sig.add(signal);
         }
-        
+
+        for(MultiplexDescription mul : multiplexes) {
+            sig.addAll(mul.decodeData(data));
+        }
+
+        m.setSignals(sig);
+
         return m;
     }
 
-    public SignalDescription createSignal() {
+    public SignalDescription createSignalDescription() {
         SignalDescription s = new SignalDescription(this);
         signals.add(s);
         return s;
+    }
+
+    public MultiplexDescription createMultiplexDescription() {
+        MultiplexDescription m = new MultiplexDescription(this);
+        multiplexes.add(m);
+        return m;
     }
 
 }

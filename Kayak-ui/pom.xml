@@ -59,6 +59,7 @@
             <groupId>com.github.kayak</groupId>
             <artifactId>Kayak-core</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <type>nbm</type>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>

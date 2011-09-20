@@ -43,10 +43,34 @@ public class SignalDescription {
     private HashMap<Integer, String> labels;
     private HashSet<Node> consumers;
     private ByteOrder byteOrder;
-    private MessageDescription message;
+    private Object parent;
+    private boolean multiplexed = false;
+    private MultiplexDescription multiplexDescription;
+    private MessageDescription description;
+    private long multiplexCount;
 
-    public MessageDescription getMessage() {
-        return message;
+    public MessageDescription getDescription() {
+        return description;
+    }
+
+    public long getMultiplexCount() {
+        return multiplexCount;
+    }
+
+    public MessageDescription getMessageDescription() {
+        return description;
+    }
+
+    public MultiplexDescription getMultiplexDescription() {
+        return multiplexDescription;
+    }
+
+    public boolean isMultiplexed() {
+        return multiplexed;
+    }
+
+    public Object getParent() {
+        return parent;
     }
 
     public HashSet<Node> getConsumers() {
@@ -129,7 +153,7 @@ public class SignalDescription {
         this.unit = unit;
     }
 
-    protected SignalDescription(MessageDescription message) {
+    protected SignalDescription(MessageDescription description) {
         byteOrder = ByteOrder.LITTLE_ENDIAN;
         length = 1;
         offset = 0;
@@ -138,10 +162,40 @@ public class SignalDescription {
         intercept = 0;
         slope = 1;
         type = Type.UNSIGNED;
-        this.message = message;
+        this.description = description;
     }
 
+    protected SignalDescription(MultiplexDescription multiplexDescription, MessageDescription description, long multiplexCount) {
+        byteOrder = ByteOrder.LITTLE_ENDIAN;
+        length = 1;
+        offset = 0;
+        unit = "";
+        notes = "";
+        intercept = 0;
+        slope = 1;
+        type = Type.UNSIGNED;
+        this.multiplexDescription = multiplexDescription;
+        multiplexed = true;
+        this.description = description;
+        this.multiplexCount = multiplexCount;
+    }
+
+    /**
+     * Decode the binary data according to the signal information in this
+     * description. may return null if this is a multiplexed signal and the
+     * multiplex count does not match.
+     * @param data
+     * @return
+     */
     public Signal decodeData(byte[] data) {
+
+        if(multiplexed) {
+            long rawValue = SignalDescription.extractBits(data, multiplexDescription.getOffset(), multiplexDescription.getLength(), multiplexDescription.getByteOrder());
+
+            if(rawValue != multiplexCount)
+                return null;
+        }
+
         Signal signal = new Signal();
         signal.setUnit(unit);
         signal.setNotes(notes);
@@ -152,7 +206,7 @@ public class SignalDescription {
 
         signal.setRawValue(rawValue);
 
-        switch(type) {  
+        switch(type) {
             case SIGNED:
                 long signBit = (long) (1L << ((long) length - 1L));
                 long signedRawValue = rawValue - ((rawValue & signBit) << 1);
@@ -189,7 +243,7 @@ public class SignalDescription {
      * @param order The {@link ByteOrder} for the extraction
      * @return Long representation of the extracted bits
      */
-    private long extractBits(byte[] data, int offset, int length, ByteOrder order) {
+    protected static long extractBits(byte[] data, int offset, int length, ByteOrder order) {
         long val = 0;
 
         if(order == ByteOrder.LITTLE_ENDIAN) {
@@ -197,7 +251,7 @@ public class SignalDescription {
                 int bitNr = i + offset;
                 val |= ((data[bitNr >> 3] >> (bitNr & 0x07)) & 1) << i;
             }
-        } else {            
+        } else {
             for (int i = 0; i < length; i++) {
                 int bitNr = offset + length - i -1;
                 val |= ((data[bitNr >> 3] >> (7-(bitNr & 0x07))) & 1) << i;
