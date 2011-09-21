@@ -14,11 +14,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -37,16 +40,20 @@ public final class RawViewTopComponent extends TopComponent {
     private Subscription subscription;
     private RawViewTableModel model;
     private SelectionListener selectionListener;
-    private ColorRenderer colorRenderer;
 
     private class ColorRenderer extends DefaultTableCellRenderer {
 
         private final Color color = new Color(230, 230, 230);
+        private int alignment;
+
+        public ColorRenderer(int alignment) {
+            this.alignment = alignment;
+        }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object object, boolean isSelected, boolean hasFocus, int row, int column) {
 
-            Component component = super.getTableCellRendererComponent(table, object, isSelected, hasFocus, row, column);
+            JLabel component = (JLabel) super.getTableCellRendererComponent(table, object, isSelected, hasFocus, row, column);
             if(!isSelected) {
                 if((row % 2) == 0) {
                     component.setBackground(color);
@@ -56,7 +63,7 @@ public final class RawViewTopComponent extends TopComponent {
             } else {
                 component.setBackground(table.getSelectionBackground());
             }
-
+            component.setHorizontalAlignment(alignment);
             return component;
         }
     };
@@ -134,9 +141,17 @@ public final class RawViewTopComponent extends TopComponent {
         model = new RawViewTableModel();
         initComponents();
         selectionListener = new SelectionListener(jTable1);
-        colorRenderer = new ColorRenderer();
-        jTable1.setDefaultRenderer(String.class, colorRenderer);
-        jTable1.setDefaultRenderer(Integer.class, colorRenderer);
+        ColorRenderer rightColorRenderer = new ColorRenderer(JLabel.RIGHT);
+        ColorRenderer leftColorRenderer = new ColorRenderer(JLabel.LEFT);
+
+        TableColumnModel cm = jTable1.getColumnModel();
+
+        cm.getColumn(0).setCellRenderer(rightColorRenderer);
+        cm.getColumn(1).setCellRenderer(rightColorRenderer);
+        cm.getColumn(2).setCellRenderer(rightColorRenderer);
+        cm.getColumn(3).setCellRenderer(rightColorRenderer);
+        cm.getColumn(4).setCellRenderer(leftColorRenderer);
+
         jTable1.getSelectionModel().addListSelectionListener(selectionListener);
         setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent"));
         setToolTipText(NbBundle.getMessage(RawViewTopComponent.class, "HINT_RawViewTopComponent"));

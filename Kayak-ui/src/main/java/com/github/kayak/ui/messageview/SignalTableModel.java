@@ -136,7 +136,7 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             case 3:
                 return String.class;
             case 4:
-                return Long.class;
+                return String.class;
             default:
                 return String.class;
         }
@@ -148,13 +148,13 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             case 0:
                 return "Name";
             case 1:
-                return "Value";
+                return "Value [dec]";
             case 2:
                 return "Unit";
             case 3:
                 return "Message";
             case 4:
-                return "Raw value";
+                return "Raw value [hex]";
             default:
                 return "";
         }
@@ -205,9 +205,9 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
                 return message.getName() + " (0x" + Integer.toHexString(message.getId()) + ")";
             case 4:
                 if(signal != null)
-                    return signal.getRawValue();
+                    return Long.toHexString(signal.getRawValue());
                 else
-                    return 0;
+                    return "0";
             default:
                 return null;
         }

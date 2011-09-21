@@ -20,6 +20,9 @@ package com.github.kayak.ui.messageview;
 import java.awt.dnd.DropTarget;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -45,14 +48,22 @@ public final class MessageViewTopComponent extends TopComponent {
 
 
     private SignalTableModel model = new SignalTableModel();
-    
+
     public MessageViewTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(MessageViewTopComponent.class, "CTL_MessageViewTopComponent"));
         setToolTipText(NbBundle.getMessage(MessageViewTopComponent.class, "HINT_MessageViewTopComponent"));
-         
+
         DropTarget dt = new DropTarget(jTable1, new MessageSignalDropAdapter(model));
 	jTable1.setDropTarget(dt);
+
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment( JLabel.RIGHT);
+        TableColumnModel cm = jTable1.getColumnModel();
+
+        cm.getColumn(1).setCellRenderer(rightRenderer);
+        cm.getColumn(4).setCellRenderer(rightRenderer);
+
     }
 
     /** This method is called from within the constructor to
