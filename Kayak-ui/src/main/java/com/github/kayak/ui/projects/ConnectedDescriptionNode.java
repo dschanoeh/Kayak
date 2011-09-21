@@ -38,7 +38,7 @@ import org.openide.util.lookup.Lookups;
  * @author dschanoeh
  */
 public class ConnectedDescriptionNode extends AbstractNode {
-    
+
     private Bus bus;
     private BusDescription description = null;
 
@@ -60,7 +60,7 @@ public class ConnectedDescriptionNode extends AbstractNode {
         public void descriptionChanged() {
             BusDescription newDesc = bus.getDescription();
             description = newDesc;
-            
+
             if(newDesc == null) {
                 setDisplayName("Description: None");
             } else {
@@ -68,16 +68,21 @@ public class ConnectedDescriptionNode extends AbstractNode {
             }
         }
     };
-    
+
     public ConnectedDescriptionNode(Bus bus) {
         super(Children.LEAF, Lookups.fixed(bus));
 
         this.bus = bus;
         bus.addBusChangeListener(listener);
-        setDisplayName("Description: None");
+        description = bus.getDescription();
+        if(description == null)
+            setDisplayName("Description: None");
+        else
+            setDisplayName("Description: " + description.getName());
+
         setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/text-x-generic.png");
     }
-    
+
     @Override
     public PasteType getDropType(Transferable t, int action, int index) {
         try {
@@ -95,27 +100,27 @@ public class ConnectedDescriptionNode extends AbstractNode {
             Exceptions.printStackTrace(ex);
         }
         return null;
-    }    
-    
+    }
+
     @Override
     public Action[] getActions(boolean popup) {
         if(description != null)
             return new Action[] { new DisconnectAction() };
         else
             return new Action[]{};
-    } 
+    }
 
     private class DisconnectAction extends AbstractAction {
 
         public DisconnectAction() {
             putValue(NAME, "Disconnect");
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent ae) {
             bus.setDescription(null);
         }
-        
+
     };
 
 }
