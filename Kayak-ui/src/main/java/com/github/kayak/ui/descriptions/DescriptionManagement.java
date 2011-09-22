@@ -21,68 +21,152 @@ import com.github.kayak.core.description.DescriptionLoader;
 import com.github.kayak.core.description.Document;
 import com.github.kayak.ui.options.Options;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.filesystems.FileAttributeEvent;
+import org.openide.filesystems.FileChangeListener;
+import org.openide.filesystems.FileEvent;
 import org.openide.filesystems.FileObject;
 
+import org.openide.filesystems.FileRenameEvent;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
+import org.openide.util.RequestProcessor;
+import org.openide.util.Task;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class DescriptionManagement {
-    
+
     private static final Logger logger = Logger.getLogger(DescriptionManagement.class.getCanonicalName());
-    
+
     private static DescriptionManagement instance;
     private FileObject descriptionsFolder;
-    private ArrayList<Document> descriptions = new ArrayList<Document>();
-    
-    private DescriptionManagement() {
-        descriptionsFolder = FileUtil.toFileObject(new File(Options.getDescriptionsFolder()));
-        
-        
-        
-        Collection<? extends DescriptionLoader> loaders = Lookup.getDefault().lookupAll(DescriptionLoader.class);
-        
-        logger.log(Level.INFO, "Found {0} DescriptionLoaders.", Integer.toString(loaders.size()));
-        
-        if (descriptionsFolder.isFolder()) {
+    private Set<Document> descriptions = new HashSet<Document>();
+    Collection<? extends DescriptionLoader> loaders;
+    Set<DescriptionManagementChangeListener> listeners = new HashSet<DescriptionManagementChangeListener>();
+
+    private FileChangeListener changeListener = new FileChangeListener() {
+
+        @Override
+        public void fileFolderCreated(FileEvent fe) {
+
+        }
+
+        @Override
+        public void fileDataCreated(FileEvent fe) {
+            logger.log(Level.INFO, "Adding new description {0}", fe.getFile().getPath());
+            addDescription(fe.getFile());
+        }
+
+        @Override
+        public void fileChanged(FileEvent fe) {
+            logger.log(Level.INFO, "Changing description {0}", fe.getFile().getPath());
+            removeDescription(fe.getFile());
+            addDescription(fe.getFile());
+        }
+
+        @Override
+        public void fileDeleted(FileEvent fe) {
+            logger.log(Level.INFO, "Removing description {0}", fe.getFile().getPath());
+            removeDescription(fe.getFile());
+        }
+
+        @Override
+        public void fileRenamed(FileRenameEvent fre) {
+
+        }
+
+        @Override
+        public void fileAttributeChanged(FileAttributeEvent fae) {
+
+        }
+    };
+
+    private Runnable initRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            if (descriptionsFolder.isFolder()) {
             Enumeration<? extends FileObject> children = descriptionsFolder.getChildren(true);
 
             while (children.hasMoreElements()) {
                 FileObject file = children.nextElement();
+                addDescription(file);
+            }
+        }
 
-                try {
-                    for(DescriptionLoader loader : loaders) {
-                        for(String extension : loader.getSupportedExtensions()) {
-                            if(file.getExt().equals(extension)) {
-                                Document parseFile = loader.parseFile(FileUtil.toFile(file));
-                                descriptions.add(parseFile);
-                            }
+        descriptionsFolder.addRecursiveListener(changeListener);
+        }
+    };
+
+    private void addDescription(FileObject file) {
+        for (DescriptionLoader loader : loaders) {
+            for (String extension : loader.getSupportedExtensions()) {
+                if (file.getExt().equals(extension)) {
+                    try {
+                        Document parseFile = loader.parseFile(FileUtil.toFile(file));
+                        descriptions.add(parseFile);
+                        for (DescriptionManagementChangeListener listener : listeners) {
+                            listener.descriptionRemoved(parseFile);
                         }
+                    } catch (Exception ex) {
+                        logger.log(Level.INFO, "Could not load file", ex);
                     }
-                } catch (Exception ex) {
-                    logger.log(Level.WARNING, "Could not parse description", ex);
                 }
             }
         }
     }
-    
+
+    private void removeDescription(FileObject fe) {
+        Document doc = null;
+        for (Document d : descriptions) {
+            if (d.getFileName().equals(fe.getPath())) {
+                doc = d;
+                break;
+
+            }
+        }
+        if (doc != null) {
+            descriptions.remove(doc);
+            for (DescriptionManagementChangeListener listener : listeners) {
+                listener.descriptionRemoved(doc);
+            }
+        }
+    }
+
+    private DescriptionManagement() {
+        descriptionsFolder = FileUtil.toFileObject(new File(Options.getDescriptionsFolder()));
+
+        loaders = Lookup.getDefault().lookupAll(DescriptionLoader.class);
+        logger.log(Level.INFO, "Found {0} DescriptionLoaders.", Integer.toString(loaders.size()));
+
+        Task t = new Task(initRunnable);
+        RequestProcessor.getDefault().post(t);
+    }
+
     public static DescriptionManagement getGlobalDescriptionManagement() {
         if(instance == null)
             instance = new DescriptionManagement();
-        
+
         return instance;
     }
-    
+
     public Collection<Document> getDescriptions() {
         return descriptions;
     }
-    
+
+    public void addListener(DescriptionManagementChangeListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(DescriptionManagementChangeListener listener) {
+        listeners.remove(listener);
+    }
 }
