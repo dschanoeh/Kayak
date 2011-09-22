@@ -174,10 +174,12 @@ public class ProjectManager {
 
                         NamedNodeMap busAttributes = busNode.getAttributes();
                         Node busNameNode = busAttributes.getNamedItem("name");
-
                         String busName = busNameNode.getNodeValue();
+                        Node aliasNode = busAttributes.getNamedItem("alias");
+                        String alias = aliasNode.getNodeValue();
                         Bus bus = new Bus();
                         bus.setName(busName);
+                        bus.setAlias(alias);
 
                         NodeList busChildren = busNode.getChildNodes();
 
@@ -255,6 +257,7 @@ public class ProjectManager {
                 for(Bus bus : project.getBusses()) {
                     Element busElement = doc.createElement("Bus");
                     busElement.setAttribute("name", bus.getName());
+                    busElement.setAttribute("alias", bus.getAlias());
                     projectElement.appendChild(busElement);
 
                     BusURL connection = bus.getConnection();

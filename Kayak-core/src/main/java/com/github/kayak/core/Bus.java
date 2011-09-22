@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * A Bus is the virtual representation of a CAN bus. It connects different
@@ -43,6 +44,7 @@ public class Bus implements SubscriptionChangeListener {
     private BCMConnection bcmConnection;
     private ControlConnection controlConnection;
     private String name;
+    private String alias;
     private BusURL url;
     private final HashSet<BusChangeListener> listeners;
     private final HashSet<EventFrameListener> eventFrameListeners;
@@ -51,6 +53,8 @@ public class Bus implements SubscriptionChangeListener {
     private final HashSet<StatisticsListener> statisticsListeners;
     private BusDescription description;
     private long delta=0; /* delta between socketcand system time and local timesource */
+
+    public static final Pattern BUS_NAME_PATTERN = Pattern.compile("[a-z0-9]{1,16}");
 
     private StatisticsListener statisticsReceiver = new StatisticsListener() {
 
@@ -103,16 +107,43 @@ public class Bus implements SubscriptionChangeListener {
     public String toString() {
         if(name == null)
             return super.toString();
-        else
-            return name;
+        else {
+            if(alias == null || alias.equals(""))
+                return name;
+            else
+                return alias + " (" + name + ")";
+        }
     }
 
     public BusURL getConnection() {
         return url;
     }
 
+    /**
+     * Returns the name of the bus. This name is used internally and has to
+     * match a specific pattern. A human readable name can be set with 'alias
+     */
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        if(BUS_NAME_PATTERN.matcher(name).matches()) {
+            this.name = name;
+            notifyListenersName();
+        }
+    }
+
+    /**
+     * Returns the human readable name of the bus.
+     */
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+        notifyListenersAlias();
     }
 
     public void registerStatisticsReceiver(StatisticsListener receiver) {
@@ -140,11 +171,6 @@ public class Bus implements SubscriptionChangeListener {
         if(controlConnection != null) {
             controlConnection.disableStatistics();
         }
-    }
-
-    public void setName(String name) {
-        this.name = name;
-        notifyListenersName();
     }
 
     /**
@@ -472,7 +498,16 @@ public class Bus implements SubscriptionChangeListener {
         synchronized(listeners) {
             for(BusChangeListener listener : listeners) {
                 if(listener != null)
-                    listener.nameChanged();
+                    listener.nameChanged(name);
+            }
+        }
+    }
+
+    private void notifyListenersAlias() {
+        synchronized(listeners) {
+            for(BusChangeListener listener : listeners) {
+                if(listener != null)
+                    listener.aliasChanged(alias);
             }
         }
     }

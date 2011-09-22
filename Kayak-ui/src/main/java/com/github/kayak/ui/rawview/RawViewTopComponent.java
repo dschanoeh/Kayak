@@ -76,8 +76,8 @@ public final class RawViewTopComponent extends TopComponent {
         }
 
         @Override
-        public void nameChanged() {
-            setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent") + " - " + bus.getName());
+        public void nameChanged(String name) {
+            setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent") + " - " + bus.toString());
         }
 
         @Override
@@ -88,6 +88,11 @@ public final class RawViewTopComponent extends TopComponent {
         @Override
         public void descriptionChanged() {
 
+        }
+
+        @Override
+        public void aliasChanged(String string) {
+            setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent") + " - " + bus.toString());
         }
     };
 
@@ -400,7 +405,7 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     public void setBus(Bus bus) {
         this.bus = bus;
-        setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent") + " - " + bus.getName());
+        setName(NbBundle.getMessage(RawViewTopComponent.class, "CTL_RawViewTopComponent") + " - " + bus.toString());
         bus.addBusChangeListener(listener);
 
         subscription = new Subscription(model, bus);

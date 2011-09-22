@@ -57,14 +57,14 @@ public class ConnectedBusURLNode extends AbstractNode {
             BusURL conn = bus.getConnection();
             url = conn;
             if(conn == null) {
-                setDisplayName("Connection: None"); 
+                setDisplayName("Connection: None");
             } else {
-                setDisplayName("Connection: " + url.toString()); 
+                setDisplayName("Connection: " + url.toString());
             }
         }
 
         @Override
-        public void nameChanged() {
+        public void nameChanged(String name) {
         }
 
         @Override
@@ -73,6 +73,11 @@ public class ConnectedBusURLNode extends AbstractNode {
 
         @Override
         public void descriptionChanged() {
+        }
+
+        @Override
+        public void aliasChanged(String string) {
+            
         }
     };
 
@@ -89,9 +94,9 @@ public class ConnectedBusURLNode extends AbstractNode {
         } else {
             setDisplayName("Connection: " + url.toString());
         }
-        setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");    
+        setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");
     }
-    
+
     @Override
     public Action[] getActions(boolean popup) {
         if(url != null)
@@ -99,7 +104,7 @@ public class ConnectedBusURLNode extends AbstractNode {
         else
             return new Action[]{};
     }
-    
+
     @Override
     protected Sheet createSheet() {
         Sheet s = super.createSheet();
@@ -160,7 +165,7 @@ public class ConnectedBusURLNode extends AbstractNode {
 
         return s;
     }
-    
+
     @Override
     public PasteType getDropType(Transferable t, int action, int index) {
         try {
@@ -171,6 +176,7 @@ public class ConnectedBusURLNode extends AbstractNode {
                 public Transferable paste() throws IOException {
                     if(newURL.checkConnection()) {
                         url = newURL;
+                        bus.setName(url.getBus());
                         bus.setConnection(url);
                         ConnectionManager.getGlobalConnectionManager().addRecent(url);
                     } else {
@@ -185,17 +191,17 @@ public class ConnectedBusURLNode extends AbstractNode {
         }
         return null;
     }
-    
+
     private class DisconnectAction extends AbstractAction {
 
         public DisconnectAction() {
             putValue(NAME, "Disconnect");
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent ae) {
             bus.disconnect();
         }
-        
-    }; 
+
+    };
 }

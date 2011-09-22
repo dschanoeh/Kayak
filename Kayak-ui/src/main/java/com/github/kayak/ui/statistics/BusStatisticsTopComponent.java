@@ -53,8 +53,8 @@ public final class BusStatisticsTopComponent extends TopComponent {
         }
 
         @Override
-        public void nameChanged() {
-            setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.getName());
+        public void nameChanged(String name) {
+            setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.toString());
         }
 
         @Override
@@ -65,6 +65,11 @@ public final class BusStatisticsTopComponent extends TopComponent {
         @Override
         public void descriptionChanged() {
 
+        }
+
+        @Override
+        public void aliasChanged(String string) {
+            setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.toString());
         }
     };
 
@@ -118,7 +123,7 @@ public final class BusStatisticsTopComponent extends TopComponent {
         bus.registerStatisticsReceiver(model);
         bus.enableStatistics(model.getInterval());
 
-        setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.getName());
+        setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.toString());
     }
 
     void writeProperties(java.util.Properties p) {

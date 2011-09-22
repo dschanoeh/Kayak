@@ -49,7 +49,7 @@ public class ConnectedDescriptionNode extends AbstractNode {
         }
 
         @Override
-        public void nameChanged() {
+        public void nameChanged(String name) {
         }
 
         @Override
@@ -66,6 +66,11 @@ public class ConnectedDescriptionNode extends AbstractNode {
             } else {
                 setDisplayName("Description: " + description.getName());
             }
+        }
+
+        @Override
+        public void aliasChanged(String string) {
+            
         }
     };
 

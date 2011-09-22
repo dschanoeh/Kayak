@@ -28,10 +28,12 @@ public interface BusChangeListener extends EventListener {
 
     public void connectionChanged();
 
-    public void nameChanged();
+    public void nameChanged(String newName);
 
     public void destroyed();
 
     public void descriptionChanged();
-    
+
+    public void aliasChanged(String newAlias);
+
 }

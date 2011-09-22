@@ -84,7 +84,7 @@ public class BusFactory extends ChildFactory<BusDescription> {
         }
 
         @Override
-        public void nameChanged() {
+        public void nameChanged(String name) {
         }
 
         @Override
@@ -94,6 +94,11 @@ public class BusFactory extends ChildFactory<BusDescription> {
         @Override
         public void descriptionChanged() {
             refresh(true);
+        }
+
+        @Override
+        public void aliasChanged(String string) {
+
         }
     };
 
@@ -132,11 +137,11 @@ public class BusFactory extends ChildFactory<BusDescription> {
             if(b.getDescription() == key)
                 bus = b;
         }
-        
+
         AbstractNode node = new AbstractNode(Children.create(new MessageNodeFactory(key, bus), true), Lookups.fixed(key, bus));
         node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
         node.setDisplayName(bus.getName() + " (" + key.getName() + ")");
         return new Node[] { node };
     }
-    
+
 }

@@ -330,12 +330,9 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
             out.write("PLATFORM " + platform + "\n");
             out.write("DESCRIPTION \"" + description + "\"\n");
 
-            String[] busses = new String[model.getSize()];
             for(int i=0;i<model.getSize();i++) {
-                busses[i] = ((Bus) model.getElementAt(i)).getName();
-            }
-            for(String name : busses) {
-                out.write("DEVICE_ALIAS " + name + " " + name + "\n");
+                Bus b = ((Bus) model.getElementAt(i));
+                out.write("DEVICE_ALIAS " + b.getAlias() + " " + b.getName() + "\n");
             }
 
             jList1.setEnabled(false);

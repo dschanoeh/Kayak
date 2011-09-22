@@ -111,6 +111,7 @@
                         <publicPackage>com.github.kayak.ui.messageview</publicPackage>
                         <publicPackage>com.github.kayak.ui.projects</publicPackage>
                         <publicPackage>com.github.kayak.ui.time</publicPackage>
+                        <publicPackage>com.github.kayak.ui.useroutput</publicPackage>
                     </publicPackages>
                 </configuration>
                 <version>3.6</version>

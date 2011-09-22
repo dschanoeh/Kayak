@@ -30,7 +30,7 @@ import com.github.kayak.core.Bus;
  */
 public class Project {
 
-    private HashSet<Bus> busses = new HashSet<Bus>();
+    private final Set<Bus> busses = Collections.synchronizedSet(new HashSet<Bus>());
     private String name;
     private HashSet<ProjectChangeListener> listeners = new HashSet<ProjectChangeListener>();
     private boolean opened = false;
@@ -57,6 +57,33 @@ public class Project {
         }
 
         notifyListenersClosed();
+    }
+
+    public boolean isBusNameValid(String name) {
+        if(!Bus.BUS_NAME_PATTERN.matcher(name).matches())
+            return false;
+        
+        synchronized (busses) {
+            for (Bus bus : busses) {
+                if (name.equals(bus.getName())) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public String getNextValidBusName() {
+        String n = "";
+        for(int i=0;;i++) {
+            n = "can" + String.valueOf(i);
+            if(isBusNameValid(n)) {
+                break;
+            }
+        }
+
+        return name;
     }
 
     public void addProjectChangeListener(ProjectChangeListener listener) {

@@ -31,26 +31,15 @@ public final class NewBusAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        String name = JOptionPane.showInputDialog("Please give a name for the Bus", "newBus");
+        Bus b = new Bus();
+        b.setName(context.getNextValidBusName());
 
-        if (name != null) {
-            while(!nameValid(name)) {
-                name = JOptionPane.showInputDialog("Bus name is already used. Please give a correct name for the Bus", "newBus");
-                if(name == null)
-                    return;
-            }
-            Bus b = new Bus();
-            b.setName(name);
-            context.addBus(b);
+        String alias = JOptionPane.showInputDialog("Please give an alias for the Bus or leave blank for no alias", "");
+
+        if (alias != null) {
+            b.setAlias(alias);
         }
-    }
-    
-    private boolean nameValid(String name) {
-        for(Bus b : context.getBusses()) {
-            if(b.getName().equals(name))
-                return false;
-        }
-        
-        return true;
+
+        context.addBus(b);
     }
 }

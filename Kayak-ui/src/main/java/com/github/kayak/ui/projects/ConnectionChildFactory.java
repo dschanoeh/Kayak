@@ -41,17 +41,22 @@ public class ConnectionChildFactory extends ChildFactory<BusURL> {
         }
 
         @Override
-        public void nameChanged() {
-            
+        public void nameChanged(String name) {
+
         }
 
         @Override
         public void destroyed() {
-            
+
         }
 
         @Override
         public void descriptionChanged() {
+
+        }
+
+        @Override
+        public void aliasChanged(String string) {
             
         }
     };
