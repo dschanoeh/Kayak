@@ -20,6 +20,8 @@ package com.github.kayak.ui.rawview;
 
 import com.github.kayak.core.Frame;
 import com.github.kayak.core.FrameListener;
+import com.github.kayak.core.Util;
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -127,12 +129,20 @@ public class RawViewTableModel extends AbstractTableModel implements FrameListen
 
             switch (columnIndex) {
                 case 0:
+                    StringBuilder sb = new StringBuilder(20);
                     long timestamp = data.get(keys[rowIndex]).getTimestamp();
-                    return String.format("%.6f",(double) timestamp/1000000);
+                    sb.append(timestamp/1000000);
+                    sb.append(".");
+                    long l = timestamp % 1000000;
+                    String lstring = String.valueOf(l);
+                    sb.append(lstring);
+                    for(int i=0;i<(6-lstring.length());i++)
+                        sb.append('0');
+                    return sb.toString();
                 case 1:
                     return data.get(keys[rowIndex]).getInterval() / 1000;
                 case 2:
-                    return Integer.toHexString(data.get(keys[rowIndex]).getIdentifier());
+                    return Util.intToHexString(data.get(keys[rowIndex]).getIdentifier());
                 case 3:
                     return data.get(keys[rowIndex]).getData().length;
                 case 4:

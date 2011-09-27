@@ -119,15 +119,19 @@ public final class RawViewTopComponent extends TopComponent {
                 if(row != -1) {
                     row = table.convertRowIndexToModel(row);
                     String idString = (String) model.getValueAt(row, 2);
-                    int id = Integer.parseInt(idString,16);
+                    int id = Util.hexStringToInt(idString);
 
                     byte[] bytes = model.getDataForID(id);
 
-                    StringBuilder sb = new StringBuilder();
+                    StringBuilder sb = new StringBuilder(100);
 
-                    sb.append("ID: ");
+                    sb.append("[ID: ");
                     sb.append(idString);
-                    sb.append("\nBinary: ");
+
+                    sb.append("] [Timestamp: ");
+                    sb.append((String) model.getValueAt(row, 0));
+
+                    sb.append("]\nBinary: ");
 
                     for(byte b : bytes) {
                         sb.append(Util.hexStringToBinaryString(Util.byteToHexString(b)));

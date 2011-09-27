@@ -81,9 +81,6 @@ public class UtilTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of hexStringToBinaryString method, of class Util.
-     */
     @Test
     public void testHexStringToBinaryString() {
         System.out.println("hexStringToBinaryString");
@@ -91,5 +88,22 @@ public class UtilTest {
         String expResult = "111111110001001001001010";
         String result = Util.hexStringToBinaryString(s);
         assertEquals(expResult, result);
+    }
+
+    @Test
+    public void testIntStringConversion() {
+        System.out.println("IntStringConversion");
+        int a = 0x345fea;
+        int b = 0x00;
+        int c = 0xfe34b;
+
+        int newa = Util.hexStringToInt(Util.intToHexString(a));
+        int newb = Util.hexStringToInt(Util.intToHexString(b));
+        int newc = Util.hexStringToInt(Util.intToHexString(c));
+
+        assertEquals(a, newa);
+        assertEquals(b, newb);
+        assertEquals(c, newc);
+
     }
 }

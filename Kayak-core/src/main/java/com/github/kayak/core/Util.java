@@ -94,4 +94,27 @@ public class Util {
 
         return sb.toString();
     }
+
+    public static String intToHexString(int i) {
+        StringBuilder sb = new StringBuilder(10);
+        while(i > 0) {
+            int rest = i % 16;
+
+            sb.append(HEXES.charAt(rest));
+            i /= 16;
+        }
+
+        sb.reverse();
+        return sb.toString();
+    }
+
+    public static int hexStringToInt(String s) {
+        int val=0;
+        int weight=1;
+        for(int i=s.length()-1;i>=0;i--) {
+            val += weight * Character.digit(s.charAt(i), 16);
+            weight *= 16;
+        }
+        return val;
+    }
 }
