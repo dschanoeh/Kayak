@@ -235,7 +235,7 @@ public class LogFile {
                         platform = "No platform";
                     }
 
-                    Frame f = Frame.fromLogFileNotation(line);
+                    Frame f = Frame.fromLogFileNotation(line).getFrame();
                     startTime = f.getTimestamp();
                     break;
                 }

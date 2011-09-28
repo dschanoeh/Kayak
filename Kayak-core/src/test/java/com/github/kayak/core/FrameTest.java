@@ -40,20 +40,24 @@ public class FrameTest {
     public void testFromLogFileNotation() {
         System.out.println("fromLogFileNotation");
         String line = "(1244101432.788973)  can1 040#4B0B000000000000";
-        Frame result = Frame.fromLogFileNotation(line);
+        String busName = "";
+        Frame.FrameBusNamePair result = Frame.fromLogFileNotation(line);
 
-        assertEquals(1244101432788973L, result.getTimestamp());
-        assertEquals(0x40, result.getIdentifier());
+        assertEquals(1244101432788973L, result.getFrame().getTimestamp());
+        assertEquals(0x40, result.getFrame().getIdentifier());
+        assertEquals("can1", result.getBusName());
     }
 
     @Test
     public void testFromLogFileNotation2() {
         System.out.println("fromLogFileNotation2");
         String line = "(1244101432.830624) vcan2 7D3#6C00082E36560100";
-        Frame result = Frame.fromLogFileNotation(line);
+        String busName = "";
+        Frame.FrameBusNamePair result = Frame.fromLogFileNotation(line);
 
-        assertEquals(1244101432830624L, result.getTimestamp());
-        assertEquals(0x7d3, result.getIdentifier());
+        assertEquals(1244101432830624L, result.getFrame().getTimestamp());
+        assertEquals(0x7d3, result.getFrame().getIdentifier());
+        assertEquals("vcan2", result.getBusName());
     }
 
     @Test

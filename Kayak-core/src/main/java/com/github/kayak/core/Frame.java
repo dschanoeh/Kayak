@@ -67,6 +67,26 @@ public class Frame {
         }
     };
 
+    public static class FrameBusNamePair {
+
+        private Frame frame;
+        private String busName;
+
+        public String getBusName() {
+            return busName;
+        }
+
+        public Frame getFrame() {
+            return frame;
+        }
+
+        public FrameBusNamePair(Frame f, String busName) {
+            this.frame = f;
+            this.busName = busName;
+        }
+
+    }
+
     public Bus getBus() {
         return bus;
     }
@@ -143,7 +163,7 @@ public class Frame {
         return sb.toString();
     }
 
-    public static Frame fromLogFileNotation(String line) {
+    public static FrameBusNamePair fromLogFileNotation(String line) {
         if(!LogFileNotationPattern.matcher(line).matches())
             return null;
 
@@ -158,31 +178,26 @@ public class Frame {
         if(dotPos == -1)
             return null;
 
-        int bracketPos = -1;
+        int bracketPos = dotPos + 7;
 
-        for(int i=dotPos;i<line.length();i++) {
-            if(line.charAt(i) == ')') {
-                bracketPos = i;
-                break;
-            }
-        }
-
-        if(bracketPos == -1)
-            return null;
-
-        long msecs = Long.parseLong(line.substring(1, dotPos)) * 1000000 + Long.parseLong(line.substring(dotPos+1, bracketPos));
+        long usecs = Long.parseLong(line.substring(1, dotPos)) * 1000000 + Long.parseLong(line.substring(dotPos+1, bracketPos));
 
         int idPos = -3;
+
+        int busStart = -1;
+        int busStop = -1;
 
         for(int i=bracketPos+1;i<line.length();i++) {
             switch(idPos) {
                 case -3:
                     if(line.charAt(i) != ' ') {
+                        busStart = i;
                         idPos = -2;
                     }
                     break;
                 case -2:
                     if(line.charAt(i) == ' ') {
+                        busStop = i-1;
                         idPos = -1;
                     }
                     break;
@@ -202,6 +217,11 @@ public class Frame {
         if(idPos < 0)
             return null;
 
+        if(busStart == -1 || busStop == -1)
+            return null;
+
+        String busName = line.substring(busStart, busStop+1);
+
         int hashPos = -1;
 
         for(int i=idPos+1;i<line.length();i++) {
@@ -216,9 +236,9 @@ public class Frame {
         byte[] message = Util.hexStringToByteArray(line.substring(hashPos+1, line.length()));
 
         Frame frame = new Frame(identifier, message);
-        frame.setTimestamp(msecs);
+        frame.setTimestamp(usecs);
 
-        return frame;
+        return new FrameBusNamePair(frame, busName);
     }
 
     public boolean isExtendedIdentifier() {
