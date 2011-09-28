@@ -105,11 +105,14 @@ public class Bus implements SubscriptionChangeListener {
 
     @Override
     public String toString() {
-        if(name == null)
-            return super.toString();
-        else {
-            if(alias == null || alias.equals(""))
-                return name;
+        if(name == null) {
+            if(alias == null)
+                return super.toString();
+            else
+                return alias + " ()";
+        } else {
+            if(alias == null)
+                return "(" + name + ")";
             else
                 return alias + " (" + name + ")";
         }

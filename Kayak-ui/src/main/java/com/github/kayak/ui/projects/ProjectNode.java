@@ -59,12 +59,12 @@ public class ProjectNode extends AbstractNode {
 
         @Override
         public void projectBusAdded(Project p, Bus bus) {
-            
+
         }
 
         @Override
         public void projectBusRemoved(Project p, Bus bus) {
-            
+
         }
     };
 
@@ -92,11 +92,12 @@ public class ProjectNode extends AbstractNode {
                 @Override
                 public Transferable paste() throws IOException {
                     if (url.checkConnection()) {
-                        String name = JOptionPane.showInputDialog("Please give a name for the Bus", url.getBus());
+                        String alias = JOptionPane.showInputDialog("Please input a alias for the Bus", url.getBus());
 
-                        if (name != null) {
+                        if (alias != null) {
                             Bus b = new Bus();
-                            b.setName(name);
+                            b.setAlias(alias);
+                            b.setName(url.getBus());
                             project.addBus(b);
                             b.setConnection(url);
                             ConnectionManager.getGlobalConnectionManager().addRecent(url);
