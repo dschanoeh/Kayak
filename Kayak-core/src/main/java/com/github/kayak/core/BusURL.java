@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,8 +37,27 @@ import java.util.logging.Logger;
  */
 public class BusURL implements Transferable {
 
+    public static Comparator<BusURL> nameComparator = new Comparator<BusURL>() {
+
+        @Override
+        public int compare(BusURL o1, BusURL o2) {
+            int i = o1.getHost().compareTo(o2.getHost());
+            if(i!=0) {
+                return i;
+            } else {
+                i = o1.getDescription().compareTo(o2.getDescription());
+                if(i!=0) {
+                    return i;
+                } else {
+                    i = o1.getBus().compareTo(o2.getBus());
+                    return i;
+                }
+            }
+        }
+    };
+
     private static final Logger logger = Logger.getLogger(BusURL.class.getCanonicalName());
-    
+
     public static final DataFlavor DATA_FLAVOR = new DataFlavor(BusURL.class, "BusURL");
     private String host;
     private String bus;
@@ -195,7 +215,7 @@ public class BusURL implements Transferable {
                     socket.getInputStream());
 
             String ret = "< hi >";
-            
+
             for(int i=0;i<6;i++) {
                 if(input.read() != ret.charAt(i)) {
                     logger.log(Level.INFO, "Could not connect to host");

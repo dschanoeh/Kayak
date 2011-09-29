@@ -20,6 +20,7 @@ package com.github.kayak.ui.connections;
 
 import com.github.kayak.core.BusURL;
 import java.util.Set;
+import java.util.TreeSet;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 
@@ -36,14 +37,20 @@ public class ConnectionChildrenFactory extends Children.Keys<BusURL> implements 
     public void addNotify() {
         switch(type) {
             case DISCOVERY:
-               setKeys(manager.getAutoDiscovery());
-                break;
+               TreeSet<BusURL> set = new TreeSet<BusURL>(BusURL.nameComparator);
+               set.addAll(manager.getAutoDiscovery());
+               setKeys(set.toArray(new BusURL[set.size()]));
+               break;
             case FAVOURITE:
-                setKeys(manager.getFavourites());
-                break;
+               TreeSet<BusURL> set1 = new TreeSet<BusURL>(BusURL.nameComparator);
+               set1.addAll(manager.getFavourites());
+               setKeys(set1.toArray(new BusURL[set1.size()]));
+               break;
             case RECENT:
-                setKeys(manager.getRecent());
-                break;
+               TreeSet<BusURL> set2 = new TreeSet<BusURL>(BusURL.nameComparator);
+               set2.addAll(manager.getRecent());
+               setKeys(set2.toArray(new BusURL[set2.size()]));
+               break;
         }
     }
 

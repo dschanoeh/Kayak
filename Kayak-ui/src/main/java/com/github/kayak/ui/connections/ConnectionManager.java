@@ -60,7 +60,7 @@ public class ConnectionManager {
     private Thread discoveryThread;
     private ArrayList<ConnectionListener> listeners;
     private static final Logger logger = Logger.getLogger(ConnectionManager.class.getName());
-    
+
     private Runnable discoveryRunnable = new Runnable() {
 
         @Override
@@ -74,7 +74,7 @@ public class ConnectionManager {
                 logger.log(Level.WARNING, "Could not create XML parser. Aborting auto discovery.", ex);
                 return;
             }
-            
+
             while (true) {
                 DatagramSocket socket;
                 try {
@@ -89,7 +89,7 @@ public class ConnectionManager {
                         return;
                     }
                     continue;
-                }  
+                }
 
                 while (true) {
                     /* Check if old beacons need to be removed from the list */
@@ -105,19 +105,19 @@ public class ConnectionManager {
                         }
                         autoDiscovery.removeAll(toRemove);
                     }
-                        
+
                     if(removed)
                         notifyListeners();
-                
+
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     }
-                    
+
                     byte[] buffer = new byte[1024];
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                    
+
                     try {
                         socket.receive(packet);
                     } catch(SocketTimeoutException ex) {
@@ -207,27 +207,27 @@ public class ConnectionManager {
                             if(changed)
                                 notifyListeners();
                         }
-                    }                   
+                    }
                 }
             }
         }
     };
 
-    public BusURL[] getAutoDiscovery() {
+    public Set<BusURL> getAutoDiscovery() {
         synchronized(autoDiscovery) {
-            return autoDiscovery.toArray(new BusURL[autoDiscovery.size()]);
+            return Collections.unmodifiableSet(autoDiscovery);
         }
     }
 
-    public BusURL[] getFavourites() {
+    public Set<BusURL> getFavourites() {
         synchronized(favourites) {
-            return favourites.toArray(new BusURL[favourites.size()]);
+            return Collections.unmodifiableSet(favourites);
         }
     }
 
-    public BusURL[] getRecent() {
+    public Set<BusURL> getRecent() {
         synchronized(recent) {
-            return recent.toArray(new BusURL[recent.size()]);
+            return Collections.unmodifiableSet(recent);
         }
     }
 
@@ -238,7 +238,7 @@ public class ConnectionManager {
      * @param url
      */
     public void addFavourite(BusURL url) {
-        
+
         /* no duplicates */
         for(BusURL u : favourites) {
             if(u.equals(url)) {
@@ -294,7 +294,7 @@ public class ConnectionManager {
         recent.remove(url);
         notifyListeners();
     }
-    
+
     public void loadFromFile(InputStream stream) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -318,7 +318,7 @@ public class ConnectionManager {
 
                         this.favourites.add(new BusURL(host, port, name));
                     } catch (Exception ex) {
-                        
+
                     }
                 }
             }
