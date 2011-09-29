@@ -20,6 +20,7 @@ package com.github.kayak.core.description;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Set;
 
 /**
@@ -30,6 +31,14 @@ import java.util.Set;
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
 public class Signal {
+
+    public static final Comparator<Signal> nameComparator = new Comparator<Signal>() {
+
+        @Override
+        public int compare(Signal o1, Signal o2) {
+            return o1.getDescription().getName().compareTo(o2.getDescription().getName());
+        }
+    };
 
     private static final DecimalFormat readableFormat = new DecimalFormat("0.00");
 

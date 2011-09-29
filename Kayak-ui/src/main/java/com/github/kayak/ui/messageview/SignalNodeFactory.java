@@ -21,7 +21,10 @@ import com.github.kayak.core.Bus;
 import com.github.kayak.core.description.MessageDescription;
 import com.github.kayak.core.description.MultiplexDescription;
 import com.github.kayak.core.description.SignalDescription;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
 
@@ -34,6 +37,30 @@ public class SignalNodeFactory extends ChildFactory<Object> {
     private MessageDescription description = null;
     private MultiplexDescription multiplexDescription = null;
     private Bus bus;
+
+    private static final Comparator<Object> comparator = new Comparator<Object>() {
+
+        @Override
+        public int compare(Object o1, Object o2) {
+            String name1="";
+            String name2="";
+
+            if(o1 instanceof SignalDescription) {
+                name1 = ((SignalDescription) o1).getName();
+            } else if(o1 instanceof MultiplexDescription) {
+                name1 = ((MultiplexDescription) o1).getName();
+            }
+
+            if(o2 instanceof SignalDescription) {
+                name2 = ((SignalDescription) o2).getName();
+            } else if(o2 instanceof MultiplexDescription) {
+                name2 = ((MultiplexDescription) o2).getName();
+            }
+
+            return name1.compareTo(name2);
+        }
+
+    };
 
     public SignalNodeFactory(MessageDescription description, Bus bus) {
         this.description = description;
@@ -48,11 +75,15 @@ public class SignalNodeFactory extends ChildFactory<Object> {
 
     @Override
     protected boolean createKeys(List<Object> list) {
+        Set<Object> set = new TreeSet<Object>(comparator);
         if(description != null) {
-            list.addAll(description.getSignals());
-            list.addAll(description.getMultiplexes());
+            set.addAll(description.getSignals());
+            set.addAll(description.getSignals());
+            set.addAll(description.getMultiplexes());
+            list.addAll(set);
         } else if(multiplexDescription != null) {
-            list.addAll(multiplexDescription.getAllSignalDescriptions());
+            set.addAll(multiplexDescription.getAllSignalDescriptions());
+            list.addAll(set);
         }
 
         return true;

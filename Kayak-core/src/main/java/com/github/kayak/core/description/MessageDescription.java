@@ -20,6 +20,7 @@ package com.github.kayak.core.description;
 
 import com.github.kayak.core.Frame;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +29,14 @@ import java.util.Set;
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
 public class MessageDescription {
+
+    public static final Comparator<MessageDescription> nameComparator = new Comparator<MessageDescription>() {
+
+        @Override
+        public int compare(MessageDescription o1, MessageDescription o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    };
 
     private int id;
     private int interval;

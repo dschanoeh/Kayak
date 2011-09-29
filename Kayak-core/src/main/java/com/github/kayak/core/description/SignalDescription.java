@@ -19,6 +19,7 @@ package com.github.kayak.core.description;
 
 import java.nio.ByteOrder;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +29,14 @@ import java.util.Set;
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
 public class SignalDescription {
+
+    public static final Comparator<SignalDescription> nameComparator = new Comparator<SignalDescription>() {
+
+        @Override
+        public int compare(SignalDescription o1, SignalDescription o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    };
 
     public static enum Type {
         SIGNED, UNSIGNED, SINGLE, DOUBLE
