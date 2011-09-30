@@ -23,7 +23,7 @@ import org.openide.util.Utilities;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui//Connections//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "ConnectionsTopComponent",
-iconBase="org/freedesktop/tango/16x16/devices/network-wireless.png", 
+iconBase="org/freedesktop/tango/16x16/devices/network-wireless.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "management", openAtStartup = true)
 @ActionID(category = "Window", id = "com.github.kayak.ui.connections.ConnectionsTopComponent")
@@ -38,20 +38,19 @@ public final class ConnectionsTopComponent extends TopComponent implements Explo
         initComponents();
         setName(NbBundle.getMessage(ConnectionsTopComponent.class, "CTL_ConnectionsTopComponent"));
         setToolTipText(NbBundle.getMessage(ConnectionsTopComponent.class, "HINT_ConnectionsTopComponent"));
-       
+
         ConnectionNodeFactory factory = new ConnectionNodeFactory();
 
         AbstractNode rootNode = new AbstractNode(Children.create(factory, true));
 
         manager.setRootContext(rootNode);
         associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
-        beanTreeView1.expandAll();
         initToolbar();
     }
 
     private void initToolbar() {
-        List<? extends Action> actions = Utilities.actionsForPath("Actions/Connections");
-        
+        List<? extends Action> actions = Utilities.actionsForPath("Menu/Connections");
+
         for(Action a : actions) {
             jToolBar1.add(a);
         }

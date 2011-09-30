@@ -17,8 +17,8 @@ import org.openide.awt.ActionRegistration;
 @ActionID(category="File", id="com.github.kayak.ui.projects.NewBusAction")
 @ActionReferences( value= {
     @ActionReference(path = "Shortcuts", name = "D-B"),
-    @ActionReference(path = "Menu/File", position = 200 ),
-    @ActionReference(path = "Actions/Projects", position = 200 )
+    @ActionReference(path = "Menu/File", position = 20 ),
+    @ActionReference(path = "Actions/Projects", position = 20 )
 })
 public final class NewBusAction extends AbstractAction {
 

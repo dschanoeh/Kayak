@@ -122,6 +122,7 @@ public class RAWConnection extends SocketcandConnection {
             String ret = getElement();
             if (!ret.equals("< hi >")) {
                 logger.log(Level.SEVERE, "Did not receive greeting from host.");
+                return;
             }
 
             output.write("< open " + busName + " >");
@@ -130,6 +131,7 @@ public class RAWConnection extends SocketcandConnection {
             ret = getElement();
             if (!ret.equals("< ok >")) {
                 logger.log(Level.SEVERE, "Could not open bus");
+                return;
             }
 
             output.write("< rawmode >");
@@ -138,6 +140,7 @@ public class RAWConnection extends SocketcandConnection {
             ret = getElement();
             if (!ret.equals("< ok >")) {
                 logger.log(Level.SEVERE, "Could not switch to RAW mode.");
+                return;
             }
             socket.setSoTimeout(100);
 

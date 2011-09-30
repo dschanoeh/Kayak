@@ -23,6 +23,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Comparator;
@@ -207,12 +208,15 @@ public class BusURL implements Transferable {
         Socket socket = new Socket();
         InetSocketAddress address = new InetSocketAddress(host, port);
         InputStreamReader input = null;
+        OutputStreamWriter output = null;
         try {
             socket.setSoTimeout(10);
             socket.connect(address, 50);
 
             input = new InputStreamReader(
                     socket.getInputStream());
+
+            output = new OutputStreamWriter(socket.getOutputStream());
 
             String ret = "< hi >";
 
@@ -222,6 +226,18 @@ public class BusURL implements Transferable {
                     return false;
                 }
             }
+
+            output.write("< open " + bus + " >");
+            output.flush();
+
+            ret = "< ok >";
+            for(int i=0;i<6;i++) {
+                if(input.read() != ret.charAt(i)) {
+                    logger.log(Level.INFO, "Could not open bus");
+                    return false;
+                }
+            }
+
         } catch (IOException ex) {
             logger.log(Level.INFO, "Could not connect to host", ex);
             return false;
@@ -230,8 +246,9 @@ public class BusURL implements Transferable {
             if(input != null) {
                     try {
                     input.close();
+                    output.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(BusURL.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         }

@@ -124,6 +124,7 @@ public class BCMConnection extends SocketcandConnection {
             String ret = getElement();
             if (!ret.equals("< hi >")) {
                 logger.log(Level.SEVERE, "Did not receive greeting from host.");
+                return;
             }
 
             output.write("< open " + busName + " >");
@@ -132,6 +133,7 @@ public class BCMConnection extends SocketcandConnection {
             ret = getElement();
             if (!ret.equals("< ok >")) {
                 logger.log(Level.SEVERE, "Could not open bus");
+                return;
             }
             socket.setSoTimeout(100);
 

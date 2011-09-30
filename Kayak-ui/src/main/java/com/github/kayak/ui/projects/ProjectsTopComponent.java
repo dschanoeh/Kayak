@@ -7,6 +7,7 @@ package com.github.kayak.ui.projects;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.Action;
+import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -26,7 +27,7 @@ import org.openide.util.Utilities;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.projects//Projects//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "ProjectsTopComponent",
-iconBase="org/freedesktop/tango/16x16/mimetypes/package-x-generic.png", 
+iconBase="org/freedesktop/tango/16x16/mimetypes/package-x-generic.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "explorer", openAtStartup = true)
 @ActionID(category = "Window", id = "com.github.kayak.ui.projects.ProjectsTopComponent")
@@ -37,6 +38,25 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
 
     private ExplorerManager manager = new ExplorerManager();
 
+    private ProjectManagementListener listener = new ProjectManagementListener() {
+
+        @Override
+        public void projectsUpdated() {
+
+        }
+
+        @Override
+        public void openProjectChanged(Project p) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    beanTreeView1.expandAll();
+                }
+            });
+        }
+    };
+
     public ProjectsTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(ProjectsTopComponent.class, "CTL_ProjectsTopComponent"));
@@ -44,17 +64,18 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
         putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
-        
+
         AbstractNode rootNode = new AbstractNode(Children.create(new ProjectNodeFactory(), true));
         manager.setRootContext(rootNode);
         associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
 
         initToolbar();
+        ProjectManager.getGlobalProjectManager().addListener(listener);
     }
 
     private void initToolbar() {
         List<? extends Action> actions = Utilities.actionsForPath("Actions/Projects");
-        
+
         for(Action a : actions) {
             jToolBar1.add(a);
         }

@@ -29,6 +29,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.util.Utilities;
 import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.Lookups;
 
@@ -121,27 +122,12 @@ public class ProjectNode extends AbstractNode {
     @Override
     public Action[] getActions(boolean popup) {
         if (project.isOpened()) {
-            return new Action[]{new NewBusAction(project), new RenameAction(), new DeleteAction(), new CloseAction()};
+            return new Action[]{new NewBusAction(project), new RenameAction(), new DeleteProjectAction(project), new CloseAction()};
         } else {
-            return new Action[]{new OpenAction(), new RenameAction(), new DeleteAction(), };
+            return new Action[]{new OpenAction(), new RenameAction(), new DeleteProjectAction(project)};
         }
     }
 
-    private class DeleteAction extends AbstractAction {
-
-        public DeleteAction() {
-            putValue(NAME, "Delete");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (project.isOpened()) {
-                project.close();
-            }
-
-            ProjectManager.getGlobalProjectManager().removeProject(project);
-        }
-    };
 
     private class RenameAction extends AbstractAction {
 

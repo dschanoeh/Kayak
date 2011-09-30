@@ -36,7 +36,7 @@ import org.openide.util.Utilities;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.logfiles//LogFiles//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "LogFilesTopComponent",
-iconBase="org/freedesktop/tango/16x16/apps/accessories-text-editor.png", 
+iconBase="org/freedesktop/tango/16x16/apps/accessories-text-editor.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "management", openAtStartup = true)
 @ActionID(category = "Window", id = "com.github.kayak.logging.LogFilesTopComponent")
@@ -100,10 +100,10 @@ public final class LogFilesTopComponent extends TopComponent implements Explorer
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_ALWAYS;
     }
-    
+
     private void initToolbar() {
-        List<? extends Action> actions = Utilities.actionsForPath("Actions/Log files");
-        
+        List<? extends Action> actions = Utilities.actionsForPath("Menu/Log files");
+
         for(Action a : actions) {
             jToolBar1.add(a);
         }

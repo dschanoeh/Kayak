@@ -33,7 +33,7 @@ import org.openide.awt.ActionRegistration;
 @ActionRegistration(displayName = "Enable snapshots", iconBase = "org/freedesktop/tango/16x16/devices/camera-photo.png", iconInMenu = true, surviveFocusChange = true)
 @ActionID(category = "Log files", id = "com.github.kayak.logging.snapshots.EnableSnapshotsAction")
 @ActionReferences(value = {
-    @ActionReference(path = "Menu/Log files", position = 30)})
+    @ActionReference(path = "Menu/Log files", position = 60)})
 public class EnableSnapshotsAction extends AbstractAction {
 
     private static final Logger logger = Logger.getLogger(CreateSnapshotAction.class.getCanonicalName());

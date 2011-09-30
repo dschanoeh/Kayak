@@ -21,11 +21,11 @@ import org.openide.awt.ActionRegistration;
 @ActionRegistration(displayName="Delete Log file...", iconBase="org/freedesktop/tango/16x16/actions/edit-delete.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="Log files", id="com.github.kayak.logging.DeleteLogFileAction")
 @ActionReferences(value = {
-    @ActionReference(path="Menu/Log files", position=30)}) 
+    @ActionReference(path="Menu/Log files", position=40)})
 public class DeleteLogFileAction extends AbstractAction {
 
     LogFile lf;
-    
+
     public DeleteLogFileAction(LogFile context) {
         putValue(NAME, "Delete...");
         lf = context;

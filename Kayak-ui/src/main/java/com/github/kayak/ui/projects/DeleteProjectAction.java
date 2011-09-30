@@ -15,35 +15,36 @@
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.github.kayak.logging.snapshots;
+package com.github.kayak.ui.projects;
 
 import java.awt.event.ActionEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
-/**
- *
- * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
- */
-@ActionRegistration(displayName = "Create snapshot", iconBase = "org/freedesktop/tango/16x16/devices/camera-photo.png", iconInMenu = true, surviveFocusChange = true, asynchronous=true)
-@ActionID(category = "Log files", id = "com.github.kayak.logging.snapshots.CreateSnapshotAction")
+@ActionID(id = "com.github.kayak.ui.projects.DeleteProjectAction", category = "File")
+@ActionRegistration(iconInMenu = true, displayName = "#CTL_DeleteProject", iconBase = "org/freedesktop/tango/16x16/actions/edit-delete.png")
 @ActionReferences(value = {
-    @ActionReference(path = "Menu/Log files", position = 70),
-    @ActionReference(path = "Shortcuts", name="D-S")})
-public class CreateSnapshotAction extends AbstractAction {
+    @ActionReference(path = "Actions/Projects", position = 30 ),
+    @ActionReference(path = "Menu/File", name = "com-github-kayak-ui-projects-NewProject", position = 30)})
+public class DeleteProjectAction extends AbstractAction {
 
-    private static final Logger logger = Logger.getLogger(CreateSnapshotAction.class.getCanonicalName());
+    private Project project;
+
+    public DeleteProjectAction(Project p) {
+            this.project = p;
+            this.putValue(NAME, "Delete project");
+        }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        logger.log(Level.INFO, "Creating snapshot...");
-        SnapshotBuffer buffer = SnapshotManager.getCurrentBuffer();
-        buffer.stopBuffering(3000);
-        buffer.writeToFile();
+        if (project.isOpened()) {
+            project.close();
+        }
+
+        ProjectManager.getGlobalProjectManager().removeProject(project);
     }
+
 }

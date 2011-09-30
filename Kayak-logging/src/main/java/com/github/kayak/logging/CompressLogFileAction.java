@@ -39,12 +39,12 @@ import org.openide.awt.ActionRegistration;
 @ActionRegistration(displayName="Compress Log file...", iconBase="org/freedesktop/tango/16x16/mimetypes/package-x-generic.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="Log files", id="com.github.kayak.logging.CompressLogFileAction")
 @ActionReferences(value = {
-    @ActionReference(path="Menu/Log files", position=30)}) 
+    @ActionReference(path="Menu/Log files", position=20)})
 public class CompressLogFileAction extends AbstractAction {
-    
+
     private LogFile lf;
     private static final Logger logger = Logger.getLogger(CompressLogFileAction.class.getCanonicalName());
-    
+
     public CompressLogFileAction(LogFile context) {
             putValue (NAME, "Compress");
             lf = context;

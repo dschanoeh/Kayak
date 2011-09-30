@@ -48,10 +48,9 @@ public class UserOutput {
     }
 
     public static void print(EventFrame ef) {
+        createOutput();
         synchronized(io) {
-            createOutput();
             OutputWriter out = io.getOut();
-
             Date date = new Date();
             out.write("[");
             out.write(dateFormat.format(date));
@@ -63,14 +62,27 @@ public class UserOutput {
     }
 
     public static void printInfo(String info) {
+        createOutput();
         synchronized(io) {
-            createOutput();
             OutputWriter out = io.getOut();
-
             Date date = new Date();
             out.write("[");
             out.write(dateFormat.format(date));
             out.write("] INFO ");
+            out.write(info);
+            out.write("\n");
+            out.close();
+        }
+    }
+
+    public static void printWarning(String info) {
+        createOutput();
+        synchronized(io) {
+            OutputWriter out = io.getOut();
+            Date date = new Date();
+            out.write("[");
+            out.write(dateFormat.format(date));
+            out.write("] WARNING ");
             out.write(info);
             out.write("\n");
             out.close();

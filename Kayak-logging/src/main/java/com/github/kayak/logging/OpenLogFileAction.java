@@ -20,7 +20,7 @@ import org.openide.awt.ActionRegistration;
 @ActionRegistration(displayName = "Open Log file...", iconBase = "org/freedesktop/tango/16x16/actions/document-open.png", iconInMenu = true, surviveFocusChange = true)
 @ActionID(category = "Log files", id = "com.github.kayak.logging.OpenLogFileAction")
 @ActionReferences(value = {
-    @ActionReference(path = "Menu/Log files", position = 30)})
+    @ActionReference(path = "Menu/Log files", position = 10)})
 public class OpenLogFileAction extends AbstractAction {
 
     private LogFile logFile;

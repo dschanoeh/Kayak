@@ -22,6 +22,7 @@ import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.BusURL;
 import com.github.kayak.ui.connections.BookmarkConnectionAction;
 import com.github.kayak.ui.connections.ConnectionManager;
+import com.github.kayak.ui.useroutput.UserOutput;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -77,7 +78,7 @@ public class ConnectedBusURLNode extends AbstractNode {
 
         @Override
         public void aliasChanged(String string) {
-            
+
         }
     };
 
@@ -180,7 +181,7 @@ public class ConnectedBusURLNode extends AbstractNode {
                         bus.setConnection(url);
                         ConnectionManager.getGlobalConnectionManager().addRecent(url);
                     } else {
-                        logger.log(Level.WARNING, "Could not connect!");
+                        UserOutput.printWarning("Could not connect to socketcand! Check if the host is up.");
                     }
                     return null;
                 }
