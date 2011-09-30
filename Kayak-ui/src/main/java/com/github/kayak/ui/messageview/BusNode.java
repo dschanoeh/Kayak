@@ -17,21 +17,23 @@
  */
 package com.github.kayak.ui.messageview;
 
-import org.openide.nodes.FilterNode;
-import org.openide.nodes.Node;
+import org.openide.nodes.AbstractNode;
+import org.openide.nodes.Children;
+import com.github.kayak.core.description.BusDescription;
+import com.github.kayak.core.Bus;
 
 /**
  *
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
-public class SearchFilteredNode extends FilterNode {
+public class BusNode extends AbstractNode {
 
-    public SearchFilteredNode(Node original, String searchFilter) {
-        super(original, new SearchFilteredChildren(original, searchFilter));
+
+    public BusNode(BusDescription desc, Bus bus) {
+        super(Children.create(new MessageNodeFactory(desc, bus), true));
+
+        setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
+        setDisplayName(bus.getName() + " (" + desc.getName() + ")");
     }
 
-    @Override
-    public Node getOriginal() {
-        return super.getOriginal();
-    }
 }

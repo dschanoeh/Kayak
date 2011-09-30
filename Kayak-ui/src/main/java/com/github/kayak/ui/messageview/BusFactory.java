@@ -137,11 +137,8 @@ public class BusFactory extends ChildFactory<BusDescription> {
             if(b.getDescription() == key)
                 bus = b;
         }
-
-        AbstractNode node = new AbstractNode(Children.create(new MessageNodeFactory(key, bus), true), Lookups.fixed(key, bus));
-        node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
-        node.setDisplayName(bus.getName() + " (" + key.getName() + ")");
-        return new Node[] { node };
+        
+        return new Node[] { new BusNode(key, bus) };
     }
 
 }
