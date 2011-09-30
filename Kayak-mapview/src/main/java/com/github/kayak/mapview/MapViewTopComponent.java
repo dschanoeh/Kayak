@@ -29,6 +29,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.dnd.DropTarget;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -162,6 +163,9 @@ public final class MapViewTopComponent extends TopComponent {
 
         Painter<JXMapViewer> textOverlay = new Painter<JXMapViewer>() {
 
+            private Stroke normal = new BasicStroke(2);
+            private Stroke thick = new BasicStroke(4);
+
             @Override
             public void paint(Graphics2D g, JXMapViewer t, int i, int i1) {
                 /* Draw latitude longitude information */
@@ -178,12 +182,14 @@ public final class MapViewTopComponent extends TopComponent {
                 g.translate(-rect.x, -rect.y);
 
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g.setStroke(new BasicStroke(2));
+                g.setStroke(normal);
 
                 int lastX = -1;
                 int lastY = -1;
                 synchronized(waypoints) {
-                    for(Waypoint w : waypoints) {
+                    for(int j=0;j<waypoints.size();j++) {
+                        Waypoint w = waypoints.get(j);
+
                         Point2D pt = t.getTileFactory().geoToPixel(w.getPosition(), t.getZoom());
 
                         if(lastX != -1 && lastY != -1) {
@@ -192,6 +198,12 @@ public final class MapViewTopComponent extends TopComponent {
 
                         lastX = (int) pt.getX();
                         lastY = (int) pt.getY();
+
+                        if(j == waypoints.size()-1) {
+                            g.setStroke(thick);
+                            g.setColor(Color.BLUE);
+                            g.drawOval(lastX-4, lastY-4, 8, 8);
+                        }
                     }
                 }
             }
@@ -366,6 +378,19 @@ public final class MapViewTopComponent extends TopComponent {
     // End of variables declaration//GEN-END:variables
 
     private void addWaypoint(double latitude, double longitude) {
+        /*
+         * Only add a waypoint if it is different from
+         * the last waypoint
+         */
+        if(waypoints.size() > 0) {
+            Waypoint lastWaypoint = waypoints.get(waypoints.size()-1);
+            double oldLat = lastWaypoint.getPosition().getLatitude();
+            double oldLong = lastWaypoint.getPosition().getLongitude();
+            if(Math.abs(oldLat - latitude) < 0.000001)
+                if(Math.abs(oldLong - longitude) < 0.000001)
+                    return;
+        }
+
         if(jToggleButton1.isSelected())
             mapKit.setAddressLocation(new GeoPosition(latitude, longitude));
         waypoints.add(new Waypoint(latitude, longitude));
