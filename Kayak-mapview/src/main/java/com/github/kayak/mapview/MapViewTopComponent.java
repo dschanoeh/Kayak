@@ -53,13 +53,6 @@ autostore = false)
 iconBase="org/freedesktop/tango/16x16/apps/internet-web-browser.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Window", id = "com.github.kayak.mapview.MapViewTopComponent")
-@ActionReferences( value = {
-   @ActionReference(path = "Menu/Bus views" /*, position = 333 */),
-   @ActionReference(path = "Toolbars/Bus views" /*, position = 333 */)
-})
-@TopComponent.OpenActionRegistration(displayName = "#CTL_MapViewAction",
-preferredID = "MapViewTopComponent")
 public final class MapViewTopComponent extends TopComponent {
 
     private static final Logger logger = Logger.getLogger(MapViewTopComponent.class.getName());
