@@ -435,7 +435,7 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
 
     @Override
     public void receive(Bus b, int number) {
-        fields[number].setText(b.getName());
+        fields[number].setText(b.toString());
         buttons[number].setEnabled(true);
         replay.setBus(busses.get(number), b);
     }
