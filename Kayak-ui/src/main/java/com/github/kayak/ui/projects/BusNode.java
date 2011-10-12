@@ -72,7 +72,7 @@ public class BusNode extends AbstractNode implements Transferable {
     };
 
     public BusNode(Bus bus, Project project) {
-        super(new BusChildFactory(bus), Lookups.fixed(bus));
+        super(new BusChildFactory(bus, project), Lookups.fixed(bus, project));
 
         setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
         super.setDisplayName(bus.toString());

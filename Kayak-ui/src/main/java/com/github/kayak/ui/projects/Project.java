@@ -62,7 +62,7 @@ public class Project {
     public boolean isBusNameValid(String name) {
         if(!Bus.BUS_NAME_PATTERN.matcher(name).matches())
             return false;
-        
+
         synchronized (busses) {
             for (Bus bus : busses) {
                 if (name.equals(bus.getName())) {
@@ -83,7 +83,7 @@ public class Project {
             }
         }
 
-        return name;
+        return n;
     }
 
     public void addProjectChangeListener(ProjectChangeListener listener) {

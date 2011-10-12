@@ -48,6 +48,7 @@ public class ConnectedBusURLNode extends AbstractNode {
 
     private static final Logger logger = Logger.getLogger(ConnectedBusURLNode.class.getCanonicalName());
 
+    private Project project;
     private BusURL url;
     private Bus bus;
 
@@ -82,11 +83,12 @@ public class ConnectedBusURLNode extends AbstractNode {
         }
     };
 
-    public ConnectedBusURLNode(BusURL url, Bus bus) {
+    public ConnectedBusURLNode(BusURL url, Bus bus, Project project) {
         super(Children.LEAF, Lookups.fixed(bus));
 
         this.url = url;
         this.bus = bus;
+        this.project = project;
 
         bus.addBusChangeListener(listener);
 
@@ -177,7 +179,12 @@ public class ConnectedBusURLNode extends AbstractNode {
                 public Transferable paste() throws IOException {
                     if(newURL.checkConnection()) {
                         url = newURL;
-                        bus.setName(url.getBus());
+
+                        String newName = url.getBus();
+                        if(project.isBusNameValid(newName)) {
+                            bus.setName(url.getBus());
+                        }
+
                         bus.setConnection(url);
                         ConnectionManager.getGlobalConnectionManager().addRecent(url);
                     } else {
