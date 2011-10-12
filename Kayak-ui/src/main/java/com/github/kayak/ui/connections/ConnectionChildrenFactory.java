@@ -68,13 +68,19 @@ public class ConnectionChildrenFactory extends Children.Keys<BusURL> implements 
     public void connectionsChanged() {
         switch(type) {
             case DISCOVERY:
-                setKeys(manager.getAutoDiscovery());
+                TreeSet<BusURL> set = new TreeSet<BusURL>(BusURL.nameComparator);
+                set.addAll(manager.getAutoDiscovery());
+                setKeys(set.toArray(new BusURL[set.size()]));
                 break;
             case FAVOURITE:
-                setKeys(manager.getFavourites());
+                TreeSet<BusURL> set1 = new TreeSet<BusURL>(BusURL.nameComparator);
+                set1.addAll(manager.getFavourites());
+                setKeys(set1.toArray(new BusURL[set1.size()]));
                 break;
             case RECENT:
-                setKeys(manager.getRecent());
+                TreeSet<BusURL> set2 = new TreeSet<BusURL>(BusURL.nameComparator);
+                set2.addAll(manager.getRecent());
+                setKeys(set2.toArray(new BusURL[set2.size()]));
                 break;
         }
     }
