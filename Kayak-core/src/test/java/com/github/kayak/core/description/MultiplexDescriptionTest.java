@@ -19,7 +19,6 @@ package com.github.kayak.core.description;
 
 import com.github.kayak.core.Frame;
 import java.nio.ByteOrder;
-import java.util.HashSet;
 import java.util.Set;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -69,7 +68,7 @@ public class MultiplexDescriptionTest {
     }
 
     @Test
-    public void testMultiplex() {
+    public void testMultiplex() throws DescriptionException {
         Frame f = new Frame(0x12, new byte[] {(byte) 0xff, (byte) 0x00, (byte) 0x13});
 
         Message message = messageDescription.decodeFrame(f);

@@ -97,7 +97,7 @@ public class MessageDescription {
         this.id = id;
     }
 
-    public Message decodeFrame(Frame f) {
+    public Message decodeFrame(Frame f) throws DescriptionException {
 
         Message m = new Message();
         m.setId(id);

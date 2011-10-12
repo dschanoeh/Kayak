@@ -265,7 +265,7 @@ public class SendFramesTableModel extends AbstractTableModel {
         switch(columnIndex) {
             case 1:
                 try {
-                    int id = Integer.valueOf(((String) aValue).substring(2), 16);
+                    int id = Integer.valueOf(((String) aValue), 16);
                     row.setId(id);
                 } catch (Exception ex) {
                     logger.log(Level.WARNING, "Could not set new ID", ex);

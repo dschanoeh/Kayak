@@ -99,7 +99,7 @@ public class MultiplexDescription  {
      * @param data
      * @return
      */
-    public Set<Signal> decodeData(byte[] data) {
+    public Set<Signal> decodeData(byte[] data) throws DescriptionException {
         long rawValue = SignalDescription.extractBits(data, getOffset(), getLength(), getByteOrder());
 
         Set<SignalDescription> signalDescriptions = signals.get(rawValue);

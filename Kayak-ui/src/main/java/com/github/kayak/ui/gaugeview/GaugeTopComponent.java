@@ -8,6 +8,7 @@ import com.github.kayak.core.Bus;
 import com.github.kayak.core.Frame;
 import com.github.kayak.core.FrameListener;
 import com.github.kayak.core.Subscription;
+import com.github.kayak.core.description.DescriptionException;
 import com.github.kayak.core.description.MessageDescription;
 import com.github.kayak.core.description.Signal;
 import com.github.kayak.core.description.SignalDescription;
@@ -15,6 +16,7 @@ import com.github.kayak.ui.messageview.MessageSignalDropAdapter;
 import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManager;
+import com.github.kayak.ui.useroutput.UserOutput;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -80,9 +82,15 @@ public final class GaugeTopComponent extends TopComponent {
 
         @Override
         public void newFrame(Frame frame) {
-            Signal s = signalDescription.decodeData(frame.getData());
-            if(s != null)
+            try {
+                Signal s = signalDescription.decodeData(frame.getData());
+
+                if(s != null)
                 updateValue(s.getValue());
+            } catch (DescriptionException ex) {
+                UserOutput.printWarning(ex.getMessage());
+            }
+
 
         }
     };

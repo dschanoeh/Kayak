@@ -426,11 +426,16 @@ public class Bus implements SubscriptionChangeListener {
 
         this.url = url;
 
-        rawConnection = new RAWConnection(url);
-        bcmConnection = new BCMConnection(url);
+        if(url != null) {
+            rawConnection = new RAWConnection(url);
+            bcmConnection = new BCMConnection(url);
 
-        rawConnection.setListener(rawReceiver);
-        bcmConnection.setListener(bcmReceiver);
+            rawConnection.setListener(rawReceiver);
+            bcmConnection.setListener(bcmReceiver);
+        } else {
+            rawConnection = null;
+            bcmConnection = null;
+    }
 
         notifyListenersConnection();
     }

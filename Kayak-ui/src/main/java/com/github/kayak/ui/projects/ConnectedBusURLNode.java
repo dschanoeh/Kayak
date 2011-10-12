@@ -208,7 +208,7 @@ public class ConnectedBusURLNode extends AbstractNode {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            bus.disconnect();
+            bus.setConnection(null);
         }
 
     };

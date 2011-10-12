@@ -22,6 +22,8 @@ import java.util.Set;
 import com.github.kayak.core.Util;
 import com.github.kayak.core.Frame;
 import java.nio.ByteOrder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -187,5 +189,26 @@ public class SignalDescriptionTest {
         }
 
         assertEquals("foo", data2.getReadableString());
+    }
+
+    public void lengthTest() {
+        System.out.println("Testing length");
+        boolean ret=false;
+        byte[] data1 = new byte[] {0x00 };
+        try {
+            description2.decodeData(data1);
+        } catch (DescriptionException ex) {
+            ret = true;
+        }
+
+        assertFalse(ret);
+
+        try {
+            description3.decodeData(data1);
+        } catch (DescriptionException ex) {
+            ret = true;
+        }
+
+        assertTrue(ret);
     }
 }

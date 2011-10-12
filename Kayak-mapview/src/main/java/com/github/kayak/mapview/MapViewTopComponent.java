@@ -23,6 +23,7 @@ import com.github.kayak.core.FrameListener;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.core.description.Signal;
 import com.github.kayak.core.description.SignalDescription;
+import com.github.kayak.core.description.DescriptionException;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -44,9 +45,7 @@ import org.jdesktop.swingx.mapviewer.Waypoint;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionReferences;
+import com.github.kayak.ui.useroutput.UserOutput;
 
 @ConvertAsProperties(dtd = "-//com.github.kayak.mapview//MapView//EN",
 autostore = false)
@@ -87,16 +86,20 @@ public final class MapViewTopComponent extends TopComponent {
                 @Override
                 public void newFrame(Frame frame) {
                     if(description != null && frame.getIdentifier() == description.getMessageDescription().getId()) {
-                        Signal s = description.decodeData(frame.getData());
-                        latitude = s.getValue();
-                        long timestamp = frame.getTimestamp();
-                        if(timeLastLat != -1 && timeLastLong != -1) {
-                            timeLongLat = frame.getTimestamp() - timeLastLong;
-                            if(timeLatLong > timeLongLat) {
-                                addWaypoint(latitude, longitude);
+                        try {
+                            Signal s = description.decodeData(frame.getData());
+                            latitude = s.getValue();
+                            long timestamp = frame.getTimestamp();
+                            if(timeLastLat != -1 && timeLastLong != -1) {
+                                timeLongLat = frame.getTimestamp() - timeLastLong;
+                                if(timeLatLong > timeLongLat) {
+                                    addWaypoint(latitude, longitude);
+                                }
                             }
+                            timeLastLat = timestamp;
+                        } catch (DescriptionException ex) {
+                            UserOutput.printWarning(ex.getMessage());
                         }
-                        timeLastLat = timestamp;
                     }
                 }
             };
@@ -128,16 +131,20 @@ public final class MapViewTopComponent extends TopComponent {
                 @Override
                 public void newFrame(Frame frame) {
                     if(description != null && frame.getIdentifier() == description.getMessageDescription().getId()) {
-                        Signal s = description.decodeData(frame.getData());
-                        longitude = s.getValue();
-                        long timestamp = frame.getTimestamp();
-                        if(timeLastLat != -1 && timeLastLong != -1) {
-                            timeLatLong = frame.getTimestamp() - timeLastLat;
-                            if(timeLatLong < timeLongLat) {
-                                addWaypoint(latitude, longitude);
+                        try {
+                            Signal s = description.decodeData(frame.getData());
+                            longitude = s.getValue();
+                            long timestamp = frame.getTimestamp();
+                            if(timeLastLat != -1 && timeLastLong != -1) {
+                                timeLatLong = frame.getTimestamp() - timeLastLat;
+                                if(timeLatLong < timeLongLat) {
+                                    addWaypoint(latitude, longitude);
+                                }
                             }
+                            timeLastLong = timestamp;
+                        } catch (DescriptionException ex) {
+                            UserOutput.printWarning(ex.getMessage());
                         }
-                        timeLastLong = timestamp;
                     }
                 }
             };

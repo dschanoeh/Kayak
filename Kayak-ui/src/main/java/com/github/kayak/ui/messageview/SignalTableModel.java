@@ -21,14 +21,14 @@ import com.github.kayak.core.Bus;
 import com.github.kayak.core.Frame;
 import com.github.kayak.core.FrameListener;
 import com.github.kayak.core.Subscription;
+import com.github.kayak.core.description.DescriptionException;
 import com.github.kayak.core.description.Message;
 import com.github.kayak.core.description.MessageDescription;
 import com.github.kayak.core.description.Signal;
 import com.github.kayak.core.description.SignalDescription;
+import com.github.kayak.ui.useroutput.UserOutput;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.table.AbstractTableModel;
@@ -94,19 +94,24 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
         public void newFrame(Frame frame) {
             Bus bus = frame.getBus();
 
-            Message m = bus.getDescription().decodeFrame(frame);
-            Set<Signal> frameSignals = m.getSignals();
+            try {
+                Message m = bus.getDescription().decodeFrame(frame);
 
-            synchronized(entries) {
-                for(Signal s : frameSignals) {
-                    for(SignalTableEntry entry : entries) {
-                        if(s.getDescription().equals(entry.getDescription())) {
-                            entry.setSignal(s);
-                            entry.setRefresh(true);
+                Set<Signal> frameSignals = m.getSignals();
+                synchronized(entries) {
+                    for(Signal s : frameSignals) {
+                        for(SignalTableEntry entry : entries) {
+                            if(s.getDescription().equals(entry.getDescription())) {
+                                entry.setSignal(s);
+                                entry.setRefresh(true);
+                            }
                         }
                     }
                 }
+            } catch (DescriptionException ex) {
+                UserOutput.printWarning(ex.getMessage());
             }
+
         }
     };
 

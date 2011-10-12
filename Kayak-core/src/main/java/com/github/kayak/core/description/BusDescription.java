@@ -66,7 +66,7 @@ public class BusDescription {
         messages = new HashMap<Integer,MessageDescription>();
     }
 
-    public Message decodeFrame(Frame frame) {
+    public Message decodeFrame(Frame frame) throws DescriptionException {
         MessageDescription message = messages.get(frame.getIdentifier());
 
         if(message != null) {

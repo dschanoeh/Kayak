@@ -205,7 +205,7 @@ public class SignalDescription {
      * @param data
      * @return
      */
-    public Signal decodeData(byte[] data) {
+    public Signal decodeData(byte[] data) throws DescriptionException {
 
         if(multiplexed) {
             long rawValue = SignalDescription.extractBits(data, multiplexDescription.getOffset(), multiplexDescription.getLength(), multiplexDescription.getByteOrder());
@@ -271,8 +271,13 @@ public class SignalDescription {
      * @param order The {@link ByteOrder} for the extraction
      * @return Long representation of the extracted bits
      */
-    protected static long extractBits(byte[] data, int offset, int length, ByteOrder order) {
+    protected static long extractBits(byte[] data, int offset, int length, ByteOrder order) throws DescriptionException {
         long val = 0;
+
+        /* Check if the data array is too short for this signal */
+        if(data.length < ((offset+length+7) / 8)) {
+            throw new DescriptionException(DescriptionException.Cause.FRAME_LENGTH);
+        }
 
         if(order == ByteOrder.LITTLE_ENDIAN) {
             for (int i = 0; i < length; i++) {

@@ -45,8 +45,6 @@ autostore = false)
 iconBase="org/freedesktop/tango/16x16/actions/mail-forward.png",
 persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Window", id = "com.github.kayak.ui.send.SendFramesTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_SendFramesAction",
 preferredID = "SendFramesTopComponent")
 public final class SendFramesTopComponent extends TopComponent {
@@ -123,11 +121,11 @@ public final class SendFramesTopComponent extends TopComponent {
         ButtonColumn bc = new ButtonColumn(jTable1, send, 4);
 
         jTable1.getColumn("Bus").setPreferredWidth(100);
-        jTable1.getColumn("ID").setPreferredWidth(60);
+        jTable1.getColumn("ID [hex]").setPreferredWidth(60);
         jTable1.getColumn("Length").setPreferredWidth(70);
         jTable1.getColumn("Data").setPreferredWidth(200);
         jTable1.getColumn("Send").setPreferredWidth(60);
-        jTable1.getColumn("Interval (ms)").setPreferredWidth(100);
+        jTable1.getColumn("Interval [ms]").setPreferredWidth(100);
         jTable1.getColumn("Send interval").setPreferredWidth(100);
         jTable1.getColumn("Note").setPreferredWidth(150);
     }
