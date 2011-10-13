@@ -45,7 +45,7 @@ A log file starts with a header that may include multiple of the following field
 A description may be used to describe the content of the logfile in a human readable form. This element may only once occur in the header.
 
 ##### Regex
-    DESCRIPTION "[:alnum::punct:]+"
+    DESCRIPTION "[^"]+"
 
 ### Platform
 

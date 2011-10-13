@@ -55,7 +55,7 @@ public class LogFile {
 
     public static final Pattern platformPattern = Pattern.compile("[A-Z0-9_]+");
     public static final Pattern descriptionPattern = Pattern.compile("[a-zA-Z0-9\\s]+");
-    public static final Pattern descriptionLinePattern = Pattern.compile("DESCRIPTION \"[a-zA-Z0-9\\s]+\"");
+    public static final Pattern descriptionLinePattern = Pattern.compile("DESCRIPTION \"[^\"]+\"");
     public static final Pattern platformLinePattern = Pattern.compile("PLATFORM [A-Z0-9_]+");
     public static final Pattern deviceAliasLinePattern = Pattern.compile("DEVICE_ALIAS [A-Za-z0-9]+ [a-z0-9]{1,16}");
 
