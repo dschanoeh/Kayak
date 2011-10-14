@@ -46,7 +46,12 @@ public class BusURL implements Transferable {
             if(i!=0) {
                 return i;
             } else {
-                i = o1.getDescription().compareTo(o2.getDescription());
+                String d1 = o1.getDescription();
+                String d2 = o2.getDescription();
+
+                if(d1 != null && d2 != null) {
+                    i = o1.getDescription().compareTo(o2.getDescription());
+                }
                 if(i!=0) {
                     return i;
                 } else {
@@ -210,8 +215,8 @@ public class BusURL implements Transferable {
         InputStreamReader input = null;
         OutputStreamWriter output = null;
         try {
-            socket.setSoTimeout(10);
-            socket.connect(address, 50);
+            socket.setSoTimeout(100);
+            socket.connect(address, 100);
 
             input = new InputStreamReader(
                     socket.getInputStream());
