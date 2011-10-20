@@ -188,6 +188,10 @@ public class SeekableLogFileReplay {
         busses.put(name, bus);
     }
 
+    public Bus getBus(String name) {
+        return busses.get(name);
+    }
+
     /**
      * Create a new {@link LogFileReplay} with a specific {@link LogFile}.
      * @param logFile
@@ -206,7 +210,7 @@ public class SeekableLogFileReplay {
         indexCreationThread.setPriority(Thread.MIN_PRIORITY);
         indexCreationThread.start();
 
-        in = logFile.getStartPosition();
+        in = logFile.getStartTime();
         out = logFile.getStopTime();
         currentTimestamp = in;
 

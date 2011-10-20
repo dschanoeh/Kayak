@@ -101,6 +101,12 @@
             <artifactId>org-openide-loaders</artifactId>
             <version>RELEASE701</version>
         </dependency>
+        <dependency>
+            <artifactId>org-netbeans-api-progress</artifactId>
+            <groupId>org.netbeans.api</groupId>
+            <type>jar</type>
+            <version>RELEASE701</version>
+        </dependency>
     </dependencies>
 
     <build>

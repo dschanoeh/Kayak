@@ -21,14 +21,20 @@ import com.github.kayak.core.Bus;
 import com.github.kayak.core.LogFile;
 import com.github.kayak.core.SeekableLogFileReplay;
 import com.github.kayak.core.TimeSource;
+import com.github.kayak.ui.projects.Project;
+import com.github.kayak.ui.projects.ProjectManager;
 import java.awt.Color;
 import java.awt.dnd.DropTarget;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
-import org.openide.util.Exceptions;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -41,9 +47,11 @@ import org.netbeans.api.settings.ConvertAsProperties;
 autostore = false)
 @TopComponent.Description(preferredID = "LogInputTopComponent",
 iconBase="org/freedesktop/tango/16x16/actions/go-previous.png",
-persistenceType = TopComponent.PERSISTENCE_NEVER)
+persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 @TopComponent.Registration(mode = "properties", openAtStartup = false)
 public final class LogInputTopComponent extends TopComponent implements BusDropTargetAdapter.BusDropReceiver {
+
+    private static final Logger logger = Logger.getLogger(LogInputTopComponent.class.getCanonicalName());
 
     private LogFile logFile;
     private JLabel[] labels;
@@ -53,6 +61,7 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
     private SeekableLogFileReplay replay;
     private TimeSource timeSource;
     private Thread positionUpdateThread;
+    private boolean seeking=false;
 
     private boolean inSet;
     private boolean outSet;
@@ -61,11 +70,16 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
 
         @Override
         public void run() {
+            ProgressHandle p = ProgressHandleFactory.createHandle("Creating log file index...");
+            p.start();
             while(true) {
                 long in = replay.getIn()/1000;
                 long out = replay.getOut()/1000;
                 long current = replay.getCurrentTime()/1000;
-                jSlider1.setValue((int) current);
+
+                if(!seeking)
+                    jSlider1.setValue((int) current);
+
                 jTextField1.setText(String.format("%.3f", in/1000f));
                 jTextField2.setText(String.format("%.3f", out/1000f));
                 jLabel2.setText(String.format("%.3f", current/1000f));
@@ -74,6 +88,7 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
                     jButton4.setEnabled(true);
                     jButton5.setEnabled(true);
                     jSlider1.setEnabled(true);
+                    p.finish();
                 }
                 try {
                     Thread.sleep(200);
@@ -184,6 +199,9 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
 
         jSlider1.setEnabled(false);
         jSlider1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jSlider1MouseClicked(evt);
+            }
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 jSlider1MouseReleased(evt);
             }
@@ -334,11 +352,14 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
 
     private void jSlider1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSlider1MouseReleased
         JSlider source = (JSlider)evt.getSource();
-        if (!source.getValueIsAdjusting()) {
-            int newVal = (int) source.getValue();
-            replay.seekTo(((long) newVal) * 1000);
-        }
+        int newVal = (int) source.getValue();
+        replay.seekTo(((long) newVal) * 1000);
+        seeking = false;
     }//GEN-LAST:event_jSlider1MouseReleased
+
+    private void jSlider1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSlider1MouseClicked
+        seeking = true;
+    }//GEN-LAST:event_jSlider1MouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -375,10 +396,53 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
+
+        p.setProperty("filename", logFile.getFile().getAbsolutePath());
+
+
+        for(String bus : busses) {
+            Bus b = replay.getBus(bus);
+
+            if(b != null) {
+                p.setProperty(bus, b.getName());
+            }
+        }
     }
 
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
+
+        String filename = p.getProperty("filename");
+
+        File f = new File(filename);
+
+        if(f.exists() && f.canRead()) {
+            try {
+                LogFile l = new LogFile(f);
+                setLogFile(l);
+
+                Project project = ProjectManager.getGlobalProjectManager().getOpenedProject();
+                if(project != null) {
+
+                    for(int i=0;i<busses.size();i++) {
+                        String bus = busses.get(i);
+                        String busName = p.getProperty(bus);
+                        for(Bus projectBus : project.getBusses()) {
+                            if(projectBus.getName().equals(busName)) {
+                                receive(projectBus, i);
+                            }
+                        }
+
+                    }
+                }
+
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Could not restore persisted log input", ex);
+                close();
+            }
+        } else {
+            close();
+        }
     }
 
     public void setLogFile(LogFile file) {
