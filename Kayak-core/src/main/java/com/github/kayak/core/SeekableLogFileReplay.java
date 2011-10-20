@@ -41,15 +41,19 @@ public class SeekableLogFileReplay {
     private TimeSource timeSource;
     private Thread thread;
     private long startTime; /* time of the first frame in the log file */
+    private long stopTime; /* time of the last frame in the file */
     private long currentTimestamp; /* time of the current frame in the log file */
     private Map<String, Bus> busses = new HashMap<String, Bus>();
     private boolean infiniteReplay;
-    private final RandomAccessFile file;
-    private long stopTime; /* time of the last frame in the file */
+    private BufferedLineReader reader;
+
     private long startPosition;
-    private long replayStartTime;
+    private long replayStartTime; /* Timesource time when the replay was started */
     private long in;
     private long out;
+    private long[] index;
+    private boolean indexCreated;
+    private Thread indexCreationThread;
 
     private List<Command> commands = Collections.synchronizedList(new ArrayList<Command>());
 
@@ -59,7 +63,7 @@ public class SeekableLogFileReplay {
 
         private TYPE type;
 
-        private long position;
+        private long time;
 
         public Command(TYPE type) {
             this.type = type;
@@ -69,15 +73,59 @@ public class SeekableLogFileReplay {
             return type;
         }
 
-        public long getPosition() {
-            return position;
+        public long getTime() {
+            return time;
         }
 
-        public void setPosition(long position) {
-            this.position = position;
+        public void setTime(long time) {
+            this.time = time;
         }
 
     }
+
+    public boolean isIndexCreated() {
+        return indexCreated;
+    }
+
+    private Runnable indexCreationRunnable = new Runnable() {
+        @Override
+        public void run() {
+
+            BufferedLineReader reader = null;
+            try {
+                reader = new BufferedLineReader(logFile.getFile(), startPosition);
+
+
+                for(long currentTime=startTime;currentTime<stopTime;) {
+                    String line = reader.readLine();
+                    if(line == null)
+                        break;
+
+                    Frame f = Frame.fromLogFileNotation(line).getFrame();
+                    if(f.getTimestamp() >= currentTime) {
+                        int i=(int) ((currentTime-startTime)/1000000);
+                        index[i] = reader.getPositionOfLastLine();
+                        currentTime += 1000000;
+                    }
+                }
+            } catch (FileNotFoundException ex) {
+                logger.log(Level.SEVERE, "File not found!", ex);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "IOException while creating index", ex);
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
+
+            indexCreated = true;
+
+            logger.log(Level.INFO, "Index was created (size {3}) ({0} {1} {2} ... {4})",
+                    new Object[] {index[0], index[1], index[2], index.length, index[index.length-1]});
+        }
+    };
 
     public long getIn() {
         return in - startTime;
@@ -150,180 +198,90 @@ public class SeekableLogFileReplay {
     public SeekableLogFileReplay(LogFile logFile) throws FileNotFoundException {
         this.logFile = logFile;
 
-        file = new RandomAccessFile(logFile.getFile(), "r");
-
-        findStopPosition();
-        findStartPosition();
+        findPositions();
+        try {
+            reader = new BufferedLineReader(logFile.getFile(), startPosition);
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        index = new long[(int) ((stopTime - startTime)/1000000)+1];
+        indexCreationThread = new Thread(indexCreationRunnable);
+        indexCreationThread.setName("LogFile index creation");
+        indexCreationThread.setPriority(Thread.MIN_PRIORITY);
+        indexCreationThread.start();
 
         logger.log(Level.INFO, "New log file replay. Length from {0} to {1}", new Object[]{startTime, stopTime});
-        try {
-            logger.log(Level.INFO, "Positions in file are {0} and {1}", new Object[]{startPosition, file.length()});
-        } catch (IOException ex) {
-            Logger.getLogger(SeekableLogFileReplay.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        logger.log(Level.INFO, "Start position: {0}", new Object[]{startPosition});
     }
 
     /**
      * Seeks the file to the position of the first frame and returns
      * this position
      */
-    private long findStartPosition() {
+    private void findPositions() {
+        RandomAccessFile newFile = null;
         try {
-            file.seek(0);
+            newFile = new RandomAccessFile(logFile.getFile(), "r");
 
             while(true) {
-                long posBefore = file.getFilePointer();
-                String line = file.readLine();
+                long posBefore = newFile.getFilePointer();
+                String line = newFile.readLine();
                 if(line.startsWith("(")) {
                     Frame f = Frame.fromLogFileNotation(line).getFrame();
                     startTime = f.getTimestamp();
                     currentTimestamp = startTime;
                     in = startTime;
                     startPosition = posBefore;
-                    file.seek(posBefore);
-                    return posBefore;
+                    break;
                 }
             }
-        } catch(IOException ex) {
-                return -1;
-        }
 
-    }
+            for(long checkPos = newFile.length() - 10;checkPos>0;checkPos--) {
+                newFile.seek(checkPos);
 
-    /**
-     * Seeks the file to the position of the last frame and returns
-     * this position
-     */
-    private long findStopPosition() {
-        try {
-            for(long checkPos = file.length() - 10;checkPos>0;checkPos--) {
-                file.seek(checkPos);
-
-                String line = file.readLine();
+                String line = newFile.readLine();
 
                 if(line != null) {
                     Frame.FrameBusNamePair pair = Frame.fromLogFileNotation(line);
 
                     if(pair != null) {
-                        file.seek(checkPos);
+                        newFile.seek(checkPos);
                         stopTime = pair.getFrame().getTimestamp();
                         out = stopTime;
-                        return checkPos;
+                        break;
                     }
                 }
             }
         } catch(IOException ex) {
-                return -1;
+            logger.log(Level.INFO, "Exception while finding positions.", ex);
+        } finally {
+            try {
+                newFile.close();
+            } catch (Exception ex) {
+                Logger.getLogger(SeekableLogFileReplay.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        return -1;
     }
 
     /**
-     * Seek file to the line nearest to position. makes sure that it seeks to
-     * the beginning of a line and not before the start of the file or after the
-     * end of the file
+     *
+     * @param time Time in microseconds
+     * @return
+     * @throws InterruptedException
      */
-    private void safeFileSeek(long position, RandomAccessFile f) throws IOException {
-
-        if(position > startPosition) {
-            if(position < (f.length() - 150)) { /* totally safe */
-                f.seek(position);
-                f.readLine();
-                return;
-            } else { /* find a valid line at position or go back bytewise */
-                for(long checkPos = position;checkPos>0;checkPos--) {
-                    f.seek(checkPos);
-
-                    String line = f.readLine();
-
-                    if(line != null) {
-                        Frame.FrameBusNamePair pair = Frame.fromLogFileNotation(line);
-
-                        if(pair != null) {
-                            f.seek(checkPos);
-                            return;
-                        }
-                    }
-                }
-            }
-        } else { /* first possible position */
-            file.seek(startPosition);
-        }
-    }
-
     private long findSeekPosition(long time) {
         if(time <= 0) {
             return startPosition;
         }
 
-        try {
-            RandomAccessFile newFile = new RandomAccessFile(logFile.getFile(), "r");
-
-            if(time >= 0 && time <= getLength()) {
-                time += startTime;
-
-                /* The position of the first frame after 'time' must be found in
-                 * the file. The position is completely unclear.
-                 * Start with a guess position based on relative time and go
-                 * forward or backward from this point.
-                 */
-                long guessPosition = newFile.length() * (time - startTime) / (stopTime- startTime);
-
-                if(guessPosition <= startPosition)
-                    safeFileSeek(startPosition, newFile);
-                else if(guessPosition >= newFile.length())
-                    findStopPosition();
-                else
-                    safeFileSeek(guessPosition, newFile);
-
-                while(true) {
-                    long positionBeforeRead = newFile.getFilePointer();
-                    Frame f = Frame.fromLogFileNotation(newFile.readLine()).getFrame();
-
-                    /* we have to go forward -> read next line */
-                    if(f.getTimestamp() < time) {
-                        continue;
-                    /* we could either be to far in the file or at the right
-                     * position. Try to find previous frame to check if we have
-                     * to go backward.
-                     */
-                    } else {
-                        for(long previousFramePosition = positionBeforeRead - 10; previousFramePosition > 0;previousFramePosition--) {
-
-                            newFile.seek(previousFramePosition);
-                            String line = newFile.readLine();
-                            Frame previousFrame = null;
-                            if(line != null) {
-                                Frame.FrameBusNamePair pair = Frame.fromLogFileNotation(line);
-                                if(pair != null)
-                                    previousFrame = pair.getFrame();
-                            }
-
-                            /* we are at the right position \o/ */
-                            if(previousFrame != null) {
-                                if(previousFrame.getTimestamp() < time) {
-                                    newFile.close();
-                                    return positionBeforeRead;
-                                /* we have to go backward -> seek back some bytes */
-                                } else {
-                                    newFile.seek(previousFramePosition - 200);
-                                    newFile.readLine(); /* make sure we are at the start of a line */
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            newFile.close();
-        } catch(FileNotFoundException ex ) {
-            logger.log(Level.WARNING, "Could not find seek position", ex);
-        } catch(IOException ex) {
-            logger.log(Level.WARNING, "Could not find seek position", ex);
+        if(!indexCreated) {
+            return startPosition;
         }
 
-        return -1;
+        long i = index[(int) (time/1000000)];
+        logger.log(Level.INFO, "Seek time {0} translates to position {1}",
+                new Object[] { time, i});
+        return i;
     }
 
     /**
@@ -331,18 +289,17 @@ public class SeekableLogFileReplay {
      * @param time
      */
     public void seekTo(long time) {
-        long pos = findSeekPosition(time);
-
-        if(pos != -1) {
-            Command c = new Command(Command.TYPE.SEEK);
-            c.setPosition(pos);
-            commands.add(c);
-        }
+        logger.log(Level.INFO, "Seeking to {0}", time);
+        Command c = new Command(Command.TYPE.SEEK);
+        c.setTime(time);
+        in = time;
+        commands.add(c);
+        thread.interrupt();
     }
 
     private Frame.FrameBusNamePair readNextFrame() {
         try {
-            String line = file.readLine();
+            String line = reader.readLine();
             if(line != null)
                 return Frame.fromLogFileNotation(line);
             else
@@ -354,129 +311,127 @@ public class SeekableLogFileReplay {
 
     private Runnable myRunnable = new Runnable() {
 
-        private boolean checkCommands() {
+        private Command getCommand() {
             if(commands.size()>0) {
                 Command c = commands.get(0);
                 commands.remove(c);
-                switch(c.getType()) {
-                    case SEEK:
-                       try {
-                           file.seek(c.getPosition());
-                       } catch (IOException ex) {
-                           Logger.getLogger(SeekableLogFileReplay.class.getName()).log(Level.SEVERE, null, ex);
-                       }
-                       return false;
-                    case STOP:
-                        return true;
-                    case PAUSE:
-                        while(true) {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException ex1) {
-                                if (commands.size() > 0) {
-                                    for(Command c1 : commands) {
-                                        if(c1.getType() == Command.TYPE.PLAY) {
-                                            commands.remove(c1);
-                                            return false;
-                                        } else if(c1.getType() == Command.TYPE.STOP) {
-                                            commands.remove(c1);
-                                            return true;
-                                        }
-                                    }
-                                    return false;
-                                }
-                            }
-                        }
-                    default:
-                       break;
-                }
+                return c;
+            } else {
+                return null;
             }
-            return false;
         }
 
-        private void seekToIn() {
-            long pos = findSeekPosition(getIn());
-            if(pos != -1) {
+        private void seekTo(long time) {
+            long pos = findSeekPosition(time);
+            if(pos > 0) {
                 try {
-                    file.seek(pos);
+                    reader.seek(pos);
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "Exception while seeking to beginning", ex);
                 }
-                replayStartTime = timeSource.getTime();
+                replayStartTime = timeSource.getTime() - (time/1000);
             }
         }
 
+        private static final int MODE_PLAY = 0;
+        private static final int MODE_PAUSE = 1;
+        private static final int MODE_STOP = 2;
+
         @Override
         public void run() {
-            while (true) {
-                /* try to read a frame */
-                Frame.FrameBusNamePair pair = readNextFrame();
-                if(pair != null) {
-                    Frame f = pair.getFrame();
-                    long timestamp = f.getTimestamp();
-                    if(timestamp > out) {
-                        if(infiniteReplay) {
-                            logger.log(Level.INFO, "Reached the end of the log file. Seeking to beginning.");
-                            seekToIn();
-                            continue;
-                        } else {
-                            return;
+            int mode = MODE_PLAY;
+            replayStartTime = timeSource.getTime() - (getIn()/1000);
+
+
+            while(true) {
+                switch(mode) {
+                    case MODE_PLAY:
+                        while(true) {
+                            Command c = getCommand();
+                            if(c != null) {
+                                if(c.getType() == Command.TYPE.STOP) {
+                                    logger.log(Level.INFO, "Play->Stop");
+                                    mode = MODE_STOP;
+                                    break;
+                                } else if(c.getType() == Command.TYPE.PAUSE) {
+                                    logger.log(Level.INFO, "Play->Pause");
+                                    mode = MODE_PAUSE;
+                                    break;
+                                }else if(c.getType() == Command.TYPE.SEEK) {
+                                    logger.log(Level.INFO, "Play->Seek");
+                                    seekTo(c.getTime());
+                                }
+                            }
+
+                            /* try to read a frame */
+                            Frame.FrameBusNamePair pair = readNextFrame();
+                            if(pair != null) {
+                                Frame f = pair.getFrame();
+                                long timestamp = f.getTimestamp();
+                                if(timestamp > out) { /* End position was reached */
+                                    if(infiniteReplay) {
+                                        logger.log(Level.INFO, "Reached the end of the log file. Seeking to beginning.");
+                                        seekTo(getIn());
+                                        continue;
+                                    } else {
+                                        return;
+                                    }
+                                }
+
+                                String busName = pair.getBusName();
+                                Bus bus = busses.get(busName);
+
+                                if(bus != null) {
+                                    /*
+                                     * Sleep time in microseconds
+                                     * (relative time in log file) - (relative time since replay start)
+                                     */
+                                    long timeToWait = (timestamp-startTime) - (timeSource.getTime()-replayStartTime)*1000;
+
+                                    try {
+                                        if(timeToWait > 10000)
+                                            Thread.sleep(timeToWait / 1000);
+                                        currentTimestamp = timestamp;
+                                        bus.sendFrame(f);
+                                    } catch (InterruptedException ex) {
+                                        /* Command will be checked in next loop */
+                                    }
+                                }
+                            } else {
+                                if(infiniteReplay) {
+                                    logger.log(Level.INFO, "Reached the end of the log file. Seeking to beginning.");
+                                    seekTo(getIn());
+                                }
+                            }
                         }
-                    }
-
-                    String busName = pair.getBusName();
-                    Bus bus = busses.get(busName);
-
-                    if(bus != null) {
-                        /*                 (relative time in log file) - (relative time since replay start) */
-                        long timeToWait = ((timestamp-in)/1000) - (timeSource.getTime()-replayStartTime);
-
-                        /* if timeToWait is <0 we are to late. if it is >0 we have to wait. This only makes sense if
-                         * it is more than a few ms.
-                         */
-                        if (timeToWait >= 10) {
+                        break;
+                    case MODE_PAUSE:
+                        Command c;
+                        while(true) {
                             try {
-                                Thread.sleep(timeToWait);
+                            Thread.sleep(100);
                             } catch (InterruptedException ex) {
-                                if(checkCommands())
-                                    return;
-                            }
-                        }
-                        currentTimestamp = timestamp;
-                        bus.sendFrame(f);
-                    }
 
-                } else {
-                    /* are we at the end of the file? */
-                    boolean eof = false;
-                    synchronized(file) {
-                        try {
-                            if(file.getFilePointer() == file.length()) {
-                                eof = true;
                             }
-                        } catch (IOException ex) {
-                            logger.log(Level.SEVERE, "IOException while checking for EOF", ex);
+                            c = getCommand();
+                            if(c != null)
+                                break;
                         }
-                    }
-                    if(eof) {
-                        if(infiniteReplay) {
-                            logger.log(Level.INFO, "Reached the end of the log file. Seeking to beginning.");
-                            seekToIn();
-                            continue;
-                        } else {
-                            return;
-                        }
-                    } else {
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException ex) {
 
+                        switch(c.getType()) {
+                            case PLAY:
+                                logger.log(Level.INFO, "Pause->Play");
+                                mode = MODE_PLAY;
+                                break;
+                            case SEEK:
+                                seekTo(c.getTime());
+                                break;
                         }
-                    }
+                        break;
+                    case MODE_STOP:
+                        logger.log(Level.INFO, "Stopped");
+                        return;
                 }
-
-                if(checkCommands())
-                    return;
             }
         }
     };
@@ -508,11 +463,11 @@ public class SeekableLogFileReplay {
         @Override
         public void stopped() {
             if(thread != null && thread.isAlive()) {
-                Command c = new Command(Command.TYPE.SEEK);
-                c.setPosition(getIn());
-                commands.add(c);
                 commands.add(new Command(Command.TYPE.STOP));
                 thread.interrupt();
+                Command c = new Command(Command.TYPE.SEEK);
+                c.setTime(getIn());
+                commands.add(c);
             }
         }
     };

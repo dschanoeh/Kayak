@@ -250,38 +250,6 @@ public class LogFile {
                 logger.log(Level.WARNING, "Could not close reader.", ex);
             }
         }
-
-        /*RandomAccessFile raf = null;
-        try {
-            raf = new RandomAccessFile(file, "r");
-
-            // try to find last valid content line
-            for(int i=1;;i++) {
-                raf.seek(raf.length()-i);
-                String line = raf.readLine();
-
-                if(line != null && !line.equals("")) {
-                    Frame f = Frame.fromLogFileNotation(line);
-                    if(f != null) {
-                        long stopTime = f.getTimestamp();
-
-                        length = stopTime - startTime;
-                    }
-                }
-            }
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(LogFile.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(LogFile.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if(raf != null)
-                try {
-                raf.close();
-            } catch (IOException ex) {
-                Logger.getLogger(LogFile.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }*/
     }
 
     @Override

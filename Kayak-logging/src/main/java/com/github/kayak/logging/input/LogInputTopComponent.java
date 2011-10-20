@@ -69,6 +69,12 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
                 jTextField1.setText(String.format("%.3f", in/1000f));
                 jTextField2.setText(String.format("%.3f", out/1000f));
                 jLabel2.setText(String.format("%.3f", current/1000f));
+
+                if(replay.isIndexCreated()) {
+                    jButton4.setEnabled(true);
+                    jButton5.setEnabled(true);
+                    jSlider1.setEnabled(true);
+                }
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException ex) {
@@ -176,6 +182,12 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
 
         jPanel1.add(jPanel4);
 
+        jSlider1.setEnabled(false);
+        jSlider1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSlider1MouseReleased(evt);
+            }
+        });
         jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSlider1StateChanged(evt);
@@ -194,6 +206,7 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
         jPanel5.add(jTextField1, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton4, org.openide.util.NbBundle.getMessage(LogInputTopComponent.class, "LogInputTopComponent.jButton4.text")); // NOI18N
+        jButton4.setEnabled(false);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -209,6 +222,7 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
         jPanel5.add(jLabel2, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton5, org.openide.util.NbBundle.getMessage(LogInputTopComponent.class, "LogInputTopComponent.jButton5.text")); // NOI18N
+        jButton5.setEnabled(false);
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -315,12 +329,16 @@ public final class LogInputTopComponent extends TopComponent implements BusDropT
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
-        /*JSlider source = (JSlider)evt.getSource();
+
+    }//GEN-LAST:event_jSlider1StateChanged
+
+    private void jSlider1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSlider1MouseReleased
+        JSlider source = (JSlider)evt.getSource();
         if (!source.getValueIsAdjusting()) {
             int newVal = (int) source.getValue();
             replay.seekTo(((long) newVal) * 1000);
-        }*/
-    }//GEN-LAST:event_jSlider1StateChanged
+        }
+    }//GEN-LAST:event_jSlider1MouseReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
