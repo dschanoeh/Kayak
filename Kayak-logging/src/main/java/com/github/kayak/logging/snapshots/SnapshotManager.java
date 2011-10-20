@@ -4,6 +4,9 @@
  */
 package com.github.kayak.logging.snapshots;
 
+import com.github.kayak.core.TimeEventReceiver;
+import com.github.kayak.ui.time.TimeSourceManager;
+
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
@@ -42,5 +45,26 @@ public class SnapshotManager {
         if(!buffer.isBuffering())
             buffer.startBuffering();
     }
+
+    public static void enableBuffering() {
+        TimeSourceManager.getGlobalTimeSource().register(receiver);
+    }
+
+    private static TimeEventReceiver receiver = new TimeEventReceiver() {
+
+        public void paused() {
+
+        }
+	public void played() {
+            buffer = new SnapshotBuffer();
+            buffer.startBuffering();
+
+        }
+	public void stopped() {
+            if(buffer != null && buffer.isBuffering()) {
+                buffer.stopBuffering(0);
+            }
+        }
+    };
 
 }

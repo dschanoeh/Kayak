@@ -21,6 +21,8 @@ import java.awt.event.ActionEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -41,9 +43,12 @@ public class CreateSnapshotAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        ProgressHandle p = ProgressHandleFactory.createHandle("Recording snapshot...");
+        p.start();
         logger.log(Level.INFO, "Creating snapshot...");
         SnapshotBuffer buffer = SnapshotManager.getCurrentBuffer();
         buffer.stopBuffering(3000);
         buffer.writeToFile();
+        p.finish();
     }
 }

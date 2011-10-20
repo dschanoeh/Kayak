@@ -37,7 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -204,6 +203,8 @@ public class SnapshotBuffer {
 
             currentProject.addProjectChangeListener(projectListener);
         }
+
+        logger.log(Level.INFO, "New snapshot buffer was connected");
     }
 
     private void connectBus(Bus bus) {
@@ -212,6 +213,7 @@ public class SnapshotBuffer {
         if (s == null) {
             Subscription sn = new Subscription(receiver, bus);
             subscriptions.put(bus, sn);
+            logger.log(Level.INFO, "Connected bus" + bus.getName());
         }
     }
 
@@ -254,7 +256,6 @@ public class SnapshotBuffer {
         for (Subscription s : subscriptions.values()) {
             s.Terminate();
         }
-        subscriptions.clear();
 
         isBuffering = false;
     }
@@ -274,12 +275,13 @@ public class SnapshotBuffer {
             out.write("PLATFORM SNAPSHOTS\n");
             out.write("DESCRIPTION \"Snapshot of project " + currentProject.getName() + "\"\n");
 
-            HashSet<String> busNames = new HashSet<String>();
-            for (Frame frame : frames) {
-                busNames.add(frame.getBus().getName());
-            }
-            for (String n : busNames) {
-                out.write("DEVICE_ALIAS " + n + " " + n + "\n");
+            Set<Bus> busses = subscriptions.keySet();
+
+            for (Bus bus : busses) {
+                if(bus.getAlias() != null && !bus.getAlias().equals(""))
+                    out.write("DEVICE_ALIAS " + bus.getAlias() + " " + bus.getName() + "\n");
+                else
+                    out.write("DEVICE_ALIAS " + bus.getName() + " " + bus.getName() + "\n");
             }
 
             for (Frame frame : frames) {

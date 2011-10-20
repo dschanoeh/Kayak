@@ -19,26 +19,18 @@
 package com.github.kayak.logging;
 
 import com.github.kayak.core.LogFile;
-import com.github.kayak.logging.input.LogInputTopComponent;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
-import org.openide.util.Exceptions;
 import org.openide.util.lookup.Lookups;
 
 /**
@@ -152,7 +144,13 @@ public class LogFileNode extends AbstractNode {
                 StringBuilder sb = new StringBuilder();
 
                 for(String bus : logFile.getBusses()) {
+                    String alias = logFile.getAlias(bus);
                     sb.append(bus);
+                    if(alias != null && !alias.equals("")) {
+                        sb.append(" (");
+                        sb.append(alias);
+                        sb.append(")");
+                    }
                     sb.append(", ");
                 }
 

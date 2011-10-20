@@ -226,6 +226,9 @@ public class LogFile {
             while (true) {
                 String line = reader.readLine();
 
+                if(line == null)
+                    break;
+
                 if(descriptionLinePattern.matcher(line).matches()) {
                     int start = line.indexOf('\"') + 1;
                     int stop = line.lastIndexOf("\"");

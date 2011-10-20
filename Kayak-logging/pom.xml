@@ -38,7 +38,8 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>Kayak-core</artifactId>
-            <version>${project.version}</version>
+            <version>1.0-SNAPSHOT</version>
+            <type>nbm</type>
         </dependency>
         <dependency>
             <groupId>org.freedesktop.tango</groupId>
@@ -103,6 +104,12 @@
         </dependency>
         <dependency>
             <artifactId>org-netbeans-api-progress</artifactId>
+            <groupId>org.netbeans.api</groupId>
+            <type>jar</type>
+            <version>RELEASE701</version>
+        </dependency>
+        <dependency>
+            <artifactId>org-openide-modules</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
             <version>RELEASE701</version>
