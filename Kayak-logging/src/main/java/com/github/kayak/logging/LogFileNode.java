@@ -184,11 +184,17 @@ public class LogFileNode extends AbstractNode {
             }
         };
 
-        Property length = new PropertySupport.ReadOnly<String>("Length", String.class, "Length", "Length of the file in milliseconds") {
+        Property length = new PropertySupport.ReadOnly<String>("Length", String.class, "Length", "Length of the file in hours, minutes, seconds") {
 
             @Override
             public String getValue() throws IllegalAccessException, InvocationTargetException {
-                return String.valueOf(logFile.getLength() / 1000) + "." + String.valueOf(logFile.getLength() % 1000);
+                long milliseconds = logFile.getLength() / 1000;
+
+                int seconds = (int) (milliseconds / 1000) % 60;
+                int minutes = (int) ((milliseconds / (1000*60)) % 60);
+                int hours   = (int) ((milliseconds / (1000*60*60)));
+
+                return String.format("%d:%02d:%02d", hours, minutes, seconds);
             }
 
         };

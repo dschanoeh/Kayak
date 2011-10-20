@@ -51,7 +51,9 @@ public class LogFile {
     private String description;
     private String platform;
     private HashMap<String, String> deviceAlias;
-    private long length;
+    private long startTime;
+    private long stopTime;
+    private long startPosition;
 
     public static final Pattern platformPattern = Pattern.compile("[A-Z0-9_]+");
     public static final Pattern descriptionPattern = Pattern.compile("[a-zA-Z0-9\\s]+");
@@ -59,8 +61,21 @@ public class LogFile {
     public static final Pattern platformLinePattern = Pattern.compile("PLATFORM [A-Z0-9_]+");
     public static final Pattern deviceAliasLinePattern = Pattern.compile("DEVICE_ALIAS [A-Za-z0-9]+ [a-z0-9]{1,16}");
 
+    public long getStartPosition() {
+        return startPosition;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public long getStopTime() {
+        return stopTime;
+    }
+
+
     public long getLength() {
-        return length;
+        return stopTime - startTime;
     }
 
     public long getSize() {
@@ -128,6 +143,7 @@ public class LogFile {
         }
 
         parseHeader();
+        findPositions();
     }
 
     private void rewriteHeader() throws FileNotFoundException, IOException {
@@ -248,6 +264,48 @@ public class LogFile {
                 reader.close();
             } catch (Exception ex) {
                 logger.log(Level.WARNING, "Could not close reader.", ex);
+            }
+        }
+    }
+
+    private void findPositions() {
+        RandomAccessFile newFile = null;
+        try {
+            newFile = new RandomAccessFile(file, "r");
+
+            while(true) {
+                long posBefore = newFile.getFilePointer();
+                String line = newFile.readLine();
+                if(line.startsWith("(")) {
+                    Frame f = Frame.fromLogFileNotation(line).getFrame();
+                    startTime = f.getTimestamp();
+                    startPosition = posBefore;
+                    break;
+                }
+            }
+
+            for(long checkPos = newFile.length() - 10;checkPos>0;checkPos--) {
+                newFile.seek(checkPos);
+
+                String line = newFile.readLine();
+
+                if(line != null) {
+                    Frame.FrameBusNamePair pair = Frame.fromLogFileNotation(line);
+
+                    if(pair != null) {
+                        newFile.seek(checkPos);
+                        stopTime = pair.getFrame().getTimestamp();
+                        break;
+                    }
+                }
+            }
+        } catch(IOException ex) {
+            logger.log(Level.INFO, "Exception while finding positions.", ex);
+        } finally {
+            try {
+                newFile.close();
+            } catch (Exception ex) {
+                Logger.getLogger(SeekableLogFileReplay.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
