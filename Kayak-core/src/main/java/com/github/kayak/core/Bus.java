@@ -199,12 +199,12 @@ public class Bus implements SubscriptionChangeListener {
                 long timestamp = f.getTimestamp();
                 if(timestamp != 0) {
                     if(delta == 0) {
-                        delta = timestamp - timeSource.getTime();
+                        delta = (timestamp/1000) - timeSource.getTime();
                     }
-                    timestamp -= delta;
+                    timestamp -= delta*1000;
                     f.setTimestamp(timestamp);
                 } else {
-                    f.setTimestamp(timeSource.getTime());
+                    f.setTimestamp(timeSource.getTime()*1000);
                 }
                 deliverRAWFrame(f);
             }
@@ -219,12 +219,12 @@ public class Bus implements SubscriptionChangeListener {
                 long timestamp = f.getTimestamp();
                 if(timestamp != 0) {
                     if(delta == 0) {
-                        delta = timestamp - timeSource.getTime();
+                        delta = (timestamp/1000) - timeSource.getTime();
                     }
-                    timestamp -= delta;
+                    timestamp -= delta*1000;
                     f.setTimestamp(timestamp);
                 } else {
-                    f.setTimestamp(timeSource.getTime());
+                    f.setTimestamp(timeSource.getTime()*1000);
                 }
                 deliverBCMFrame(f);
             }

@@ -17,6 +17,7 @@
  */
 package com.github.kayak.logging.snapshots;
 
+import com.github.kayak.logging.options.Options;
 import java.awt.event.ActionEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +48,7 @@ public class CreateSnapshotAction extends AbstractAction {
         p.start();
         logger.log(Level.INFO, "Creating snapshot...");
         SnapshotBuffer buffer = SnapshotManager.getCurrentBuffer();
-        buffer.stopBuffering(3000);
+        buffer.stopBuffering(Options.getSnapshotBufferFinish());
         buffer.writeToFile();
         p.finish();
     }

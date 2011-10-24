@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,8 +62,7 @@ public class SnapshotBuffer {
     private static final Calendar cal = Calendar.getInstance();
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
     private static final int depth = Options.getSnapshotBufferDepth();
-    private static final int finish = Options.getSnapshotBufferFinish();
-    private final Set<Frame> frames = Collections.synchronizedSet(new TreeSet<Frame>(new Frame.TimestampComparator()));
+    private final Set<Frame> frames = new TreeSet<Frame>(new Frame.TimestampComparator());
     private Thread cleanupThread;
     private int stopTimeout = 0;
     private boolean stopRequest = false;
@@ -140,7 +140,7 @@ public class SnapshotBuffer {
 
         @Override
         public void newFrame(Frame frame) {
-            synchronized (frames) {
+            synchronized(frames) {
                 frames.add(frame);
             }
         }
@@ -154,23 +154,24 @@ public class SnapshotBuffer {
             while (!stopRequest) {
 
                 try {
-                    Thread.sleep(finish);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     if (stopRequest) {
-                        cleanup();
-                        return;
+                        break;
                     } else {
                         logger.log(Level.WARNING, "Snapshot buffer interrupted without stop request");
                     }
                 }
 
                 long currentTime = ts.getTime();
-                synchronized (frames) {
-                    Frame[] frameArray = new Frame[frames.size()];
+                Frame[] frameArray = new Frame[frames.size()];
+                synchronized(frames) {
                     frameArray = frames.toArray(frameArray);
                     for (Frame f : frameArray) {
-                        if (f.getTimestamp() < currentTime - depth) {
+                        if ((f.getTimestamp()/1000) < (currentTime - depth)) {
                             frames.remove(f);
+                        } else { /* set is ordered so we can stop here */
+                            break;
                         }
                     }
                 }
