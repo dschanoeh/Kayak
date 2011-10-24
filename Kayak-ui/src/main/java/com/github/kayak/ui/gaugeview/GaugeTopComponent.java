@@ -1,6 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 	This file is part of Kayak.
+ *
+ *	Kayak is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU Lesser General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	Kayak is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU Lesser General Public License
+ *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package com.github.kayak.ui.gaugeview;
 
@@ -17,14 +30,13 @@ import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManager;
 import com.github.kayak.ui.useroutput.UserOutput;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
 import java.awt.dnd.DropTarget;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
+import eu.hansolo.steelseries.gauges.Radial;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.gaugeview//Gauge//EN",
@@ -40,13 +52,11 @@ public final class GaugeTopComponent extends TopComponent {
     private Subscription subscription;
     private Bus bus;
     private double minimum = 0.0;
-    private double maximum = 5.0;
+    private double maximum = 100.0;
     private double value;
-    private static final int RADIUS = 75;
-    private static final int BORDER = 25;
-    private static final int CENTERX = RADIUS + BORDER;
-    private static final int CENTERY = RADIUS;
     private boolean manualRange;
+    private Radial gauge;
+    private boolean settings=true;
 
     private MessageSignalDropAdapter.Receiver dropReceiver = new MessageSignalDropAdapter.Receiver() {
 
@@ -60,8 +70,8 @@ public final class GaugeTopComponent extends TopComponent {
             subscription = new Subscription(listener, b);
             subscription.subscribe(id);
             signalDescription = signal;
-            jTextField1.setText(signalDescription.getName());
-            jTextField5.setText(signalDescription.getUnit());
+            gauge.setUnitString(signalDescription.getUnit());
+            gauge.setTitle(signalDescription.getName());
             setName(NbBundle.getMessage(GaugeTopComponent.class, "CTL_GaugeTopComponent") + " - " + signal.getName());
             bus = b;
 
@@ -125,17 +135,16 @@ public final class GaugeTopComponent extends TopComponent {
     };
 
     private void updateValue(double value) {
-        jTextField4.setText(String.format("%.6f", value));
 
         if(!manualRange) {
             if(minimum > value) {
-                minimum = value;
-                jTextField2.setText(String.valueOf(minimum));
+                minimum = 1.1 * value;
+                gauge.setMinValue(minimum);
             }
 
             if(maximum < value) {
-                maximum = value;
-                jTextField3.setText(String.valueOf(maximum));
+                maximum = 1.1 * value;
+                gauge.setMaxValue(maximum);
             }
         }
 
@@ -146,71 +155,8 @@ public final class GaugeTopComponent extends TopComponent {
 
         if(change > 0.005f) {
             this.value = value;
-            repaint();
+            gauge.setValue(value);
         }
-    }
-
-    protected Point ratioToPoint(double ratio) {
-        Point p = new Point();
-        double radianRatio = ratio * 1.5 * Math.PI;
-        double realAngle = (1.25 * Math.PI) - radianRatio;
-        p.setLocation(CENTERX + (int) (RADIUS * Math.cos(realAngle)), CENTERY + (int) (RADIUS * Math.sin(-1f * realAngle)));
-        return p;
-    }
-
-    protected static double scaleElementsForRange(double range) {
-        double scaleElement = range / 10f;
-
-        double checkValue = 1f;
-        while(true) {
-            if(checkValue > scaleElement) { /* go down */
-                if(!((range / (checkValue/10f)) > 15f)) { /* not more than 15 elements */
-                    checkValue/=10f;
-                    continue;
-                } else {
-                    break;
-                }
-            } else { /* go up */
-                if(!((range / (checkValue*10f) < 5))) { /* not less than 5 elements */
-                    checkValue*=10f;
-                    continue;
-                } else {
-                    break;
-                }
-            }
-        }
-
-        return checkValue;
-    }
-
-    @Override
-    public void paint(Graphics gr) {
-        super.paint(gr);
-        Graphics2D g = (Graphics2D) gr;
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                            RenderingHints.VALUE_ANTIALIAS_ON);
-
-        /* Scale */
-        g.drawArc(BORDER, 0, RADIUS*2, RADIUS*2, -45, 270);
-        double range = maximum-minimum;
-        double exactScaleElement = scaleElementsForRange(range);
-
-        for(double i=minimum + exactScaleElement;i < maximum;i+=exactScaleElement) {
-            Point p = ratioToPoint(i / (maximum-minimum));
-
-            int directionx = (p.x-CENTERX)/16;
-            int directiony = (p.y-CENTERY)/16;
-            g.drawLine(p.x-directionx, p.y-directiony,
-                    p.x+directionx, p.y+directiony);
-        }
-
-        /* Center point */
-        g.fillOval(CENTERX-5, CENTERY-5, 10, 10);
-        double ratio = value/range;
-
-        /* Pointer */
-        Point p = ratioToPoint(ratio);
-        g.drawLine(CENTERX, CENTERY, p.x, p.y);
     }
 
     public GaugeTopComponent() {
@@ -218,11 +164,20 @@ public final class GaugeTopComponent extends TopComponent {
         setName(NbBundle.getMessage(GaugeTopComponent.class, "CTL_GaugeTopComponent"));
         setToolTipText(NbBundle.getMessage(GaugeTopComponent.class, "HINT_GaugeTopComponent"));
 
-        DropTarget dt = new DropTarget(jTextField1, new MessageSignalDropAdapter(dropReceiver));
-	jTextField1.setDropTarget(dt);
+        DropTarget dt = new DropTarget(jPanel1, new MessageSignalDropAdapter(dropReceiver));
+	jPanel1.setDropTarget(dt);
 
         jTextField2.setText(String.valueOf(minimum));
         jTextField3.setText(String.valueOf(maximum));
+
+        gauge = new Radial();
+        gauge.setTitle("Drag Signal");
+        gauge.setUnitString("here");
+        gauge.setMinimumSize(new Dimension(100, 100));
+        gauge.setGlowVisible(true);
+        gauge.setMaxValue(maximum);
+        gauge.setMinValue(minimum);
+        jPanel1.add(gauge, BorderLayout.CENTER);
     }
 
     /** This method is called from within the constructor to
@@ -232,29 +187,57 @@ public final class GaugeTopComponent extends TopComponent {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        jTextField1 = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jToggleButton2 = new javax.swing.JToggleButton();
+        jToggleButton3 = new javax.swing.JToggleButton();
+        jLabel1 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jToggleButton4 = new javax.swing.JToggleButton();
 
         setMinimumSize(new java.awt.Dimension(200, 0));
         setPreferredSize(new java.awt.Dimension(200, 265));
+        setLayout(new java.awt.BorderLayout());
 
-        jTextField1.setEditable(false);
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField1.setText(org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jTextField1.text")); // NOI18N
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel1MouseClicked(evt);
+            }
+        });
+        jPanel1.setLayout(new java.awt.BorderLayout());
+        add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jLabel1.text")); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jPanel2.border.title"))); // NOI18N
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        jTextField3.setText(org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jTextField3.text")); // NOI18N
+        jTextField3.setMaximumSize(new java.awt.Dimension(50, 2147483647));
+        jTextField3.setMinimumSize(new java.awt.Dimension(100, 20));
+        jTextField3.setPreferredSize(new java.awt.Dimension(100, 20));
+        jTextField3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextField3FocusLost(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel2.add(jTextField3, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jLabel2.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jLabel3.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        jPanel2.add(jLabel2, gridBagConstraints);
 
         jTextField2.setText(org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jTextField2.text")); // NOI18N
         jTextField2.setMaximumSize(new java.awt.Dimension(100, 2147483647));
@@ -265,87 +248,76 @@ public final class GaugeTopComponent extends TopComponent {
                 jTextField2FocusLost(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(jTextField2, gridBagConstraints);
 
-        jTextField3.setText(org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jTextField3.text")); // NOI18N
-        jTextField3.setMaximumSize(new java.awt.Dimension(50, 2147483647));
-        jTextField3.setMinimumSize(new java.awt.Dimension(50, 20));
-        jTextField3.setPreferredSize(new java.awt.Dimension(50, 20));
-        jTextField3.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jTextField3FocusLost(evt);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jLabel3.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.weightx = 0.1;
+        jPanel2.add(jLabel3, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jToggleButton2, org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jToggleButton2.text")); // NOI18N
+        jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton2ActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel2.add(jToggleButton2, gridBagConstraints);
 
-        jTextField4.setEditable(false);
-        jTextField4.setText(org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jTextField4.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jToggleButton3, org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jToggleButton3.text")); // NOI18N
+        jToggleButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton3ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel2.add(jToggleButton3, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jLabel4.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        jPanel2.add(jLabel1, gridBagConstraints);
 
-        jTextField5.setEditable(false);
-        jTextField5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField5.setText(org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jTextField5.text")); // NOI18N
-        jTextField5.setBorder(null);
+        jTextField1.setText(org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jTextField1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        jPanel2.add(jTextField1, gridBagConstraints);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(jLabel2)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(jLabel3))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(9, 9, 9)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(47, 47, 47)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(83, 83, 83)
-                        .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(59, 59, 59)
-                        .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(37, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(157, 157, 157))
-        );
+        org.openide.awt.Mnemonics.setLocalizedText(jToggleButton4, org.openide.util.NbBundle.getMessage(GaugeTopComponent.class, "GaugeTopComponent.jToggleButton4.text")); // NOI18N
+        jToggleButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton4ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 2;
+        jPanel2.add(jToggleButton4, gridBagConstraints);
+
+        add(jPanel2, java.awt.BorderLayout.NORTH);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField2FocusLost
@@ -355,7 +327,7 @@ public final class GaugeTopComponent extends TopComponent {
             double min = Double.parseDouble(text);
             minimum = min;
             manualRange = true;
-            repaint();
+            gauge.setMinValue(min);
         }
     }//GEN-LAST:event_jTextField2FocusLost
 
@@ -366,20 +338,66 @@ public final class GaugeTopComponent extends TopComponent {
             double max = Double.parseDouble(text);
             maximum = max;
             manualRange = true;
-            repaint();
+            gauge.setMaxValue(max);
         }
     }//GEN-LAST:event_jTextField3FocusLost
+
+    private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
+        if(settings) {
+            remove(jPanel2);
+            settings = false;
+            gauge.repaint();
+            gauge.revalidate();
+            repaint();
+        } else {
+            add(jPanel2, BorderLayout.NORTH);
+            settings = true;
+            gauge.repaint();
+            gauge.revalidate();
+            repaint();
+        }
+    }//GEN-LAST:event_jPanel1MouseClicked
+
+    private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
+        if(jToggleButton2.isSelected()) {
+            gauge.setMaxMeasuredValueVisible(true);
+            gauge.setMinMeasuredValueVisible(true);
+            gauge.resetMaxMeasuredValue();
+            gauge.resetMinMeasuredValue();
+        } else {
+            gauge.setMaxMeasuredValueVisible(false);
+            gauge.setMinMeasuredValueVisible(false);
+        }
+    }//GEN-LAST:event_jToggleButton2ActionPerformed
+
+    private void jToggleButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton3ActionPerformed
+        gauge.setGlowing(!gauge.isGlowing());
+    }//GEN-LAST:event_jToggleButton3ActionPerformed
+
+    private void jToggleButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton4ActionPerformed
+        if(jToggleButton4.isSelected()) {
+            try {
+                double threshold = Double.parseDouble(jTextField1.getText());
+                gauge.setThreshold(threshold);
+                gauge.setThresholdVisible(true);
+            } catch(Exception ex) {}
+        } else {
+            gauge.setThresholdVisible(false);
+        }
+    }//GEN-LAST:event_jToggleButton4ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
+    private javax.swing.JToggleButton jToggleButton2;
+    private javax.swing.JToggleButton jToggleButton3;
+    private javax.swing.JToggleButton jToggleButton4;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {

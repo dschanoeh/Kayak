@@ -97,6 +97,11 @@
             <artifactId>org-netbeans-modules-options-api</artifactId>
             <version>RELEASE701</version>
         </dependency>
+        <dependency>
+            <groupId>eu.hansolo</groupId>
+            <artifactId>SteelSeries</artifactId>
+            <version>3.9.6</version>
+        </dependency>
     </dependencies>
 
     <build>
