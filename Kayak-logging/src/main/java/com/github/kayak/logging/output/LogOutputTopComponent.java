@@ -105,9 +105,9 @@ public final class LogOutputTopComponent extends TopComponent implements Explore
         jList1.setDropTarget(dt);
 
         Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
         FileObject logFolder = FileUtil.toFileObject(new File(Options.getLogFilesFolder()));
-        jTextField1.setText(logFolder.getPath() + "/" + sdf.format(cal.getTime()) + ".log.gz");
+        jTextField1.setText(logFolder.getPath() + "/LogFile_" + sdf.format(cal.getTime()) + ".log");
         jTextField2.setText("NO_PLATFORM");
         jTextField3.setText("No description");
     }
