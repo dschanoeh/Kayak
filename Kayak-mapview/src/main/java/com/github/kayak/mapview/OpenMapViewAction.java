@@ -27,7 +27,7 @@ import org.openide.util.NbBundle.Messages;
 
 @ActionID(category = "BusViews", id = "com.github.kayak.mapview.OpenMapViewAction")
 @ActionRegistration(displayName = "#CTL_OpenMapView",
-        iconBase="org/freedesktop/tango/16x16/apps/internet-web-browser.png")
+        iconBase="org/tango-project/tango-icon-theme/16x16/apps/internet-web-browser.png")
 @ActionReferences(value = {
     @ActionReference(path = "Menu/Bus views", position = 15),
     @ActionReference(path = "Toolbars/Bus views", position = 15)

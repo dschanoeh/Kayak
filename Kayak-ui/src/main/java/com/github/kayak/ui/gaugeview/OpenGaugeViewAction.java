@@ -28,7 +28,7 @@ import org.openide.awt.ActionRegistration;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-@ActionRegistration(displayName="Open gauge view", iconBase="org/freedesktop/tango/16x16/actions/appointment-new.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="Open gauge view", iconBase="org/tango-project/tango-icon-theme/16x16/actions/appointment-new.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="BusViews", id="com.github.kayak.ui.gaugeview.OpenGaugeViewAction")
 @ActionReferences( value= {
     @ActionReference(path = "Menu/Bus views", position = 10),

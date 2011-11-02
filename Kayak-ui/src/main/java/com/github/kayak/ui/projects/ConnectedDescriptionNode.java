@@ -70,7 +70,7 @@ public class ConnectedDescriptionNode extends AbstractNode {
 
         @Override
         public void aliasChanged(String string) {
-            
+
         }
     };
 
@@ -85,7 +85,7 @@ public class ConnectedDescriptionNode extends AbstractNode {
         else
             setDisplayName("Description: " + description.getName());
 
-        setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/text-x-generic.png");
+        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/mimetypes/text-x-generic.png");
     }
 
     @Override

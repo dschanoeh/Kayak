@@ -27,7 +27,7 @@ import org.openide.util.Utilities;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.projects//Projects//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "ProjectsTopComponent",
-iconBase="org/freedesktop/tango/16x16/mimetypes/package-x-generic.png",
+iconBase="org/tango-project/tango-icon-theme/16x16/mimetypes/package-x-generic.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "explorer", openAtStartup = true)
 @ActionID(category = "Window", id = "com.github.kayak.ui.projects.ProjectsTopComponent")

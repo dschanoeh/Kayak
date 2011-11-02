@@ -17,7 +17,7 @@ import org.openide.awt.ActionRegistration;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-@ActionRegistration(displayName = "Open Log file...", iconBase = "org/freedesktop/tango/16x16/actions/document-open.png", iconInMenu = true, surviveFocusChange = true)
+@ActionRegistration(displayName = "Open Log file...", iconBase = "org/tango-project/tango-icon-theme/16x16/actions/document-open.png", iconInMenu = true, surviveFocusChange = true)
 @ActionID(category = "Log files", id = "com.github.kayak.logging.OpenLogFileAction")
 @ActionReferences(value = {
     @ActionReference(path = "Menu/Log files", position = 10)})

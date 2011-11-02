@@ -37,7 +37,7 @@ import org.openide.filesystems.FileUtil;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.logfiles//LogOutput//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "LogOutputTopComponent",
-iconBase="org/freedesktop/tango/16x16/actions/go-next.png",
+iconBase="org/tango-project/tango-icon-theme/16x16/actions/go-next.png",
 persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "properties", openAtStartup = false)
 @ActionID(category = "Log files", id = "com.github.kayak.logging.LogOutputTopComponent")

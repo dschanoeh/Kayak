@@ -85,6 +85,11 @@
             <artifactId>swingx-core</artifactId>
             <version>1.6.2-2</version>
         </dependency>
+        <dependency>
+            <groupId>org.tango-project</groupId>
+            <artifactId>tango-icon-theme</artifactId>
+            <version>0.8.0</version>
+        </dependency>
     </dependencies>
 
     <build>

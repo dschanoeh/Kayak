@@ -19,7 +19,7 @@
           <Group type="102" attributes="0">
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTextField2" pref="170" max="32767" attributes="0"/>
+              <Component id="jTextField2" pref="189" max="32767" attributes="0"/>
           </Group>
           <Component id="beanTreeView1" alignment="0" pref="230" max="32767" attributes="0"/>
       </Group>

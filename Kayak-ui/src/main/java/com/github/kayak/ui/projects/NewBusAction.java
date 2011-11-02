@@ -13,7 +13,7 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
-@ActionRegistration(displayName="New bus...", iconBase="org/freedesktop/tango/16x16/places/network-workgroup.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="New bus...", iconBase="org/tango-project/tango-icon-theme/16x16/places/network-workgroup.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="File", id="com.github.kayak.ui.projects.NewBusAction")
 @ActionReferences( value= {
     @ActionReference(path = "Shortcuts", name = "D-B"),

@@ -13,7 +13,7 @@ import org.openide.awt.ActionRegistration;
 
 @ActionID(category = "Time",
 id = "com.github.kayak.ui.time.PlayAction")
-@ActionRegistration(iconBase = "org/freedesktop/tango/16x16/actions/media-playback-start.png",
+@ActionRegistration(iconBase = "org/tango-project/tango-icon-theme/16x16/actions/media-playback-start.png",
 displayName = "com.github.kayak.ui.time.Bundle#CTL_PlayAction")
 @ActionReferences({
     @ActionReference(path = "Toolbars/Time", position = 100),

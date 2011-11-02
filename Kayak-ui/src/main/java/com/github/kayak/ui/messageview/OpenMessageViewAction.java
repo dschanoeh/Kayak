@@ -32,7 +32,7 @@ import org.openide.util.NbBundle.Messages;
 @ActionID(category = "BusViews",
 id = "com.github.kayak.ui.messageview.OpenMessageViewAction")
 @ActionRegistration(displayName = "#CTL_OpenMessageViewAction",
-        iconBase="org/freedesktop/tango/16x16/status/dialog-information.png")
+        iconBase="org/tango-project/tango-icon-theme/16x16/status/dialog-information.png")
 @ActionReferences(value = {
     @ActionReference(path = "Menu/Bus views", position = 5),
     @ActionReference(path = "Toolbars/Bus views", position = 5)

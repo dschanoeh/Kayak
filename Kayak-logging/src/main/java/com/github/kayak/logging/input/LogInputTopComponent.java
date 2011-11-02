@@ -46,7 +46,7 @@ import org.netbeans.api.settings.ConvertAsProperties;
 @ConvertAsProperties(dtd = "-//com.github.kayak.logging.input//LogInput//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "LogInputTopComponent",
-iconBase="org/freedesktop/tango/16x16/actions/go-previous.png",
+iconBase="org/tango-project/tango-icon-theme/16x16/actions/go-previous.png",
 persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 @TopComponent.Registration(mode = "properties", openAtStartup = false)
 public final class LogInputTopComponent extends TopComponent implements BusDropTargetAdapter.BusDropReceiver {

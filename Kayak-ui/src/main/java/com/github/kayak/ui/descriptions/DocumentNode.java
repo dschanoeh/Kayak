@@ -39,12 +39,12 @@ import org.openide.util.lookup.Lookups;
 public class DocumentNode extends AbstractNode {
 
     private Document document;
-    
+
     public DocumentNode(Document document) {
         super(Children.create(new DocumentChildrenFactory(document), true), Lookups.fixed(document));
         this.document = document;
         setName(document.getName());
-        setIconBaseWithExtension("org/freedesktop/tango/16x16/mimetypes/text-x-generic.png");
+        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/mimetypes/text-x-generic.png");
     }
 
     @Override
@@ -59,7 +59,7 @@ public class DocumentNode extends AbstractNode {
                 return document.getName();
             }
         };
-        
+
         Property author = new PropertySupport.ReadOnly<String>("Author", String.class, "Author", "Author of the document") {
 
             @Override
@@ -67,7 +67,7 @@ public class DocumentNode extends AbstractNode {
                 return document.getAuthor();
             }
         };
-        
+
         Property company = new PropertySupport.ReadOnly<String>("Company", String.class, "Company", "Company that created the document") {
 
             @Override
@@ -75,7 +75,7 @@ public class DocumentNode extends AbstractNode {
                 return document.getCompany();
             }
         };
-        
+
         Property date = new PropertySupport.ReadOnly<String>("Date", String.class, "Date", "Date of creation") {
 
             @Override
@@ -83,7 +83,7 @@ public class DocumentNode extends AbstractNode {
                 return document.getDate();
             }
         };
-        
+
         Property version = new PropertySupport.ReadOnly<String>("Version", String.class, "Version", "Version of the document") {
 
             @Override
@@ -91,18 +91,18 @@ public class DocumentNode extends AbstractNode {
                 return document.getVersion();
             }
         };
-        
+
         set.put(name);
         set.put(author);
         set.put(company);
         set.put(date);
         set.put(version);
-        
+
         s.put(set);
-        
+
         return s;
     }
-    
+
     @Override
     public Action[] getActions(boolean context) {
         return new Action[] { new CreateProjectAction(this) };

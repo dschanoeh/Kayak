@@ -48,14 +48,14 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
     public MessageDescription getDescription() {
         return description;
     }
-    
+
     public MessageDescriptionNode(MessageDescription messageDescription, Bus bus) {
 	super(Children.create(new SignalNodeFactory(messageDescription, bus), true), Lookups.fixed(messageDescription, bus));
 
 	this.description = messageDescription;
         this.bus = bus;
         setDisplayName(description.getName());
-        setIconBaseWithExtension("org/freedesktop/tango/16x16/apps/internet-mail.png");
+        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/apps/internet-mail.png");
     }
 
     @Override
@@ -81,8 +81,8 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
             return description;
         }
         return null;
-    } 
-        
+    }
+
     @Override
     protected Sheet createSheet() {
         Sheet s = super.createSheet();
@@ -105,14 +105,14 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
             }
 
         };
-        
+
         Property producer = new PropertySupport.ReadOnly<String>("Producer", String.class, "Producer", "Node that produces this message") {
 
             @Override
             public String getValue() throws IllegalAccessException, InvocationTargetException {
                 Node producer = description.getProducer();
-                
-		return producer.getName();	
+
+		return producer.getName();
             }
 
         };
@@ -124,5 +124,5 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
         s.put(set);
 
         return s;
-    } 
+    }
 }

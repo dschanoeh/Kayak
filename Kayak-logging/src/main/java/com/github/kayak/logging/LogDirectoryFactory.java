@@ -30,22 +30,22 @@ import org.openide.nodes.Node;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class LogDirectoryFactory extends ChildFactory<String> {
-    
+
     private LogFileManagementChangeListener listener = new LogFileManagementChangeListener() {
 
         @Override
         public void logFilesForPlatformChanged(String platform) {
-            
+
         }
 
         @Override
         public void platformsChanged() {
             refresh(true);
         }
-        
+
         @Override
         public void favouritesChanged() {
-            
+
         }
     };
 
@@ -63,7 +63,7 @@ public class LogDirectoryFactory extends ChildFactory<String> {
     @Override
     protected Node[] createNodesForKey(String key) {
         AbstractNode node = new AbstractNode(Children.create(new PlatformChildFactory(key), false));
-        node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
+        node.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/folder.png");
         node.setDisplayName(key);
 
         return new Node[] {node};

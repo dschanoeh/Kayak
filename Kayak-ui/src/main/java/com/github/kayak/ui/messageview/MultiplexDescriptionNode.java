@@ -56,7 +56,7 @@ public class MultiplexDescriptionNode extends AbstractNode implements Transferab
         this.bus = bus;
 
 	setDisplayName(description.getName());
-        setIconBaseWithExtension("org/freedesktop/tango/16x16/apps/accessories-calculator.png");
+        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/apps/accessories-calculator.png");
     }
 
     @Override

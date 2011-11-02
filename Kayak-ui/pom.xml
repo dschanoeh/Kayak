@@ -82,11 +82,6 @@
             <version>RELEASE701</version>
         </dependency>
         <dependency>
-            <groupId>org.freedesktop.tango</groupId>
-            <artifactId>tango-icon-theme</artifactId>
-            <version>0.8.90</version>
-        </dependency>
-        <dependency>
             <artifactId>org-openide-text</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
@@ -101,6 +96,11 @@
             <groupId>eu.hansolo</groupId>
             <artifactId>SteelSeries</artifactId>
             <version>3.9.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.tango-project</groupId>
+            <artifactId>tango-icon-theme</artifactId>
+            <version>0.8.0</version>
         </dependency>
     </dependencies>
 

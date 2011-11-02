@@ -44,12 +44,12 @@ public class LogFilesNodeFactory extends ChildFactory<LogFilesNodeFactory.Folder
         if(key == Folders.DIRECTORY) {
             AbstractNode node = new AbstractNode(Children.create(new LogDirectoryFactory(), true));
             node.setDisplayName("Log directory");
-            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
+            node.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/folder.png");
             return new Node[] {node};
         } else if(key == Folders.FAVOURTIES) {
             AbstractNode node = new AbstractNode(Children.create(new LogFavouritesFactory(), true));
             node.setDisplayName("Favourites");
-            node.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/bookmark-new.png");
+            node.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/actions/bookmark-new.png");
             return new Node[] {node};
         }
 

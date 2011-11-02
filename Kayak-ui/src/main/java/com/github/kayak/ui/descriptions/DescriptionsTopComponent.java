@@ -23,7 +23,7 @@ import org.openide.util.Utilities;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.descriptions//Descriptions//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "DescriptionsTopComponent",
-iconBase="org/freedesktop/tango/16x16/mimetypes/text-x-generic.png", 
+iconBase="org/tango-project/tango-icon-theme/16x16/mimetypes/text-x-generic.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "management", openAtStartup = true)
 @ActionID(category = "Window", id = "com.github.kayak.ui.descriptions.DescriptionsTopComponent")
@@ -39,7 +39,7 @@ public final class DescriptionsTopComponent extends TopComponent implements Expl
         initComponents();
         setName(NbBundle.getMessage(DescriptionsTopComponent.class, "CTL_DescriptionsTopComponent"));
         setToolTipText(NbBundle.getMessage(DescriptionsTopComponent.class, "HINT_DescriptionsTopComponent"));
-        
+
         AbstractNode rootNode = new AbstractNode(Children.create(factory, false));
         manager.setRootContext(rootNode);
         associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
@@ -48,7 +48,7 @@ public final class DescriptionsTopComponent extends TopComponent implements Expl
 
     private void initToolbar() {
         List<? extends Action> actions = Utilities.actionsForPath("Actions/Descriptions");
-        
+
         for(Action a : actions) {
             jToolBar1.add(a);
         }
