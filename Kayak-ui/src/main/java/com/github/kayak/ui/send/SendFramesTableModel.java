@@ -19,7 +19,11 @@ package com.github.kayak.ui.send;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.Frame;
+import com.github.kayak.core.SendJob;
+import com.github.kayak.core.TimeEventReceiver;
+import com.github.kayak.core.TimeSource;
 import com.github.kayak.core.Util;
+import com.github.kayak.ui.time.TimeSourceManager;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,26 +38,42 @@ public class SendFramesTableModel extends AbstractTableModel {
     private static final Logger logger = Logger.getLogger(SendFramesTableModel.class.getCanonicalName());
 
     public static class TableRow {
-        private int id = 0;
-        private int interval = 100;
+        private int id = 1;
+        private long interval = 100000;
         private byte[] data = new byte[] { 0x00 };
         private boolean sending;
         private Bus bus;
         private String note = "";
-        private Thread thread;
 
-        private Runnable runnable = new Runnable() {
+        private SendJob job = new SendJob(id, data, interval);
+
+        private TimeEventReceiver receiver = new TimeEventReceiver() {
 
             @Override
-            public void run() {
-
-                while(true) {
-                    Frame f = new Frame(id, data);
-                    bus.sendFrame(f);
+            public void paused() {
+                if(sending) {
                     try {
-                        Thread.sleep(interval);
+                        job.stopSending();
                     } catch (InterruptedException ex) {
-                        return;
+
+                    }
+                }
+            }
+
+            @Override
+            public void played() {
+                if(sending) {
+                    job.startSending(bus);
+                }
+            }
+
+            @Override
+            public void stopped() {
+                if(sending) {
+                    try {
+                        job.stopSending();
+                    } catch (InterruptedException ex) {
+
                     }
                 }
             }
@@ -79,18 +99,22 @@ public class SendFramesTableModel extends AbstractTableModel {
             }
 
             data = newData;
+            job.setData(data);
         }
 
         public TableRow(Bus bus) {
             this.bus = bus;
+
+            TimeSourceManager.getGlobalTimeSource().register(receiver);
         }
 
-        public int getInterval() {
+        public long getInterval() {
             return interval;
         }
 
-        public void setInterval(int interval) {
+        public void setInterval(long interval) {
             this.interval = interval;
+            job.setInterval(interval);
         }
 
         public byte[] getData() {
@@ -99,6 +123,7 @@ public class SendFramesTableModel extends AbstractTableModel {
 
         public void setData(byte[] data) {
             this.data = data;
+            job.setData(data);
         }
 
         public int getId() {
@@ -107,13 +132,16 @@ public class SendFramesTableModel extends AbstractTableModel {
 
         public void setId(int id) {
             this.id = id;
+            job.setId(id);
         }
 
 
         public void sendSingle() {
-            logger.log(Level.INFO, "sending frame");
-            Frame frame = new Frame(id, data);
-            bus.sendFrame(frame);
+            if(TimeSourceManager.getGlobalTimeSource().getMode() == TimeSource.Mode.PLAY) {
+                logger.log(Level.INFO, "sending frame");
+                Frame frame = new Frame(id, data);
+                bus.sendFrame(frame);
+            }
         }
 
         public boolean isSending() {
@@ -122,16 +150,16 @@ public class SendFramesTableModel extends AbstractTableModel {
 
         public void setSending(boolean val) {
             if(val && !sending) {
-                thread = new Thread(runnable);
-                thread.setName("Frame send task");
-                thread.start();
+                if(TimeSourceManager.getGlobalTimeSource().getMode() == TimeSource.Mode.PLAY)
+                    job.startSending(bus);
                 sending = true;
             } else if(!val && sending) {
-                thread.interrupt();
-                try {
-                    thread.join();
-                } catch (InterruptedException ex) {
-                    logger.log(Level.WARNING, "Interrupted while stopping send task", ex);
+                if(TimeSourceManager.getGlobalTimeSource().getMode() == TimeSource.Mode.PLAY) {
+                    try {
+                        job.stopSending();
+                    } catch (InterruptedException ex) {
+                        logger.log(Level.WARNING, "Interrupted while stopping send task", ex);
+                    }
                 }
                 sending = false;
             }
@@ -183,7 +211,7 @@ public class SendFramesTableModel extends AbstractTableModel {
         fireTableRowsInserted(rows.size(), rows.size());
     }
 
-    public void add(Bus bus, int id, int interval, byte[] data, String note) {
+    public void add(Bus bus, int id, long interval, byte[] data, String note) {
         TableRow row = new TableRow(bus);
         row.setData(data);
         row.setId(id);
@@ -217,7 +245,7 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 4:
                 return String.class;
             case 5:
-                return Integer.class;
+                return Long.class;
             case 6:
                 return Boolean.class;
             case 7:
@@ -238,7 +266,7 @@ public class SendFramesTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch(columnIndex) {
             case 0:
-                return rows.get(rowIndex).getBus().getName();
+                return rows.get(rowIndex).getBus().toString();
             case 1:
                 return Integer.toHexString(rows.get(rowIndex).getId());
             case 2:
@@ -287,7 +315,7 @@ public class SendFramesTableModel extends AbstractTableModel {
                 return;
             case 5:
                 try {
-                    int interval = (Integer) aValue;
+                    long interval = (Long) aValue;
                     row.setInterval(interval);
                 } catch (Exception ex) {
                     logger.log(Level.WARNING, "Could not set new ID", ex);
@@ -319,7 +347,7 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 4:
                 return "Send";
             case 5:
-                return "Interval [ms]";
+                return "Interval [µs]";
             case 6:
                 return "Send interval";
             case 7:

@@ -32,8 +32,6 @@ import javax.swing.JTable;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
 
 /**
  *
@@ -125,7 +123,7 @@ public final class SendFramesTopComponent extends TopComponent {
         jTable1.getColumn("Length").setPreferredWidth(70);
         jTable1.getColumn("Data").setPreferredWidth(200);
         jTable1.getColumn("Send").setPreferredWidth(60);
-        jTable1.getColumn("Interval [ms]").setPreferredWidth(100);
+        jTable1.getColumn("Interval [µs]").setPreferredWidth(100);
         jTable1.getColumn("Send interval").setPreferredWidth(100);
         jTable1.getColumn("Note").setPreferredWidth(150);
     }
@@ -251,7 +249,7 @@ public final class SendFramesTopComponent extends TopComponent {
             p.setProperty("busName" + is, row.getBus().getName());
             p.setProperty("data" + is, Util.byteArrayToHexString(row.getData(), false));
             p.setProperty("id" + is, Integer.toString(row.getId()));
-            p.setProperty("interval" + is, Integer.toString(row.getInterval()));
+            p.setProperty("interval" + is, Long.toString(row.getInterval()));
             p.setProperty("projectName", project.getName());
         }
     }
@@ -277,7 +275,7 @@ public final class SendFramesTopComponent extends TopComponent {
 
             String note = p.getProperty("note" + is);
             int id = Integer.parseInt(p.getProperty("id" + is));
-            int interval = Integer.parseInt(p.getProperty("interval" + is));
+            long interval = Long.parseLong(p.getProperty("interval" + is));
             byte[] data = Util.hexStringToByteArray(p.getProperty("data" + is));
 
             tableModel.add(bus, id, interval, data, note);

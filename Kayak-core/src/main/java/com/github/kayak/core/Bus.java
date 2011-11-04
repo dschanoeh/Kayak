@@ -475,6 +475,22 @@ public class Bus implements SubscriptionChangeListener {
         }
     }
 
+    public void addSendJob(int id, byte[] data, long usec) {
+        if(url != null) {
+            openBCMConnection();
+
+            if (bcmConnection != null && bcmConnection.isConnected()) {
+                bcmConnection.addSendJob(id, data,(int) (usec / 1000000), (int) (usec % 1000000));
+            }
+        }
+    }
+
+    public void removeSendJob(int id) {
+        if (bcmConnection != null && bcmConnection.isConnected()) {
+            bcmConnection.removeSendJob(id);
+        }
+    }
+
     private void deliverBCMFrame(Frame frame) {
         frame.setBus(this);
         for (Subscription s : subscriptionsBCM) {

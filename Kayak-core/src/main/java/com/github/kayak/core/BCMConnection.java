@@ -20,7 +20,6 @@ package com.github.kayak.core;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -194,30 +193,26 @@ public class BCMConnection extends SocketcandConnection {
         send(sb.toString());
     }
 
-    public void addSendJob(Frame f, int sec, int usec) {
+    public void addSendJob(int id, byte[]data, int sec, int usec) {
         StringBuilder sb = new StringBuilder(40);
         sb.append("< add ");
         sb.append(Integer.toString(sec));
         sb.append(' ');
         sb.append(Integer.toString(usec));
         sb.append(' ');
-        sb.append(Integer.toHexString(f.getIdentifier()));
+        sb.append(Integer.toHexString(id));
         sb.append(' ');
-        sb.append(Integer.toString(f.getLength()));
+        sb.append(Integer.toString(data.length));
         sb.append(' ');
-        sb.append(Util.byteArrayToHexString(f.getData(), true));
+        sb.append(Util.byteArrayToHexString(data, true));
         sb.append(" >");
         send(sb.toString());
     }
 
-    public void updateSendJob(Frame f) {
+    public void removeSendJob(int id) {
         StringBuilder sb = new StringBuilder(40);
-        sb.append("< add ");
-        sb.append(Integer.toHexString(f.getIdentifier()));
-        sb.append(' ');
-        sb.append(Integer.toString(f.getLength()));
-        sb.append(' ');
-        sb.append(Util.byteArrayToHexString(f.getData(), true));
+        sb.append("< delete ");
+        sb.append(Integer.toHexString(id));
         sb.append(" >");
         send(sb.toString());
     }
