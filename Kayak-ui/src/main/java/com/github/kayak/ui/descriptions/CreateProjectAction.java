@@ -52,7 +52,8 @@ public class CreateProjectAction extends AbstractAction {
 
         for(BusDescription bd : context.getBusDescriptions()) {
             Bus b = new Bus();
-            b.setName(bd.getName());
+            b.setName(p.getNextValidBusName());
+            b.setAlias(bd.getName());
             b.setDescription(bd);
             p.addBus(b);
         }
