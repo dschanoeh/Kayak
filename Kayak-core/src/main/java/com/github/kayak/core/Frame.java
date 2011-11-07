@@ -35,6 +35,7 @@ public class Frame {
     private int identifier;
     private long timestamp;
     private Bus bus;
+    private boolean extended;
 
     public static final Pattern LogFileNotationPattern = Pattern.compile("\\([0-9]+\\.[0-9]{6}\\)[\\s]+[a-zA-Z0-9]{1,16}[\\s]+[A-Za-z0-9]{3,8}#[A-Fa-f0-9rR]+");
 
@@ -42,8 +43,17 @@ public class Frame {
 
         @Override
         public int compare(Frame f1, Frame f2) {
-            if(f1.equals(f2) || f1.getIdentifier() == f2.getIdentifier())
+            if(f1.equals(f2))
                 return 0;
+
+            if(f1.getIdentifier() == f2.getIdentifier()) {
+                if(f1.isExtended() && f2.isExtended())
+                    return 0;
+                else if(f1.isExtended())
+                    return 1;
+                else
+                    return -1;
+            }
 
             if(f1.getIdentifier() < f2.getIdentifier())
                 return -1;
@@ -103,15 +113,17 @@ public class Frame {
 
     }
 
-    public Frame(int identifier, byte[] data) {
+    public Frame(int identifier, boolean extended, byte[] data) {
         this.identifier = identifier;
         this.data = data;
+        this.extended = extended;
     }
 
-    public Frame(int identifier, byte[] data, long timestamp) {
+    public Frame(int identifier, boolean extended, byte[] data, long timestamp) {
         this.identifier = identifier;
         this.data = data;
         this.timestamp = timestamp;
+        this.extended = extended;
     }
 
     public long getTimestamp() {
@@ -124,6 +136,10 @@ public class Frame {
 
     public int getLength() {
         return data.length;
+    }
+
+    public boolean isExtended() {
+        return extended;
     }
 
     public void setData(byte[] data) {
@@ -150,7 +166,7 @@ public class Frame {
         sb.append(") ");
         sb.append(bus.getName());
         sb.append(" ");
-        if(isExtendedIdentifier()) {
+        if(extended) {
             sb.append(String.format("%08x", identifier));
         } else {
             sb.append(String.format("%03x", identifier));
@@ -235,13 +251,15 @@ public class Frame {
 
         byte[] message = Util.hexStringToByteArray(line.substring(hashPos+1, line.length()));
 
-        Frame frame = new Frame(identifier, message);
+        Frame frame = null;
+        if(hashPos-idPos <= 3) {
+            frame = new Frame(2047 & identifier, false, message);
+        } else {
+            frame = new Frame(536870911 & identifier, true, message);
+        }
+
         frame.setTimestamp(usecs);
 
         return new FrameBusNamePair(frame, busName);
-    }
-
-    public boolean isExtendedIdentifier() {
-        return (identifier > 2048);
     }
 }

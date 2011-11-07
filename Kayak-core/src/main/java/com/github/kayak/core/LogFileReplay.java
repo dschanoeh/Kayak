@@ -216,7 +216,13 @@ public class LogFileReplay {
 
                             byte[] message = Util.hexStringToByteArray(data[1]);
 
-                            Frame frame = new Frame(identifier, message);
+                            Frame frame;
+
+                            if(data[0].length()<=3) {
+                                frame = new Frame(identifier, false, message);
+                            } else {
+                                frame = new Frame(identifier, true, message);
+                            }
 
                             long timeToWait = msecs - (timeSource.getTime() - startTime);
 

@@ -112,9 +112,11 @@ public class DescriptionManagement {
                 if (file.getExt().equals(extension)) {
                     try {
                         Document parseFile = loader.parseFile(FileUtil.toFile(file));
-                        descriptions.add(parseFile);
-                        for (DescriptionManagementChangeListener listener : listeners) {
-                            listener.descriptionRemoved(parseFile);
+                        if(parseFile != null) {
+                            descriptions.add(parseFile);
+                            for (DescriptionManagementChangeListener listener : listeners) {
+                                listener.descriptionRemoved(parseFile);
+                            }
                         }
                     } catch (Exception ex) {
                         logger.log(Level.INFO, "Could not load file", ex);

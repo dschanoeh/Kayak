@@ -44,8 +44,9 @@ public class SendFramesTableModel extends AbstractTableModel {
         private boolean sending;
         private Bus bus;
         private String note = "";
+        private boolean extended;
 
-        private SendJob job = new SendJob(id, data, interval);
+        private SendJob job = new SendJob(id, extended, data, interval);
 
         private TimeEventReceiver receiver = new TimeEventReceiver() {
 
@@ -78,6 +79,15 @@ public class SendFramesTableModel extends AbstractTableModel {
                 }
             }
         };
+
+        public boolean isExtended() {
+            return extended;
+        }
+
+        public void setExtended(boolean extended) {
+            this.extended = extended;
+            job.setExtended(extended);
+        }
 
         public String getNote() {
             return note;
@@ -136,10 +146,11 @@ public class SendFramesTableModel extends AbstractTableModel {
         }
 
 
+
         public void sendSingle() {
             if(TimeSourceManager.getGlobalTimeSource().getMode() == TimeSource.Mode.PLAY) {
                 logger.log(Level.INFO, "sending frame");
-                Frame frame = new Frame(id, data);
+                Frame frame = new Frame(id, extended, data);
                 bus.sendFrame(frame);
             }
         }
@@ -228,7 +239,7 @@ public class SendFramesTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 8;
+        return 9;
     }
 
     @Override
@@ -239,16 +250,18 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 1:
                 return String.class;
             case 2:
-                return Integer.class;
+                return Boolean.class;
             case 3:
-                return String.class;
+                return Integer.class;
             case 4:
                 return String.class;
             case 5:
-                return Long.class;
+                return String.class;
             case 6:
-                return Boolean.class;
+                return Long.class;
             case 7:
+                return Boolean.class;
+            case 8:
                 return String.class;
         }
 
@@ -269,17 +282,20 @@ public class SendFramesTableModel extends AbstractTableModel {
                 return rows.get(rowIndex).getBus().toString();
             case 1:
                 return Integer.toHexString(rows.get(rowIndex).getId());
+
             case 2:
-                return rows.get(rowIndex).getData().length;
+                return rows.get(rowIndex).isExtended();
             case 3:
-                return Util.byteArrayToHexString(rows.get(rowIndex).getData(), false);
+                return rows.get(rowIndex).getData().length;
             case 4:
-                return "Send";
+                return Util.byteArrayToHexString(rows.get(rowIndex).getData(), false);
             case 5:
-                return rows.get(rowIndex).getInterval();
+                return "Send";
             case 6:
-                return rows.get(rowIndex).isSending();
+                return rows.get(rowIndex).getInterval();
             case 7:
+                return rows.get(rowIndex).isSending();
+            case 8:
                 return rows.get(rowIndex).getNote();
             default:
                 return "";
@@ -300,9 +316,12 @@ public class SendFramesTableModel extends AbstractTableModel {
                 }
                 return;
             case 2:
-                row.setLength((Integer) aValue);
+                row.setExtended((Boolean) aValue);
                 return;
             case 3:
+                row.setLength((Integer) aValue);
+                return;
+            case 4:
                 try {
                     byte[] newData = Util.hexStringToByteArray((String) aValue);
                     if(newData.length == row.getData().length) {
@@ -313,7 +332,7 @@ public class SendFramesTableModel extends AbstractTableModel {
                 }
 
                 return;
-            case 5:
+            case 6:
                 try {
                     long interval = (Long) aValue;
                     row.setInterval(interval);
@@ -321,11 +340,11 @@ public class SendFramesTableModel extends AbstractTableModel {
                     logger.log(Level.WARNING, "Could not set new ID", ex);
                 }
                 return;
-            case 6:
+            case 7:
                 Boolean b = (Boolean) aValue;
                 row.setSending(b);
                 return;
-            case 7:
+            case 8:
                 row.setNote((String) aValue);
                 return;
 
@@ -341,16 +360,18 @@ public class SendFramesTableModel extends AbstractTableModel {
             case 1:
                 return "ID [hex]";
             case 2:
-                return "Length";
+                return "Extended";
             case 3:
-                return "Data";
+                return "Length";
             case 4:
-                return "Send";
+                return "Data";
             case 5:
-                return "Interval [µs]";
+                return "Send";
             case 6:
-                return "Send interval";
+                return "Interval [µs]";
             case 7:
+                return "Send interval";
+            case 8:
                 return "Note";
             default:
                 return "";

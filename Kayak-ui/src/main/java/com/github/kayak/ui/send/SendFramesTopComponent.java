@@ -116,10 +116,11 @@ public final class SendFramesTopComponent extends TopComponent {
             }
         };
 
-        ButtonColumn bc = new ButtonColumn(jTable1, send, 4);
+        ButtonColumn bc = new ButtonColumn(jTable1, send, 5);
 
         jTable1.getColumn("Bus").setPreferredWidth(100);
         jTable1.getColumn("ID [hex]").setPreferredWidth(60);
+        jTable1.getColumn("Extended").setPreferredWidth(20);
         jTable1.getColumn("Length").setPreferredWidth(70);
         jTable1.getColumn("Data").setPreferredWidth(200);
         jTable1.getColumn("Send").setPreferredWidth(60);

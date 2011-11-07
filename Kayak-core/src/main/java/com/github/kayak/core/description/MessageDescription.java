@@ -39,6 +39,7 @@ public class MessageDescription {
     };
 
     private int id;
+    private boolean extended;
     private int interval;
     private String name;
     private Node producer;
@@ -55,6 +56,10 @@ public class MessageDescription {
 
     public int getId() {
         return id;
+    }
+
+    public boolean isExtended() {
+        return extended;
     }
 
     public int getInterval() {
@@ -93,11 +98,15 @@ public class MessageDescription {
         }
     }
 
-    public MessageDescription(int id) {
+    public MessageDescription(int id, boolean extended) {
         this.id = id;
+        this.extended = extended;
     }
 
     public Message decodeFrame(Frame f) throws DescriptionException {
+
+        if(f.isExtended() != extended || f.getIdentifier() != id)
+            return null;
 
         Message m = new Message();
         m.setId(id);

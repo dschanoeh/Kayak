@@ -41,12 +41,21 @@ import com.github.kayak.core.description.MultiplexDescription;
 import com.github.kayak.core.description.SignalDescription;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -55,6 +64,8 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service=DescriptionLoader.class)
 public class KCDLoader implements DescriptionLoader {
+
+    private static final Logger logger = Logger.getLogger(KCDLoader.class.getCanonicalName());
 
     @Override
     public Document parseFile(File file) {
@@ -65,6 +76,12 @@ public class KCDLoader implements DescriptionLoader {
         try {
             context = JAXBContext.newInstance(new Class[]{com.github.kayak.canio.kcd.NetworkDefinition.class});
             Unmarshaller umarshall = context.createUnmarshaller();
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            InputStream resourceAsStream = KCDLoader.class.getResourceAsStream("Definition.xsd");
+            Source s = new StreamSource(resourceAsStream);
+            Schema schema = schemaFactory.newSchema(s);
+            umarshall.setSchema(schema);
+
             Object object;
 
             if(file.getName().endsWith(".kcd.gz")) {
@@ -80,7 +97,11 @@ public class KCDLoader implements DescriptionLoader {
                 netdef = (NetworkDefinition) object;
             }
 
+        } catch(UnmarshalException e) {
+            logger.log(Level.WARNING, "Found invalid file: " + file.getAbsolutePath() + "!", e);
+            return null;
         } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not load kcd file " + file.getAbsolutePath() + "!", e);
             return null;
         }
 
@@ -106,7 +127,13 @@ public class KCDLoader implements DescriptionLoader {
 
             /* Messages for each bus */
             for(Message m :  b.getMessage()) {
-                MessageDescription messageDescription = new MessageDescription(Integer.parseInt(m.getId().substring(2),16));
+                MessageDescription messageDescription;
+
+                if(m.getFormat().equals("extended"))
+                    messageDescription = new MessageDescription(Integer.parseInt(m.getId().substring(2),16), true);
+                else
+                    messageDescription = new MessageDescription(Integer.parseInt(m.getId().substring(2),16), false);
+
                 messageDescription.setInterval(m.getInterval());
                 messageDescription.setName(m.getName());
 

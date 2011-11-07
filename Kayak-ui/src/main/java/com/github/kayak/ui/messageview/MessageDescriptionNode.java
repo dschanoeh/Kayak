@@ -97,6 +97,15 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
 
         };
 
+        Property extended = new PropertySupport.ReadOnly<Boolean>("Extended ID", Boolean.class, "Extended ID", "Extended ID of the message") {
+
+            @Override
+            public Boolean getValue() throws IllegalAccessException, InvocationTargetException {
+                return description.isExtended();
+            }
+
+        };
+
         Property interval = new PropertySupport.ReadOnly<Integer>("Interval", Integer.class, "Interval", "Interval of the message") {
 
             @Override
@@ -118,6 +127,7 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
         };
 
         set.put(id);
+        set.put(extended);
         set.put(interval);
         set.put(producer);
 

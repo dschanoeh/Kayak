@@ -23,9 +23,9 @@ public interface SubscriptionChangeListener  extends EventListener {
 
     public void addSubscription(Subscription s);
 
-    public void subscribed(int id, Subscription s);
+    public void subscribed(int id, boolean extended, Subscription s);
 
-    public void unsubscribed(int id, Subscription s);
+    public void unsubscribed(int id, boolean extended, Subscription s);
 
     public void subscriptionAllChanged(boolean all, Subscription s);
 

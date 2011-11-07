@@ -61,10 +61,27 @@ public class FrameTest {
     }
 
     @Test
-    public void testIsExtendedIdentifier() {
+    public void testIsExtended() {
         System.out.println("isExtendedIdentifier");
-        Frame instance = new Frame(0x456743, new byte[] {});
-        boolean result = instance.isExtendedIdentifier();
+        Frame instance = new Frame(0x456743, true,  new byte[] {});
+        boolean result = instance.isExtended();
+        assertEquals(true, result);
+    }
+
+    @Test
+    public void testIsExtended2() {
+        System.out.println("isExtendedIdentifier2");
+        String line = "(1244101432.830624) vcan2 7D3#6C00082E36560100";
+        Frame instance = Frame.fromLogFileNotation(line).getFrame();
+        boolean result = instance.isExtended();
+        assertEquals(false, result);
+    }
+
+    public void testIsExtended3() {
+        System.out.println("isExtendedIdentifier3");
+        String line = "(1244101432.830624) vcan2 000007D3#6C00082E36560100";
+        Frame instance = Frame.fromLogFileNotation(line).getFrame();
+        boolean result = instance.isExtended();
         assertEquals(true, result);
     }
 

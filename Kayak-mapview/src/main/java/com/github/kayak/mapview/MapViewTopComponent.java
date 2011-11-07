@@ -85,7 +85,9 @@ public final class MapViewTopComponent extends TopComponent {
 
                 @Override
                 public void newFrame(Frame frame) {
-                    if(description != null && frame.getIdentifier() == description.getMessageDescription().getId()) {
+                    if(description != null &&
+                            frame.getIdentifier() == description.getMessageDescription().getId() &&
+                            frame.isExtended() == description.getMessageDescription().isExtended()) {
                         try {
                             Signal s = description.decodeData(frame.getData());
                             latitude = s.getValue();
@@ -104,9 +106,8 @@ public final class MapViewTopComponent extends TopComponent {
                 }
             };
 
-            int id = desc.getMessageDescription().getId();
             s = new Subscription(latitudeReceiver, b);
-            s.subscribe(id);
+            s.subscribe(desc.getMessageDescription().getId(), desc.getMessageDescription().isExtended());
         }
     };
 
@@ -130,7 +131,9 @@ public final class MapViewTopComponent extends TopComponent {
 
                 @Override
                 public void newFrame(Frame frame) {
-                    if(description != null && frame.getIdentifier() == description.getMessageDescription().getId()) {
+                    if(description != null &&
+                            frame.getIdentifier() == description.getMessageDescription().getId() &&
+                            frame.isExtended() == description.getMessageDescription().isExtended()) {
                         try {
                             Signal s = description.decodeData(frame.getData());
                             longitude = s.getValue();
@@ -149,9 +152,9 @@ public final class MapViewTopComponent extends TopComponent {
                 }
             };
 
-            int id = desc.getMessageDescription().getId();
             s = new Subscription(longitudeReceiver, b);
-            s.subscribe(id);
+            s.subscribe(desc.getMessageDescription().getId(), desc.getMessageDescription().isExtended());
+
         }
     };
 

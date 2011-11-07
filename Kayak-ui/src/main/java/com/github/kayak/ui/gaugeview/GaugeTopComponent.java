@@ -68,7 +68,7 @@ public final class GaugeTopComponent extends TopComponent {
 
             int id = signal.getMessageDescription().getId();
             subscription = new Subscription(listener, b);
-            subscription.subscribe(id);
+            subscription.subscribe(id, signal.getMessageDescription().isExtended());
             signalDescription = signal;
             gauge.setUnitString(signalDescription.getUnit());
             gauge.setTitle(signalDescription.getName());
@@ -93,10 +93,12 @@ public final class GaugeTopComponent extends TopComponent {
         @Override
         public void newFrame(Frame frame) {
             try {
-                Signal s = signalDescription.decodeData(frame.getData());
+                if(frame.isExtended() == signalDescription.getMessageDescription().isExtended()) {
+                    Signal s = signalDescription.decodeData(frame.getData());
 
-                if(s != null)
-                updateValue(s.getValue());
+                    if(s != null)
+                    updateValue(s.getValue());
+                }
             } catch (DescriptionException ex) {
                 UserOutput.printWarning(ex.getMessage());
             }

@@ -49,7 +49,9 @@ public class Bus implements SubscriptionChangeListener {
     private final HashSet<BusChangeListener> listeners;
     private final HashSet<EventFrameListener> eventFrameListeners;
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
-    private final Set<Integer> subscribedIDs = Collections.synchronizedSet(new HashSet<Integer>());;
+    private final Set<Integer> subscribedIDs = Collections.synchronizedSet(new HashSet<Integer>());
+    private final Set<Integer> subscribedExtendedIDs = Collections.synchronizedSet(new HashSet<Integer>());
+
     private final HashSet<StatisticsListener> statisticsListeners;
     private BusDescription description;
     private long delta=0; /* delta between socketcand system time and local timesource */
@@ -274,16 +276,29 @@ public class Bus implements SubscriptionChangeListener {
     }
 
     @Override
-    public void subscribed(int id, Subscription s) {
+    public void subscribed(int id, boolean extended, Subscription s) {
         if (subscriptionsBCM.contains(s)) {
             /* Check if the ID was already subscribed in any subscription */
-            synchronized(subscribedIDs) {
-                if(!subscribedIDs.contains(id)) {
-                    subscribedIDs.add(id);
-                    if (bcmConnection != null && bcmConnection.isConnected()) {
-                        bcmConnection.subscribeTo(id, 0, 0);
-                    } else {
-                        logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+            if(extended) {
+                synchronized(subscribedExtendedIDs) {
+                    if(!subscribedExtendedIDs.contains(id)) {
+                        subscribedExtendedIDs.add(id);
+                        if (bcmConnection != null && bcmConnection.isConnected()) {
+                            bcmConnection.subscribeTo(id, true, 0, 0);
+                        } else {
+                            logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+                        }
+                    }
+                }
+            } else {
+                synchronized(subscribedIDs) {
+                    if(!subscribedIDs.contains(id)) {
+                        subscribedIDs.add(id);
+                        if (bcmConnection != null && bcmConnection.isConnected()) {
+                            bcmConnection.subscribeTo(id, false, 0, 0);
+                        } else {
+                            logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+                        }
                     }
                 }
             }
@@ -293,11 +308,9 @@ public class Bus implements SubscriptionChangeListener {
     }
 
     @Override
-    public void unsubscribed(int id, Subscription s) {
+    public void unsubscribed(int id, boolean extended, Subscription s) {
         if(subscriptionsBCM.contains(s)) {
-            safeUnsubscribe(id);
-        } else {
-            logger.log(Level.WARNING, "Unregistered subscription tried to unsubscribe!");
+            safeUnsubscribe(id, extended);
         }
     }
 
@@ -309,9 +322,14 @@ public class Bus implements SubscriptionChangeListener {
             if(!subscriptionsRAW.contains(s))
                 subscriptionsRAW.add(s);
 
-            Set<Integer> ids = s.getAllIdentifiers();
+            Set<Integer> ids = s.getAllIdentifiers(false);
             for(Integer identifier : ids) {
-                safeUnsubscribe(identifier);
+                safeUnsubscribe(identifier, false);
+            }
+
+            ids = s.getAllIdentifiers(true);
+            for(Integer identifier : ids) {
+                safeUnsubscribe(identifier, true);
             }
 
             if(mode == TimeSource.Mode.PLAY) {
@@ -332,12 +350,21 @@ public class Bus implements SubscriptionChangeListener {
             if(mode == TimeSource.Mode.PLAY) {
                 openBCMConnection();
 
-                for(Integer identifier : s.getAllIdentifiers()) {
-                    bcmConnection.subscribeTo(identifier, 0, 0);
+                for(Integer identifier : s.getAllIdentifiers(true)) {
+                    bcmConnection.subscribeTo(identifier, true, 0, 0);
+                }
+
+                for(Integer identifier : s.getAllIdentifiers(false)) {
+                    bcmConnection.subscribeTo(identifier, false, 0, 0);
+                }
+            }
+            synchronized(subscribedExtendedIDs) {
+                for(Integer identifier : s.getAllIdentifiers(true)) {
+                    subscribedExtendedIDs.add(identifier);
                 }
             }
             synchronized(subscribedIDs) {
-                for(Integer identifier : s.getAllIdentifiers()) {
+                for(Integer identifier : s.getAllIdentifiers(false)) {
                     subscribedIDs.add(identifier);
                 }
             }
@@ -355,22 +382,42 @@ public class Bus implements SubscriptionChangeListener {
      * be done.
      * @param identifier
      */
-    private void safeUnsubscribe(Integer identifier) {
+    private void safeUnsubscribe(Integer identifier, boolean extended) {
         Boolean found = Boolean.FALSE;
-        synchronized(subscriptionsBCM) {
-            for (Subscription subscription : subscriptionsBCM) {
-                if (subscription.includes(identifier)) {
-                    found = Boolean.TRUE;
-                    break;
+
+        if(extended) {
+            synchronized(subscriptionsBCM) {
+                for (Subscription subscription : subscriptionsBCM) {
+                    if (subscription.includes(identifier, true)) {
+                        found = Boolean.TRUE;
+                        break;
+                    }
                 }
             }
-        }
-        if (!found) {
-            synchronized(subscribedIDs) {
-                subscribedIDs.remove(identifier);
+            if (!found) {
+                synchronized(subscribedExtendedIDs) {
+                    subscribedExtendedIDs.remove(identifier);
+                }
+                if(bcmConnection != null && bcmConnection.isConnected()) {
+                    bcmConnection.unsubscribeFrom(identifier, true);
+                }
             }
-            if(bcmConnection != null && bcmConnection.isConnected()) {
-                bcmConnection.unsubscribeFrom(identifier);
+        } else {
+            synchronized(subscriptionsBCM) {
+                for (Subscription subscription : subscriptionsBCM) {
+                    if (subscription.includes(identifier, false)) {
+                        found = Boolean.TRUE;
+                        break;
+                    }
+                }
+            }
+            if (!found) {
+                synchronized(subscribedIDs) {
+                    subscribedIDs.remove(identifier);
+                }
+                if(bcmConnection != null && bcmConnection.isConnected()) {
+                    bcmConnection.unsubscribeFrom(identifier, false);
+                }
             }
         }
     }
@@ -393,9 +440,12 @@ public class Bus implements SubscriptionChangeListener {
         if(subscriptionsBCM.contains(s)) {
             subscriptionsBCM.remove(s);
 
-            Set<Integer> identifiers = s.getAllIdentifiers();
-            for(Integer identifier : identifiers) {
-                safeUnsubscribe(identifier);
+            for(Integer identifier : s.getAllIdentifiers(false)) {
+                safeUnsubscribe(identifier, false);
+            }
+
+            for(Integer identifier : s.getAllIdentifiers(true)) {
+                safeUnsubscribe(identifier, true);
             }
         }
     }
@@ -475,19 +525,19 @@ public class Bus implements SubscriptionChangeListener {
         }
     }
 
-    public void addSendJob(int id, byte[] data, long usec) {
+    public void addSendJob(int id, boolean extended, byte[] data, long usec) {
         if(url != null) {
             openBCMConnection();
 
             if (bcmConnection != null && bcmConnection.isConnected()) {
-                bcmConnection.addSendJob(id, data,(int) (usec / 1000000), (int) (usec % 1000000));
+                bcmConnection.addSendJob(id, extended, data,(int) (usec / 1000000), (int) (usec % 1000000));
             }
         }
     }
 
-    public void removeSendJob(int id) {
+    public void removeSendJob(int id, boolean extended) {
         if (bcmConnection != null && bcmConnection.isConnected()) {
-            bcmConnection.removeSendJob(id);
+            bcmConnection.removeSendJob(id, extended);
         }
     }
 
@@ -574,7 +624,12 @@ public class Bus implements SubscriptionChangeListener {
              */
             synchronized(subscribedIDs) {
                 for (Integer identifier : subscribedIDs) {
-                    bcmConnection.subscribeTo(identifier, 0, 0);
+                    bcmConnection.subscribeTo(identifier, false, 0, 0);
+                }
+            }
+            synchronized(subscribedExtendedIDs) {
+                for (Integer identifier : subscribedExtendedIDs) {
+                    bcmConnection.subscribeTo(identifier, true, 0, 0);
                 }
             }
         }

@@ -33,6 +33,7 @@ public class FrameData {
     private long timestamp;
     private long interval;
     private boolean inTable;
+    private boolean extended;
 
     public boolean isDataChanged() {
         return dataChanged;
@@ -70,6 +71,10 @@ public class FrameData {
         return frequency;
     }
 
+    public boolean isExtended() {
+        return extended;
+    }
+
     public FrameData(Frame f) {
         identifier = f.getIdentifier();
         timestamp = f.getTimestamp();
@@ -78,6 +83,7 @@ public class FrameData {
         for(int i=0;i<frequency.length;i++)
             frequency[i] = 127;
         interval = 0;
+        extended = f.isExtended();
     }
 
     public void updateWith(Frame frame) {
@@ -102,6 +108,7 @@ public class FrameData {
         this.data = newData;
         this.timestamp = frame.getTimestamp();
         this.dataChanged = true;
+        this.extended = frame.isExtended();
     }
 
 }

@@ -64,7 +64,14 @@ public class BCMConnection extends SocketcandConnection {
                             for (int i = 4; i < fields.length-1; i++) {
                                 sb.append(fields[i]);
                             }
-                            Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(sb.toString()));
+                            Frame f;
+
+                            if(fields[2].length() <= 3) {
+                                f = new Frame(Integer.valueOf(fields[2], 16), false, Util.hexStringToByteArray(sb.toString()));
+                            } else {
+                                f = new Frame(Integer.valueOf(fields[2], 16), true, Util.hexStringToByteArray(sb.toString()));
+                            }
+
                             int pos = 0;
                             for(;pos<fields[3].length();pos++) {
                                 if(fields[3].charAt(pos) =='.')
@@ -173,34 +180,46 @@ public class BCMConnection extends SocketcandConnection {
         }
     }
 
-    public void subscribeTo(int id, int sec, int usec) {
+    public void subscribeTo(int id, boolean extended, int sec, int usec) {
         StringBuilder sb = new StringBuilder(30);
         sb.append("< subscribe ");
         sb.append(String.valueOf(sec));
         sb.append(' ');
         sb.append(String.valueOf(usec));
         sb.append(' ');
-        sb.append(Integer.toHexString(id));
+        if(extended) {
+            sb.append(String.format("%08x", id));
+        } else {
+            sb.append(String.format("%03x", id));
+        }
         sb.append(" >");
         send(sb.toString());
     }
 
-    public void unsubscribeFrom(int id) {
+    public void unsubscribeFrom(int id, boolean extended) {
         StringBuilder sb = new StringBuilder(30);
         sb.append("< unsubscribe ");
-        sb.append(Integer.toHexString(id));
+        if(extended) {
+            sb.append(String.format("%08x", id));
+        } else {
+            sb.append(String.format("%03x", id));
+        }
         sb.append(" >");
         send(sb.toString());
     }
 
-    public void addSendJob(int id, byte[]data, int sec, int usec) {
+    public void addSendJob(int id, boolean extended, byte[]data, int sec, int usec) {
         StringBuilder sb = new StringBuilder(40);
         sb.append("< add ");
         sb.append(Integer.toString(sec));
         sb.append(' ');
         sb.append(Integer.toString(usec));
         sb.append(' ');
-        sb.append(Integer.toHexString(id));
+        if(extended) {
+            sb.append(String.format("%08x", id));
+        } else {
+            sb.append(String.format("%03x", id));
+        }
         sb.append(' ');
         sb.append(Integer.toString(data.length));
         sb.append(' ');
@@ -209,10 +228,14 @@ public class BCMConnection extends SocketcandConnection {
         send(sb.toString());
     }
 
-    public void removeSendJob(int id) {
+    public void removeSendJob(int id, boolean extended) {
         StringBuilder sb = new StringBuilder(40);
         sb.append("< delete ");
-        sb.append(Integer.toHexString(id));
+        if(extended) {
+            sb.append(String.format("%08x", id));
+        } else {
+            sb.append(String.format("%03x", id));
+        }
         sb.append(" >");
         send(sb.toString());
     }
@@ -220,7 +243,11 @@ public class BCMConnection extends SocketcandConnection {
     public void sendFrame(Frame f) {
         StringBuilder sb = new StringBuilder(50);
         sb.append("< send ");
-        sb.append(Integer.toHexString(f.getIdentifier()));
+        if(f.isExtended()) {
+            sb.append(String.format("%08x", f.getIdentifier()));
+        } else {
+            sb.append(String.format("%03x", f.getIdentifier()));
+        }
         sb.append(' ');
         sb.append(Integer.toString(f.getLength()));
         sb.append(' ');

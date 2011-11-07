@@ -26,9 +26,6 @@ import javax.swing.table.TableColumnModel;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionReferences;
 import org.openide.util.ImageUtilities;
 
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.messageview//MessageView//EN",

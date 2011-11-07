@@ -34,9 +34,23 @@ public class SendJob {
     private Bus bus;
     private boolean local = false;
     private boolean sending = false;
+    private boolean extended = false;
 
     public byte[] getData() {
         return data;
+    }
+
+    public boolean isExtended() {
+        return extended;
+    }
+
+    public void setExtended(boolean extended) {
+        this.extended = extended;
+
+        if(sending && !local) {
+             stopRemoteSending();
+             startRemoteSending();
+        }
     }
 
     public void setData(byte[] data) {
@@ -62,7 +76,7 @@ public class SendJob {
 
         if(sending && !local) {
             /* remove old send job */
-            bus.removeSendJob(oldId);
+            bus.removeSendJob(oldId, extended);
 
             startRemoteSending();
         }
@@ -84,7 +98,7 @@ public class SendJob {
 
         if(sending && !local) {
             /* remove old send job */
-            bus.removeSendJob(id);
+            bus.removeSendJob(id, extended);
 
             startRemoteSending();
         }
@@ -95,7 +109,7 @@ public class SendJob {
         @Override
         public void run() {
             while(true) {
-                Frame f = new Frame(id, data);
+                Frame f = new Frame(id, extended, data);
 
                 bus.sendFrame(f);
                 try {
@@ -107,10 +121,11 @@ public class SendJob {
         }
     };
 
-    public SendJob(int id, byte[] data, long usec) {
+    public SendJob(int id, boolean extended, byte[] data, long usec) {
         this.id = id;
         this.data = data;
         this.interval = usec;
+        this.extended = extended;
     }
 
     public void startSending(Bus bus) {
@@ -148,11 +163,11 @@ public class SendJob {
     }
 
     private void startRemoteSending() {
-        bus.addSendJob(id, data, interval);
+        bus.addSendJob(id, extended, data, interval);
     }
 
     private void stopRemoteSending() {
-        bus.removeSendJob(id);
+        bus.removeSendJob(id, extended);
     }
 
 }

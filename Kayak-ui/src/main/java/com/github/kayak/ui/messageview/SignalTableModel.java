@@ -97,13 +97,15 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
             try {
                 Message m = bus.getDescription().decodeFrame(frame);
 
-                Set<Signal> frameSignals = m.getSignals();
-                synchronized(entries) {
-                    for(Signal s : frameSignals) {
-                        for(SignalTableEntry entry : entries) {
-                            if(s.getDescription().equals(entry.getDescription())) {
-                                entry.setSignal(s);
-                                entry.setRefresh(true);
+                if(m != null) {
+                    Set<Signal> frameSignals = m.getSignals();
+                    synchronized(entries) {
+                        for(Signal s : frameSignals) {
+                            for(SignalTableEntry entry : entries) {
+                                if(s.getDescription().equals(entry.getDescription())) {
+                                    entry.setSignal(s);
+                                    entry.setRefresh(true);
+                                }
                             }
                         }
                     }
@@ -245,7 +247,9 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
                 subscriptions.put(bus, s);
             }
 
-            s.subscribe(desc.getMessageDescription().getId());
+            MessageDescription mdesc = desc.getMessageDescription();
+
+            s.subscribe(mdesc.getId(), mdesc.isExtended());
         }
     }
 

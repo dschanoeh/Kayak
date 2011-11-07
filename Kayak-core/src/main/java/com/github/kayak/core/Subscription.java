@@ -36,6 +36,7 @@ public class Subscription {
     private static final Logger logger = Logger.getLogger(Subscription.class.getName());
 
     private final Set<Integer> ids = Collections.synchronizedSet(new HashSet<Integer>());
+    private final Set<Integer> extendedIds = Collections.synchronizedSet(new HashSet<Integer>());
     private Boolean muted;
     private Boolean subscribeAll;
     private FrameListener receiver;
@@ -60,28 +61,20 @@ public class Subscription {
      * Subscribe for a single identifier
      * @param id identifier
      */
-    public void subscribe(int id) {
-        synchronized(ids) {
-            if (!ids.contains(id)) {
-                ids.add(id);
-            }
-            changeReceiver.subscribed(id, this);
-        }
-    }
-
-    /**
-     * Subscribe for a range of identifiers. Note that it is not recommended
-     * to do this for large ranges because it will need much time.
-     * @param from
-     * @param to
-     */
-    public void subscribeRange(int from, int to) {
-        synchronized(ids) {
-            for (int i = from; i <= to; i++) {
-                if(!ids.contains(i)) {
-                    ids.add(i);
-                    changeReceiver.subscribed(i, this);
+    public void subscribe(int id, boolean extended) {
+        if(!extended) {
+            synchronized(ids) {
+                if (!ids.contains(id)) {
+                    ids.add(id);
                 }
+                changeReceiver.subscribed(id, false, this);
+            }
+        } else {
+            synchronized(extendedIds) {
+                if (!extendedIds.contains(id)) {
+                    extendedIds.add(id);
+                }
+                changeReceiver.subscribed(id, true, this);
             }
         }
     }
@@ -97,7 +90,16 @@ public class Subscription {
         }
 
         for (int i=0;i<identifiers.length;i++) {
-            changeReceiver.unsubscribed(identifiers[i], this);
+            changeReceiver.unsubscribed(identifiers[i], false, this);
+        }
+
+        synchronized(extendedIds) {
+            identifiers = extendedIds.toArray(new Integer[extendedIds.size()]);
+            extendedIds.clear();
+        }
+
+        for (int i=0;i<identifiers.length;i++) {
+            changeReceiver.unsubscribed(identifiers[i], true, this);
         }
     }
 
@@ -105,29 +107,21 @@ public class Subscription {
      * Remove a single identifier from the subscription.
      * @param id
      */
-    public void unsubscribe(int id) {
-        synchronized(ids) {
-            if(ids.contains(id)) {
-                ids.remove(id);
-            }
-        }
-        changeReceiver.unsubscribed(id, this);
-    }
-
-    /**
-     * Remove a range of identifiers. Note that it is not recommended
-     * to do this for large ranges because it will need much time.
-     * @param from
-     * @param to
-     */
-    public void unsubscribeRange(int from, int to) {
-        synchronized(ids) {
-            for (int i = from; i <= to; i++) {
-                if(ids.contains(i)) {
-                    ids.remove(i);
-                    changeReceiver.unsubscribed(i, this);
+    public void unsubscribe(int id, boolean extended) {
+        if(!extended) {
+            synchronized(ids) {
+                if(ids.contains(id)) {
+                    ids.remove(id);
                 }
             }
+            changeReceiver.unsubscribed(id, false, this);
+        } else {
+            synchronized(extendedIds) {
+                if(extendedIds.contains(id)) {
+                    extendedIds.remove(id);
+                }
+            }
+            changeReceiver.unsubscribed(id, true, this);
         }
     }
 
@@ -139,19 +133,29 @@ public class Subscription {
         this.muted = muted;
     }
 
-    public boolean includes(int id) {
+    public boolean includes(int id, boolean extended) {
         if (subscribeAll) {
             return Boolean.TRUE;
-        } else
-            return ids.contains(id);
+        } else {
+            if(extended)
+                return extendedIds.contains(id);
+            else
+                return ids.contains(id);
+        }
     }
 
     public void deliverFrame(Frame frame, Bus bus) {
         if (subscribeAll) {
             receiver.newFrame(frame);
         } else {
-            if (ids.contains(frame.getIdentifier())) {
-                receiver.newFrame(frame);
+            if(frame.isExtended()) {
+                if (extendedIds.contains(frame.getIdentifier())) {
+                    receiver.newFrame(frame);
+                }
+            } else {
+                if (ids.contains(frame.getIdentifier())) {
+                    receiver.newFrame(frame);
+                }
             }
         }
     }
@@ -168,8 +172,11 @@ public class Subscription {
         return subscribeAll;
     }
 
-    public Set<Integer> getAllIdentifiers() {
-        return Collections.unmodifiableSet(ids);
+    public Set<Integer> getAllIdentifiers(boolean extended) {
+        if(extended)
+            return Collections.unmodifiableSet(extendedIds);
+        else
+            return Collections.unmodifiableSet(ids);
     }
 
     /**

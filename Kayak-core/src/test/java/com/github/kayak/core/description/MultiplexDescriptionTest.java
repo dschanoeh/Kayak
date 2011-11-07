@@ -50,7 +50,7 @@ public class MultiplexDescriptionTest {
 
     @Before
     public void setUp() {
-        messageDescription = new MessageDescription(0x12);
+        messageDescription = new MessageDescription(0x12, false);
 
         description = messageDescription.createMultiplexDescription();
         description.setLength(3);
@@ -69,7 +69,7 @@ public class MultiplexDescriptionTest {
 
     @Test
     public void testMultiplex() throws DescriptionException {
-        Frame f = new Frame(0x12, new byte[] {(byte) 0xff, (byte) 0x00, (byte) 0x13});
+        Frame f = new Frame(0x12, false, new byte[] {(byte) 0xff, (byte) 0x00, (byte) 0x13});
 
         Message message = messageDescription.decodeFrame(f);
         assertNotNull(message);

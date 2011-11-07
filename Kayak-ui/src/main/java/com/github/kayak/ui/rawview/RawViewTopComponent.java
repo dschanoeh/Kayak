@@ -8,7 +8,6 @@ import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.core.Util;
-import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectManager;
 import java.awt.Color;
 import java.awt.Component;
@@ -16,11 +15,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.NbBundle;
@@ -111,23 +108,23 @@ public final class RawViewTopComponent extends TopComponent {
                 return;
             }
 
-            ListSelectionModel selectionModel = table.getSelectionModel();
-
             if (e.getSource() == table.getSelectionModel()){
                 int row = table.getSelectedRow();
 
                 if(row != -1) {
                     row = table.convertRowIndexToModel(row);
                     String idString = (String) model.getValueAt(row, 2);
-                    int id = Util.hexStringToInt(idString);
 
-                    byte[] bytes = model.getDataForID(id);
+                    byte[] bytes = model.getDataForID(idString);
 
                     StringBuilder sb = new StringBuilder(100);
 
                     sb.append("[ID: ");
                     sb.append(idString);
-
+                    if(idString.length()==8)
+                        sb.append(" (extended)");
+                    else
+                        sb.append(" (standard)");
                     sb.append("] [Timestamp: ");
                     sb.append((String) model.getValueAt(row, 0));
 
@@ -189,10 +186,10 @@ public final class RawViewTopComponent extends TopComponent {
 
         for (int i = 0; i < idStrings.length; i++) {
             try {
-                if (idStrings[i].matches("0x[a-fA-F0-9]+")) {
-                    subscription.subscribe(Integer.parseInt(idStrings[i].substring(2), 16));
-                } else if (idStrings[i].matches("[a-fA-F0-9]+")) {
-                    subscription.subscribe(Integer.parseInt(idStrings[i], 16));
+                if (idStrings[i].matches("[a-fA-F0-9]{3}")) {
+                    subscription.subscribe(Integer.parseInt(idStrings[i], 16), false);
+                } else if (idStrings[i].matches("[a-fA-F0-9]{8}")) {
+                    subscription.subscribe(Integer.parseInt(idStrings[i], 16), true);
                 }
             } catch (Exception ex) {
                 logger.log(Level.WARNING, "Error while parsing filter string", ex);

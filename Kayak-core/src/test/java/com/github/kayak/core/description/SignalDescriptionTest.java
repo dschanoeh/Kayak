@@ -22,8 +22,6 @@ import java.util.Set;
 import com.github.kayak.core.Util;
 import com.github.kayak.core.Frame;
 import java.nio.ByteOrder;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,7 +49,7 @@ public class SignalDescriptionTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
 
-        MessageDescription m = new MessageDescription(42);
+        MessageDescription m = new MessageDescription(42, false);
 
         description = new SignalDescription(m);
         description.setType(SignalDescription.Type.UNSIGNED);
@@ -95,7 +93,7 @@ public class SignalDescriptionTest {
         description5.setIntercept(0);
         description5.setSlope(1);
 
-        frame = new Frame(0x12, Util.hexStringToByteArray("A8B37C"));
+        frame = new Frame(0x12, false, Util.hexStringToByteArray("A8B37C"));
 
         data = description.decodeData(frame.getData());
         assertNotNull(data);

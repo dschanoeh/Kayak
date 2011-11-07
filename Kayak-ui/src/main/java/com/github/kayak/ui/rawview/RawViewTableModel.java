@@ -34,7 +34,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class RawViewTableModel extends AbstractTableModel implements FrameListener {
 
-    private final Map<Integer, FrameData> data = Collections.synchronizedMap(new TreeMap<Integer, FrameData>());    private Thread refreshThread;
+    private final Map<String, FrameData> data = Collections.synchronizedMap(new TreeMap<String, FrameData>());    private Thread refreshThread;
     private boolean colorize = false;
 
     private Runnable refreshRunnable = new Runnable() {
@@ -43,8 +43,8 @@ public class RawViewTableModel extends AbstractTableModel implements FrameListen
         public void run() {
             while (true) {
                 synchronized (data) {
-                    Set<Integer> keys = data.keySet();
-                    Integer[] keyArray = keys.toArray(new Integer[0]);
+                    Set<String> keys = data.keySet();
+                    String[] keyArray = keys.toArray(new String[0]);
                     for(int i=0;i<keyArray.length;i++) {
                         FrameData element = data.get(keyArray[i]);
                         if(!element.isInTable()) {
@@ -110,12 +110,12 @@ public class RawViewTableModel extends AbstractTableModel implements FrameListen
         return 5;
     }
 
-    private int getRowForKey(int key) {
+    private int getRowForKey(String key) {
         synchronized(data) {
-            Integer[] keys = data.keySet().toArray(new Integer[] {});
+            String[] keys = data.keySet().toArray(new String[] {});
 
             for(int i=0;i<keys.length;i++)
-                if(keys[i] == key)
+                if(keys[i].equals(key))
                     return i;
 
             return -1;
@@ -125,7 +125,7 @@ public class RawViewTableModel extends AbstractTableModel implements FrameListen
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         synchronized (data) {
-            Integer[] keys = data.keySet().toArray(new Integer[]{});
+            String[] keys = data.keySet().toArray(new String[]{});
 
             switch (columnIndex) {
                 case 0:
@@ -142,7 +142,12 @@ public class RawViewTableModel extends AbstractTableModel implements FrameListen
                 case 1:
                     return data.get(keys[rowIndex]).getInterval() / 1000;
                 case 2:
-                    return Util.intToHexString(data.get(keys[rowIndex]).getIdentifier());
+                    FrameData f = data.get(keys[rowIndex]);
+                    if(f.isExtended()) {
+                        return String.format("%08x", f.getIdentifier());
+                    } else {
+                        return String.format("%03x", f.getIdentifier());
+                    }
                 case 3:
                     return data.get(keys[rowIndex]).getData().length;
                 case 4:
@@ -190,13 +195,13 @@ public class RawViewTableModel extends AbstractTableModel implements FrameListen
 
     public byte[] getData(int row) {
         synchronized(data) {
-            Integer[] keys = data.keySet().toArray(new Integer[]{});
+            String[] keys = data.keySet().toArray(new String[]{});
             FrameData frameData = data.get(keys[row]);
             return frameData.getData();
         }
     }
 
-    public byte[] getDataForID(int id) {
+    public byte[] getDataForID(String id) {
         synchronized(data) {
             FrameData d = data.get(id);
             if(d != null)
@@ -209,12 +214,18 @@ public class RawViewTableModel extends AbstractTableModel implements FrameListen
     @Override
     public void newFrame(Frame frame) {
         synchronized(data) {
-            int row = getRowForKey(frame.getIdentifier());
+            String idString;
+            if(frame.isExtended())
+                idString = String.format("%08x", frame.getIdentifier());
+            else
+                idString = String.format("%03x", frame.getIdentifier());
+
+            int row = getRowForKey(idString);
             if (row != -1) {
-                FrameData old = data.get(frame.getIdentifier());
+                FrameData old = data.get(idString);
                 old.updateWith(frame);
             } else {
-                data.put(frame.getIdentifier(), new FrameData(frame));
+                data.put(idString, new FrameData(frame));
             }
         }
     }

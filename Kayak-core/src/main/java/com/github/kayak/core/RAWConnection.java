@@ -63,7 +63,14 @@ public class RAWConnection extends SocketcandConnection {
                             for (int i = 4; i < fields.length-1; i++) {
                                 sb.append(fields[i]);
                             }
-                            Frame f = new Frame(Integer.valueOf(fields[2], 16), Util.hexStringToByteArray(sb.toString()));
+                            Frame f;
+
+                            if(fields[2].length() <= 3) {
+                                f = new Frame(Integer.valueOf(fields[2], 16), false, Util.hexStringToByteArray(sb.toString()));
+                            } else {
+                                f = new Frame(Integer.valueOf(fields[2], 16), true, Util.hexStringToByteArray(sb.toString()));
+                            }
+                            
                             int pos = 0;
                             for(;pos<fields[3].length();pos++) {
                                 if(fields[3].charAt(pos) =='.')
