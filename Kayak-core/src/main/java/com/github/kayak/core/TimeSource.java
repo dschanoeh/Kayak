@@ -44,11 +44,11 @@ public class TimeSource {
     }
 
     public TimeSource() {
-        reference = System.currentTimeMillis();
+        reference = System.nanoTime()/1000000;
     }
 
     public void reset() {
-        reference = System.currentTimeMillis();
+        reference = System.nanoTime()/1000000;
     }
 
     /**
@@ -59,7 +59,7 @@ public class TimeSource {
     public long getTime() {
         switch(mode) {
             case PLAY:
-                return System.currentTimeMillis() - reference;
+                return (System.nanoTime()/1000000) - reference;
 
             case STOP:
                 return 0;
@@ -97,9 +97,9 @@ public class TimeSource {
             return;
         else {
             if(mode == Mode.PAUSE)
-                reference = System.currentTimeMillis() - pauseReference;
+                reference = (System.nanoTime()/1000000) - pauseReference;
             else
-                reference = System.currentTimeMillis();
+                reference = (System.nanoTime()/1000000);
 
             mode = Mode.PLAY;
 
@@ -121,7 +121,7 @@ public class TimeSource {
 
         mode = Mode.PAUSE;
 
-        pauseReference = System.currentTimeMillis() - reference;
+        pauseReference = (System.nanoTime()/1000000) - reference;
 
         synchronized(receivers) {
             for(TimeEventReceiver receiver : receivers) {

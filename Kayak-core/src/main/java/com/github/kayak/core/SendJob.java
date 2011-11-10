@@ -17,6 +17,8 @@
  */
 package com.github.kayak.core;
 
+import java.util.concurrent.locks.LockSupport;
+
 /**
  * A send job sends a single CAN frame at a given interval time. If the bus
  * is connected to a remote socketcand the send job is fowarded to SocketCAN
@@ -112,11 +114,9 @@ public class SendJob {
                 Frame f = new Frame(id, extended, data);
 
                 bus.sendFrame(f);
-                try {
-                    Thread.sleep(interval / 1000);
-                } catch (InterruptedException ex) {
+                if(Thread.interrupted())
                     return;
-                }
+                LockSupport.parkNanos(interval*1000);
             }
         }
     };
