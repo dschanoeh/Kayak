@@ -50,6 +50,8 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
@@ -57,6 +59,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.openide.util.lookup.ServiceProvider;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -66,20 +69,32 @@ import org.openide.util.lookup.ServiceProvider;
 public class KCDLoader implements DescriptionLoader {
 
     private static final Logger logger = Logger.getLogger(KCDLoader.class.getCanonicalName());
+    Schema schema;
+    JAXBContext context;
+
+    public KCDLoader() {
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        InputStream resourceAsStream = KCDLoader.class.getResourceAsStream("Definition.xsd");
+        Source s = new StreamSource(resourceAsStream);
+        try {
+        schema = schemaFactory.newSchema(s);
+        } catch(SAXException ex) {
+            logger.log(Level.SEVERE, "Could not load schema: ", ex);
+        }
+        try {
+            context = JAXBContext.newInstance(new Class[]{com.github.kayak.canio.kcd.NetworkDefinition.class});
+        } catch(JAXBException ex) {
+            logger.log(Level.SEVERE, "Could not create JAXB context: ", ex);
+        }
+    }
 
     @Override
     public Document parseFile(File file) {
-
-        JAXBContext context = null;
         NetworkDefinition netdef = null;
 
         try {
             context = JAXBContext.newInstance(new Class[]{com.github.kayak.canio.kcd.NetworkDefinition.class});
             Unmarshaller umarshall = context.createUnmarshaller();
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            InputStream resourceAsStream = KCDLoader.class.getResourceAsStream("Definition.xsd");
-            Source s = new StreamSource(resourceAsStream);
-            Schema schema = schemaFactory.newSchema(s);
             umarshall.setSchema(schema);
 
             Object object;
