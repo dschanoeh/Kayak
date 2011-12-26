@@ -170,7 +170,7 @@ public class KCDLoader implements DescriptionLoader {
                     MultiplexDescription multiplexDescription = messageDescription.createMultiplexDescription();
 
                     /* Set multiplex values */
-                    if(multiplex.getEndianess().equals("motorola")) {
+                    if(multiplex.getEndianess().equals("big")) {
                         multiplexDescription.setByteOrder(ByteOrder.BIG_ENDIAN);
                     } else {
                         multiplexDescription.setByteOrder(ByteOrder.LITTLE_ENDIAN);
@@ -230,7 +230,7 @@ public class KCDLoader implements DescriptionLoader {
     }
 
     private com.github.kayak.core.description.SignalDescription signalToSignalDescription(Signal s, SignalDescription signalDescription) {
-        if (s.getEndianess().equals("motorola")) {
+        if (s.getEndianess().equals("big")) {
             signalDescription.setByteOrder(ByteOrder.BIG_ENDIAN);
         } else {
             signalDescription.setByteOrder(ByteOrder.LITTLE_ENDIAN);
