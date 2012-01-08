@@ -15,10 +15,6 @@
     <name>Kayak-core NetBeans Module</name>
 
     <repositories>
-        <!-- this is a remote repository hosting the netbeans api artifacts.
-         the versions of the artifacts are netbeans IDE release based, eg. RELEASE65.
-         You might want to use your own repository. To create one, use the nbm:populate-repository goal.
-          -->
         <repository>
             <id>netbeans</id>
             <name>repository hosting netbeans.org api artifacts</name>

@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -45,37 +45,37 @@
             <artifactId>org-openide-util-lookup</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-windows</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-awt</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-nodes</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-explorer</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-filesystems</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -85,29 +85,29 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-settings</artifactId>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-options-api</artifactId>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-loaders</artifactId>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <artifactId>org-netbeans-api-progress</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <artifactId>org-openide-modules</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
         <dependency>
             <groupId>org.tango-project</groupId>

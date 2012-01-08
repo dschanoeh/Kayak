@@ -8,3 +8,5 @@
 
 # ignore target path
 target
+
+.DS_Store
