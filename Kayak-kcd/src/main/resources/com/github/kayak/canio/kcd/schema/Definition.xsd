@@ -16,7 +16,7 @@
   along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
   
 --> 
-<xs:schema version="0.4" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema version="0.6" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="NetworkDefinition">
     <xs:annotation>
       <xs:documentation>Definition of one or more CAN bus networks in one file.</xs:documentation>
@@ -118,7 +118,7 @@
       </xs:attribute>
       <xs:attribute name="length" use="optional" default="auto">
         <xs:annotation>
-          <xs:documentation>Number of bytes available in the data field of the message (data length code). Default "auto"-calculates minimum length for the contained signals in the message.</xs:documentation>
+          <xs:documentation>Number of bytes available in the data field of the message (data length code). "auto" (default) calculate minimum length for the contained signals in the message.</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -190,6 +190,10 @@
         <xs:extension base="BasicSignalType">
           <xs:sequence>
             <xs:element ref="MuxGroup" maxOccurs="unbounded"/>
+            <xs:element ref="Notes" minOccurs="0"/>
+            <xs:element ref="Consumer" minOccurs="0"/>
+            <xs:element ref="Value" minOccurs="0"/>
+            <xs:element ref="LabelSet" minOccurs="0"/>            
           </xs:sequence>
         </xs:extension>
       </xs:complexContent>
@@ -306,6 +310,16 @@
       <xs:attribute default="1" name="unit" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>Physical unit of the value written as unit term as described in "The Unified Code for Units of Measure" (http://aurora.regenstrief.org/~ucum/ucum.html)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute default="0" name="min" use="optional" type="xs:double"> 
+        <xs:annotation>
+          <xs:documentation>Lower validity limit of the interpreted value after using the slope/intercept equation.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute default="1" name="max" use="optional" type="xs:double">
+        <xs:annotation>
+          <xs:documentation>Upper validity limit of the interpreted value after using the slope/intercept equation.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
