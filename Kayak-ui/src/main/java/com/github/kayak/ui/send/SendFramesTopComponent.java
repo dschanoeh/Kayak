@@ -18,6 +18,7 @@
 package com.github.kayak.ui.send;
 
 import com.github.kayak.core.Bus;
+import com.github.kayak.core.Util;
 import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManagementListener;
@@ -31,8 +32,6 @@ import javax.swing.JTable;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
 
 /**
  *
@@ -41,24 +40,23 @@ import org.openide.awt.ActionReference;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.send//SendFrames//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "SendFramesTopComponent",
-iconBase="org/freedesktop/tango/16x16/actions/mail-forward.png",  
-persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+iconBase="org/tango-project/tango-icon-theme/16x16/actions/mail-forward.png",
+persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Window", id = "com.github.kayak.ui.send.SendFramesTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_SendFramesAction",
 preferredID = "SendFramesTopComponent")
 public final class SendFramesTopComponent extends TopComponent {
 
     private static final Logger logger = Logger.getLogger(SendFramesTopComponent.class.getCanonicalName());
-    
+
+    private Project project;
     private SendFramesTableModel tableModel = new SendFramesTableModel();
-    
+
     private ProjectManagementListener managementListener = new ProjectManagementListener() {
 
             @Override
             public void projectsUpdated() {
-                
+
             }
 
             @Override
@@ -67,22 +65,22 @@ public final class SendFramesTopComponent extends TopComponent {
                 fillComboBox();
             }
         };
-    
+
     private ProjectChangeListener projectListener = new ProjectChangeListener() {
 
         @Override
         public void projectNameChanged(Project p, String name) {
-            
+
         }
 
         @Override
         public void projectClosed(Project p) {
-
+            close();
         }
 
         @Override
         public void projectOpened(Project p) {
-            
+
         }
 
         @Override
@@ -100,14 +98,14 @@ public final class SendFramesTopComponent extends TopComponent {
         initComponents();
         setName(NbBundle.getMessage(SendFramesTopComponent.class, "CTL_SendFramesTopComponent"));
         setToolTipText(NbBundle.getMessage(SendFramesTopComponent.class, "HINT_SendFramesTopComponent"));
-        
+
         ProjectManager.getGlobalProjectManager().addListener(managementListener);
-        Project p = ProjectManager.getGlobalProjectManager().getOpenedProject();
-        if(p != null) {
-            p.addProjectChangeListener(projectListener);
+        project = ProjectManager.getGlobalProjectManager().getOpenedProject();
+        if(project != null) {
+            project.addProjectChangeListener(projectListener);
             fillComboBox();
         }
-        
+
         Action send = new AbstractAction() {
 
             @Override
@@ -118,22 +116,23 @@ public final class SendFramesTopComponent extends TopComponent {
             }
         };
 
-        ButtonColumn bc = new ButtonColumn(jTable1, send, 4);
-        
+        ButtonColumn bc = new ButtonColumn(jTable1, send, 5);
+
         jTable1.getColumn("Bus").setPreferredWidth(100);
-        jTable1.getColumn("ID").setPreferredWidth(60);
+        jTable1.getColumn("ID [hex]").setPreferredWidth(60);
+        jTable1.getColumn("Extended").setPreferredWidth(20);
         jTable1.getColumn("Length").setPreferredWidth(70);
         jTable1.getColumn("Data").setPreferredWidth(200);
         jTable1.getColumn("Send").setPreferredWidth(60);
-        jTable1.getColumn("Interval (ms)").setPreferredWidth(100);
+        jTable1.getColumn("Interval [µs]").setPreferredWidth(100);
         jTable1.getColumn("Send interval").setPreferredWidth(100);
         jTable1.getColumn("Note").setPreferredWidth(150);
     }
-    
+
     private void fillComboBox() {
         jComboBox1.removeAllItems();
         Project p = ProjectManager.getGlobalProjectManager().getOpenedProject();
-        
+
         for(Bus b : p.getBusses()) {
             jComboBox1.addItem(b);
         }
@@ -209,13 +208,13 @@ public final class SendFramesTopComponent extends TopComponent {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
             Bus b = (Bus) jComboBox1.getSelectedItem();
-            
+
             if(b != null)
                 tableModel.add(b);
         } catch (Exception ex) {
             logger.log(Level.WARNING, "No bus was selected");
         }
-        
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -232,10 +231,6 @@ public final class SendFramesTopComponent extends TopComponent {
     private javax.swing.JTable jTable1;
     private javax.swing.JToolBar jToolBar1;
     // End of variables declaration//GEN-END:variables
-    @Override
-    public void componentOpened() {
-        // TODO add custom code on component opening
-    }
 
     @Override
     public void componentClosed() {
@@ -243,14 +238,51 @@ public final class SendFramesTopComponent extends TopComponent {
     }
 
     void writeProperties(java.util.Properties p) {
-        // better to version settings since initial version as advocated at
-        // http://wiki.apidesign.org/wiki/PropertyFiles
+        int rowCount = tableModel.getRowCount();
+
         p.setProperty("version", "1.0");
-        // TODO store your settings
+        p.setProperty("rowCount", Integer.toString(rowCount));
+
+        for(int i=0;i<rowCount;i++) {
+            SendFramesTableModel.TableRow row = tableModel.getRow(i);
+            String is = Integer.toString(i);
+            p.setProperty("note" + is, row.getNote());
+            p.setProperty("busName" + is, row.getBus().getName());
+            p.setProperty("data" + is, Util.byteArrayToHexString(row.getData(), false));
+            p.setProperty("id" + is, Integer.toString(row.getId()));
+            p.setProperty("interval" + is, Long.toString(row.getInterval()));
+            p.setProperty("projectName", project.getName());
+        }
     }
 
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+
+        int rowCount = Integer.parseInt(p.getProperty("rowCount"));
+        String projectName = p.getProperty("projectName");
+
+        Project pr = ProjectManager.getGlobalProjectManager().getOpenedProject();
+        if(pr == null || !pr.getName().equals(projectName))
+            return;
+
+        for(int i=0;i<rowCount;i++) {
+            String is = Integer.toString(i);
+
+            String busName = p.getProperty("busName" + is);
+            Bus bus = ProjectManager.getGlobalProjectManager().findBus(projectName, busName);
+
+            if(bus == null)
+                continue;
+
+            String note = p.getProperty("note" + is);
+            int id = Integer.parseInt(p.getProperty("id" + is));
+            long interval = Long.parseLong(p.getProperty("interval" + is));
+            byte[] data = Util.hexStringToByteArray(p.getProperty("data" + is));
+
+            tableModel.add(bus, id, interval, data, note);
+
+        }
+
+
     }
 }

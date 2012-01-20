@@ -13,11 +13,12 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
-@ActionRegistration(displayName="New bus...", iconBase="org/freedesktop/tango/16x16/places/network-workgroup.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="New bus...", iconBase="org/tango-project/tango-icon-theme/16x16/places/network-workgroup.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="File", id="com.github.kayak.ui.projects.NewBusAction")
 @ActionReferences( value= {
-    @ActionReference(path = "Menu/File", position = 200 ),
-    @ActionReference(path = "Toolbars/File", position = 200 )
+    @ActionReference(path = "Shortcuts", name = "D-B"),
+    @ActionReference(path = "Menu/File", position = 20 ),
+    @ActionReference(path = "Actions/Projects", position = 20 )
 })
 public final class NewBusAction extends AbstractAction {
 
@@ -30,12 +31,15 @@ public final class NewBusAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        String name = JOptionPane.showInputDialog("Please give a name for the Bus", "newBus");
+        Bus b = new Bus();
+        b.setName(context.getNextValidBusName());
 
-        if (name != null) {
-            Bus b = new Bus();
-            b.setName(name);
-            context.addBus(b);
+        String alias = JOptionPane.showInputDialog("Please give an alias for the Bus or leave blank for no alias", "");
+
+        if (alias != null) {
+            b.setAlias(alias);
         }
+
+        context.addBus(b);
     }
 }

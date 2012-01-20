@@ -37,12 +37,11 @@ import org.openide.nodes.Sheet;
 public class BusURLNode extends AbstractNode {
 
     public static enum Type {
-        RECENT, FAVOURITE, DISCOVERY, CONNECTED
+        RECENT, FAVOURITE, DISCOVERY
     }
 
     private Type type;
     private BusURL url;
-    private ConnectionManager manager = ConnectionManager.getGlobalConnectionManager();
 
     public Type getType() {
         return type;
@@ -67,9 +66,9 @@ public class BusURLNode extends AbstractNode {
         public void actionPerformed(ActionEvent e) {
             Boolean result = url.checkConnection();
             if(!result)
-                setIconBaseWithExtension("org/freedesktop/tango/16x16/emblems/emblem-unreadable.png");
+                setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/emblems/emblem-unreadable.png");
             else
-                setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");
+                setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/devices/network-wired.png");
         }
     }
 
@@ -78,7 +77,7 @@ public class BusURLNode extends AbstractNode {
         this.url = url;
         setDisplayName(url.toString());
         this.type = type;
-        setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wired.png");
+        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/devices/network-wired.png");
     }
 
     @Override
@@ -86,11 +85,9 @@ public class BusURLNode extends AbstractNode {
         if(type == Type.FAVOURITE)
             return new Action[] { new DeleteConnectionAction(this), new TestConnectionAction() };
         else if(type == Type.DISCOVERY)
-            return new Action[] { new BookmarkConnectionAction(this), new TestConnectionAction() };
-        else if(type == Type.CONNECTED)
-            return new Action[] {};
+            return new Action[] { new BookmarkConnectionAction(url), new TestConnectionAction() };
         else
-            return new Action[] { new BookmarkConnectionAction(this), new TestConnectionAction() };
+            return new Action[] { new BookmarkConnectionAction(url), new TestConnectionAction() };
     }
 
     @Override

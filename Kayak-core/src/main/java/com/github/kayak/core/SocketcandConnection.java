@@ -1,19 +1,19 @@
 /**
  * 	This file is part of Kayak.
- *	
+ *
  *	Kayak is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU Lesser General Public License as published by
  *	the Free Software Foundation, either version 3 of the License, or
  *	(at your option) any later version.
- *	
+ *
  *	Kayak is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
- *	
+ *
  *	You should have received a copy of the GNU Lesser General Public License
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
- *	
+ *
  */
 package com.github.kayak.core;
 
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 /**
  * This abstract class provides some common methods that are necessary for
  * socketcand connections. Both {@link BCMConnection} and {@link RAWConnection}
- * extend this class. 
+ * extend this class.
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  *
  */
@@ -35,21 +35,21 @@ public abstract class SocketcandConnection {
 
     private static final int BUFFER_SIZE = 4096;
     private static final int ELEMENT_SIZE = 512;
-    
+
     private static final Logger logger = Logger.getLogger(SocketcandConnection.class.getCanonicalName());
-    
+
     protected String busName;
     protected int port;
     protected String host;
-    private FrameReceiver receiver;
+    private FrameListener receiver;
     private BufferedReader reader;
     private final char[] elementBuffer = new char[ELEMENT_SIZE];
 
-    public FrameReceiver getReceiver() {
+    public FrameListener getListener() {
         return receiver;
     }
 
-    public void setReceiver(FrameReceiver receiver) {
+    public void setListener(FrameListener receiver) {
         this.receiver = receiver;
     }
 
@@ -75,8 +75,8 @@ public abstract class SocketcandConnection {
      * via setInput() before calling getElement().
      * A buffer is used to
      * construct elements that need multiple reads. Whitespace between the
-     * elements is ignored. 
-     * The method blocks until an element can be returned. 
+     * elements is ignored.
+     * The method blocks until an element can be returned.
      * @param in the InputStreamReader from which should be read
      * @return the first element read
      * @throws IOException
@@ -84,7 +84,7 @@ public abstract class SocketcandConnection {
     protected String getElement() throws IOException, InterruptedException, SocketTimeoutException {
         int pos = 0;
         boolean inElement = false;
-        
+
         while (true) {
             char c = (char) reader.read();
 
@@ -100,7 +100,7 @@ public abstract class SocketcandConnection {
                     logger.log(Level.WARNING, "Found frame that is too large. Ignoring...");
                     pos = 0;
                     inElement = false;
-                    
+
                 } else if (c == '>') { /* Find closing > */
                     elementBuffer[pos] = c;
                     pos++;
@@ -111,7 +111,7 @@ public abstract class SocketcandConnection {
                 }
             }
         }
-        
+
         return String.valueOf(elementBuffer, 0, pos);
     }
 }

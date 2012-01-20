@@ -33,15 +33,15 @@ import org.openide.util.lookup.Lookups;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class DescriptionNode extends AbstractNode implements Transferable {
-    
+
     public static final DataFlavor DATA_FLAVOR = new DataFlavor(DescriptionNode.class, "DescriptionNode");
-    
+
     private BusDescription description;
-    
+
     public BusDescription getDescription() {
         return description;
     }
-    
+
     @Override
     public Transferable drag() {
         return this;
@@ -66,13 +66,13 @@ public class DescriptionNode extends AbstractNode implements Transferable {
             throw new UnsupportedFlavorException(flavor);
         }
     }
-    
+
     public DescriptionNode(BusDescription d) {
         super(Children.LEAF, Lookups.fixed(d));
-        
+
         this.description = d;
         setDisplayName(description.getName());
-        this.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
+        this.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/network-workgroup.png");
     }
 
     @Override
@@ -87,7 +87,7 @@ public class DescriptionNode extends AbstractNode implements Transferable {
                 return description.getName();
             }
         };
-        
+
         Property baudrate = new PropertySupport.ReadOnly<Integer>("Baudrate", Integer.class, "Baudrate", "Predefined baudrate on the bus") {
 
             @Override
@@ -95,12 +95,12 @@ public class DescriptionNode extends AbstractNode implements Transferable {
                 return description.getBaudrate();
             }
         };
-        
+
         set.put(name);
         set.put(baudrate);
-        
+
         s.put(set);
-        
+
         return s;
     }
 

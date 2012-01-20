@@ -32,7 +32,7 @@ import org.openide.nodes.Children;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.messageview//Messages//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "MessagesTopComponent",
-iconBase="org/freedesktop/tango/16x16/status/dialog-information.png",
+iconBase="org/tango-project/tango-icon-theme/16x16/status/dialog-information.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @ActionID(category = "Window", id = "com.github.kayak.ui.messageview.MessagesTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
@@ -45,12 +45,12 @@ public final class MessagesTopComponent extends TopComponent implements Explorer
 
     private AbstractNode root;
     private ExplorerManager manager = new ExplorerManager();
-    
+
     public MessagesTopComponent() {
 	initComponents();
 	setName(NbBundle.getMessage(MessagesTopComponent.class, "CTL_MessagesTopComponent"));
 	setToolTipText(NbBundle.getMessage(MessagesTopComponent.class, "HINT_MessagesTopComponent"));
-	
+
         BusFactory factory = new BusFactory();
 	root = new AbstractNode(Children.create(factory, true));
 	manager.setRootContext(root);
@@ -105,7 +105,7 @@ public final class MessagesTopComponent extends TopComponent implements Explorer
 	    String filter = jTextField2.getText();
 	    logger.log(Level.INFO, "filtering: {0}", filter);
 	    if(filter.equals("")) {
-		manager.setRootContext(root);		    
+		manager.setRootContext(root);
 	    } else {
 		SearchFilteredNode filteredNode = new SearchFilteredNode(root, filter);
 	        manager.setRootContext(filteredNode);
@@ -118,26 +118,15 @@ public final class MessagesTopComponent extends TopComponent implements Explorer
         private javax.swing.JLabel jLabel1;
         private javax.swing.JTextField jTextField2;
         // End of variables declaration//GEN-END:variables
-    @Override
-    public void componentOpened() {
-	// TODO add custom code on component opening
-    }
-
-    @Override
-    public void componentClosed() {
-	// TODO add custom code on component closing
-    }
 
     void writeProperties(java.util.Properties p) {
 	// better to version settings since initial version as advocated at
 	// http://wiki.apidesign.org/wiki/PropertyFiles
 	p.setProperty("version", "1.0");
-	// TODO store your settings
     }
 
     void readProperties(java.util.Properties p) {
 	String version = p.getProperty("version");
-	// TODO read your settings according to their version
     }
 
     @Override

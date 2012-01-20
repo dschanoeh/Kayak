@@ -15,8 +15,7 @@
  	You should have received a copy of the GNU Lesser General Public License
  	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
 
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.kayak</groupId>
@@ -24,7 +23,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    
+
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
          the versions of the artifacts are netbeans IDE release based, eg. RELEASE65
@@ -41,7 +40,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -52,13 +51,13 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>nbm-maven-plugin</artifactId>
-                    <version>3.5</version>
                     <extensions>true</extensions>
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
                         <cluster>kayak</cluster>
                         <etcConfFile>${basedir}/kayak.conf</etcConfFile>
                     </configuration>
+                    <version>3.6</version>
                 </plugin>
 
                 <plugin>
@@ -73,11 +72,12 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>2.0.1</version>
+                    <version>3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
+                    <version>2.2.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -90,26 +90,11 @@
         <module>Kayak-kcd</module>
         <module>Kayak-core</module>
         <module>Kayak-logging</module>
-    </modules>
-
-    <reporting>
-        <outputDirectory>${project.build.directory}/site</outputDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <configuration>
-                    <debug>false</debug>
-                    <xmlOutput>true</xmlOutput>
-                </configuration>
-                <version>2.3.1</version>
-            </plugin>
-        </plugins>
-    </reporting>
-
+    <module>Kayak-mapview</module>
+  </modules>
 
     <properties>
-        <netbeans.version>RELEASE70</netbeans.version>
+        <netbeans.version>RELEASE71</netbeans.version>
         <brandingToken>kayak</brandingToken>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

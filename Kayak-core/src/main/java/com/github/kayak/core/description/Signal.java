@@ -18,6 +18,11 @@
 
 package com.github.kayak.core.description;
 
+import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Set;
+
 /**
  * A signal is a single data value that can be extracted out of a {@link Frame}.
  * The parameters for the extraction are defined in the
@@ -27,18 +32,46 @@ package com.github.kayak.core.description;
  */
 public class Signal {
 
+    public static final Comparator<Signal> nameComparator = new Comparator<Signal>() {
+
+        @Override
+        public int compare(Signal o1, Signal o2) {
+            return o1.getDescription().getName().compareTo(o2.getDescription().getName());
+        }
+    };
+
+    private static final DecimalFormat readableFormat = new DecimalFormat("0.00");
+
     private long rawValue;
     private String unit;
-    private String value;
-    private String label;
+    private double value;
+    private Set<String> labels;
     private String notes;
+    private SignalDescription description;
+    private boolean multiplexed;
 
-    public String getLabel() {
-        return label;
+    public boolean isMultiplexed() {
+        return multiplexed;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setMultiplexed(boolean multiplexed) {
+        this.multiplexed = multiplexed;
+    }
+
+    public SignalDescription getDescription() {
+        return description;
+    }
+
+    public void setDescription(SignalDescription description) {
+        this.description = description;
+    }
+
+    public Set<String> getLabels() {
+        return Collections.unmodifiableSet(labels);
+    }
+
+    public void setLabels(Set<String> labels) {
+        this.labels = labels;
     }
 
     public long getRawValue() {
@@ -57,11 +90,11 @@ public class Signal {
         this.unit = unit;
     }
 
-    public String getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Double value) {
         this.value = value;
     }
 
@@ -71,6 +104,31 @@ public class Signal {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getExactString() {
+        return Double.toString(value);
+    }
+
+    public String getReadableString() {
+        if(labels != null && !labels.isEmpty()) {
+            if(labels.size() == 1) {
+                return labels.iterator().next();
+            } else {
+                StringBuilder sb = new StringBuilder();
+                for(String label : labels) {
+                    sb.append(label);
+                    sb.append(", ");
+                }
+                sb.setLength(sb.length()-2);
+                return sb.toString();
+            }
+        }
+        return readableFormat.format(value);
+    }
+
+    public String getIntegerString() {
+        return Long.toString(Math.round(value));
     }
 
     public Signal() {

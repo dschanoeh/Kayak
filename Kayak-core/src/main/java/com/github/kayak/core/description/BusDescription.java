@@ -19,17 +19,20 @@
 package com.github.kayak.core.description;
 
 import com.github.kayak.core.Frame;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
- * @author dschanoeh
+ * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
 public class BusDescription {
 
     private String name;
     private int baudrate;
-    private HashMap<Integer,MessageDescription> messages;
+    private Map<Integer,MessageDescription> messages;
     private Document document;
 
     public int getBaudrate() {
@@ -40,12 +43,12 @@ public class BusDescription {
         this.baudrate = baudrate;
     }
 
-    public HashMap<Integer,MessageDescription> getMessages() {
-        return messages;
+    public Map<Integer,MessageDescription> getMessages() {
+        return Collections.unmodifiableMap(messages);
     }
 
-    public void setMessages(HashMap<Integer,MessageDescription> messages) {
-        this.messages = messages;
+    public void addMessageDescription(MessageDescription d) {
+        messages.put(d.getId(), d);
     }
 
     public String getName() {
@@ -63,10 +66,10 @@ public class BusDescription {
         messages = new HashMap<Integer,MessageDescription>();
     }
 
-    public Message decodeFrame(Frame frame) {
+    public Message decodeFrame(Frame frame) throws DescriptionException {
         MessageDescription message = messages.get(frame.getIdentifier());
 
-        if(messages != null) {
+        if(message != null) {
             return message.decodeFrame(frame);
         } else {
             return null;
@@ -75,16 +78,6 @@ public class BusDescription {
 
     public Document getDocument() {
         return document;
-    }
-
-    public MessageDescription createMessage(int id) {
-        if(!messages.containsKey(id)) {
-            MessageDescription m = new MessageDescription(this, id);
-            messages.put(id, m);
-            return m;
-        } else {
-            return null;
-        }
     }
 
 }

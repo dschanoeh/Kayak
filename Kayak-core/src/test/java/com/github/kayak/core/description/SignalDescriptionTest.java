@@ -18,6 +18,7 @@
 
 package com.github.kayak.core.description;
 
+import java.util.Set;
 import com.github.kayak.core.Util;
 import com.github.kayak.core.Frame;
 import java.nio.ByteOrder;
@@ -39,6 +40,7 @@ public class SignalDescriptionTest {
     private static SignalDescription description5;
     private static Frame frame;
     private static Signal data, data2, data3, data4, data5;
+    private static Label label;
 
 
     public SignalDescriptionTest() {
@@ -47,11 +49,9 @@ public class SignalDescriptionTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
 
-        Document d = new Document();
-        BusDescription b = d.createBusDescription();
-        MessageDescription m = b.createMessage(42);
+        MessageDescription m = new MessageDescription(42, false);
 
-        description = m.createSignal();
+        description = new SignalDescription(m);
         description.setType(SignalDescription.Type.UNSIGNED);
         description.setNotes("This is a test signal");
         description.setUnit("0.1 km/h");
@@ -61,21 +61,23 @@ public class SignalDescriptionTest {
         description.setIntercept(0);
         description.setSlope(1);
 
-        description2 = m.createSignal();
+        description2 = new SignalDescription(m);
         description2.setType(SignalDescription.Type.SIGNED);
         description2.setLength(8);
         description2.setOffset(0);
         description2.setIntercept(0);
         description2.setSlope(1);
-        
-        description3 = m.createSignal();
+        label = new Label(168, "foo");
+        description2.addLabel(label);
+
+        description3 = new SignalDescription(m);
         description3.setType(SignalDescription.Type.SIGNED);
         description3.setLength(7);
         description3.setOffset(4);
         description3.setIntercept(0);
         description3.setSlope(1);
 
-        description4 = m.createSignal();
+        description4 = new SignalDescription(m);
         description4.setType(SignalDescription.Type.SIGNED);
         description4.setByteOrder(ByteOrder.BIG_ENDIAN);
         description4.setLength(12);
@@ -83,7 +85,7 @@ public class SignalDescriptionTest {
         description4.setIntercept(0);
         description4.setSlope(1);
 
-        description5 = m.createSignal();
+        description5 = new SignalDescription(m);
         description5.setType(SignalDescription.Type.SIGNED);
         description5.setByteOrder(ByteOrder.BIG_ENDIAN);
         description5.setLength(6);
@@ -91,7 +93,7 @@ public class SignalDescriptionTest {
         description5.setIntercept(0);
         description5.setSlope(1);
 
-        frame = new Frame(0x12, Util.hexStringToByteArray("A8B37C"));
+        frame = new Frame(0x12, false, Util.hexStringToByteArray("A8B37C"));
 
         data = description.decodeData(frame.getData());
         assertNotNull(data);
@@ -117,9 +119,9 @@ public class SignalDescriptionTest {
     public void testValue() {
 
         System.out.println("Testing value 1");
-        long expResult = 1653;
-        String result = data.getValue();
-        assertEquals(expResult, Long.parseLong(result));
+        double expResult = 1653;
+        double result = data.getValue();
+        assertEquals(expResult, result, 0.1);
     }
 
     @Test
@@ -147,27 +149,64 @@ public class SignalDescriptionTest {
     }
 
     @Test
-    public void testValue2() {
+    public void testIntegerValue() {
         System.out.println("Testing value 2");
-        long expResult = -88;
-        long result = Long.parseLong(data2.getValue());
+        String expResult = "-88";
+        String result = data2.getIntegerString();
         assertEquals(expResult, result);
     }
 
     @Test
     public void testValue4() {
         System.out.println("Testing value 4");
-        long expResult = 1113;
-        long result = Long.parseLong(data4.getValue());
-        assertEquals(expResult, result);
+        double expResult = 1113;
+        double result = data4.getValue();
+        assertEquals(expResult, result, 0.1);
     }
 
     @Test
     public void testValue5() {
         System.out.println("Testing value 5");
-        long expResult = -17;
-        long result = Long.parseLong(data5.getValue());
-        assertEquals(expResult, result);
+        double expResult = -17;
+        double result = data5.getValue();
+        assertEquals(expResult, result, 0.1);
     }
 
+    @Test
+    public void labelTest() {
+        System.out.println("Testing label");
+        Set<Label> labels = description2.getAllLabels();
+        assertNotNull(labels);
+        assertEquals(1, labels.size());
+
+        Set<String> l = data2.getLabels();
+        assertNotNull(l);
+        assertEquals(1, l.size());
+        for(String label : l) {
+            assertEquals(label, "foo");
+        }
+
+        assertEquals("foo", data2.getReadableString());
+    }
+
+    public void lengthTest() {
+        System.out.println("Testing length");
+        boolean ret=false;
+        byte[] data1 = new byte[] {0x00 };
+        try {
+            description2.decodeData(data1);
+        } catch (DescriptionException ex) {
+            ret = true;
+        }
+
+        assertFalse(ret);
+
+        try {
+            description3.decodeData(data1);
+        } catch (DescriptionException ex) {
+            ret = true;
+        }
+
+        assertTrue(ret);
+    }
 }

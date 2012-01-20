@@ -19,9 +19,11 @@ package com.github.kayak.core;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
@@ -45,6 +47,8 @@ public class LogFileReplay {
     private long startTime; /* time when the replay was started */
     private HashMap<String, Bus> busses;
     private boolean infiniteReplay;
+
+    private final RandomAccessFile file;
 
     public boolean isInfiniteReplay() {
         return infiniteReplay;
@@ -82,12 +86,54 @@ public class LogFileReplay {
      * Create a new {@link LogFileReplay} with a specific {@link LogFile}.
      * @param logFile
      */
-    public LogFileReplay(LogFile logFile) {
+    public LogFileReplay(LogFile logFile) throws FileNotFoundException {
         this.logFile = logFile;
 
         busses = new HashMap<String, Bus>();
         for (String b : logFile.getBusses()) {
             busses.put(b, null);
+        }
+
+        file = new RandomAccessFile(logFile.getFile(), "r");
+    }
+
+    /* Seeks the file to the position of the first frame and returns
+     * this position
+     */
+    private long findStartPosition() {
+        synchronized(file) {
+            try {
+                file.seek(0);
+
+                while(true) {
+                    long posBefore = file.getFilePointer();
+                    String line = file.readLine();
+                    if(line.startsWith("(")) {
+                        file.seek(posBefore);
+                        return posBefore;
+                    }
+                }
+            } catch(IOException ex) {
+                    return -1;
+            }
+        }
+    }
+
+    public void seekTo(long pos) {
+        if(pos == timeOffset) {
+            findStartPosition();
+            return;
+        }
+    }
+
+    private Frame.FrameBusNamePair readNextFrame() {
+        synchronized(file) {
+            try {
+                String line = file.readLine();
+                return Frame.fromLogFileNotation(line);
+            } catch(IOException ex) {
+                return null;
+            }
         }
     }
 
@@ -96,7 +142,7 @@ public class LogFileReplay {
         try {
             if(reader != null)
                 reader.close();
-            
+
             InputStream inputStream;
             if (logFile.getCompressed()) {
                 inputStream = new GZIPInputStream(new FileInputStream(logFile.getFile()));
@@ -121,7 +167,7 @@ public class LogFileReplay {
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Exception while seeking to begin of file", ex);
         }
-        
+
         startTime = timeSource.getTime();
     }
 
@@ -170,7 +216,13 @@ public class LogFileReplay {
 
                             byte[] message = Util.hexStringToByteArray(data[1]);
 
-                            Frame frame = new Frame(identifier, message);
+                            Frame frame;
+
+                            if(data[0].length()<=3) {
+                                frame = new Frame(identifier, false, message);
+                            } else {
+                                frame = new Frame(identifier, true, message);
+                            }
 
                             long timeToWait = msecs - (timeSource.getTime() - startTime);
 
@@ -189,10 +241,10 @@ public class LogFileReplay {
                             bus.sendFrame(frame);
                         } else if(line.startsWith("EVENT")) {
                             String[] cols = line.split("\\s");
-                            
+
                             EventFrame ev;
                             Bus bus = null;
-                            
+
                             if(cols[1].startsWith("(")) { /* timestamp */
                                 if(cols[2].startsWith("\"")) { /* timestamp and bus name */
                                     ev = new EventFrame(cols[3].substring(1, cols[3].length()-1));
@@ -200,11 +252,11 @@ public class LogFileReplay {
                                 } else { /* no bus name */
                                     ev = new EventFrame(cols[2].substring(1, cols[2].length()-1));
                                 }
-                                
+
                                 long msecs = (long) (Double.parseDouble((cols[1].substring(1, cols[1].length() - 1))) * 1000) - timeOffset;
                                 ev.setTimestamp(msecs);
                                 long timeToWait = msecs - (timeSource.getTime() - startTime);
-                            
+
                                 if (timeToWait >= 10) {
                                     try {
                                         Thread.sleep(timeToWait);
@@ -221,26 +273,26 @@ public class LogFileReplay {
                                     ev = new EventFrame(cols[1].substring(1, cols[1].length()-1));
                                 }
                             }
-                            
+
                             if (bus == null) {
                                 Set<String> keys = busses.keySet();
                                 for(String key : keys) {
                                     busses.get(key).sendEventFrame(ev);
                                 }
                             }
-                            
+
                             bus.sendEventFrame(ev);
                         }
                     } else {
                         if (infiniteReplay) {
                             EventFrame ev = new EventFrame("Seeking to beginning");
                             ev.setTimestamp(timeOffset);
-                            
+
                             Set<String> keys = busses.keySet();
                             for(String key : keys) {
                                 busses.get(key).sendEventFrame(ev);
                             }
-                                
+
                             seekToBeginning();
                             continue;
                         } else {

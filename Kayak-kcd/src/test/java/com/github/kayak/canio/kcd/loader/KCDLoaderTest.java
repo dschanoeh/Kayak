@@ -18,9 +18,14 @@
 
 package com.github.kayak.canio.kcd.loader;
 
-import java.util.HashSet;
+import com.github.kayak.core.description.Label;
+import com.github.kayak.core.description.MultiplexDescription;
+import java.util.Set;
+import com.github.kayak.core.description.Node;
 import com.github.kayak.core.description.BusDescription;
 import com.github.kayak.core.description.Document;
+import com.github.kayak.core.description.MessageDescription;
+import com.github.kayak.core.description.SignalDescription;
 import java.io.File;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -62,17 +67,74 @@ public class KCDLoaderTest {
         assertEquals("1.23", document.getVersion());
         assertEquals("Herbert Powell", document.getAuthor());
         assertEquals("Powell Motors", document.getCompany());
-        
+
         System.out.println("nodes");
-        HashSet<String> nodes = document.getNodes();
-        assertTrue(nodes.contains("Motor ACME"));
-        assertTrue(nodes.contains("Crypto"));
-        assertTrue(nodes.contains("ParkDistance"));
+        Set<Node> nodes = document.getNodes();
 
+        boolean foundMotor = false;
+        for(Node n : nodes) {
+            if(n.getName().equals("Motor ACME"))
+                foundMotor = true;
 
-        HashSet<BusDescription> busses = document.getBusses();
+        }
+
+        assertTrue(foundMotor);
+
+        Set<BusDescription> busses = document.getBusDescriptions();
         assertEquals(3, busses.size());
-        
+
+    }
+
+    @Test
+    public void testMultiplexes() {
+        boolean found = false;
+        Set<BusDescription> busses = document.getBusDescriptions();
+
+        for(BusDescription bus : busses) {
+            if(bus.getName().equals("Motor")) {
+                MessageDescription message = bus.getMessages().get(0x0b2);
+
+                Set<MultiplexDescription> multiplexes = message.getMultiplexes();
+                assertEquals(multiplexes.size(), 1);
+
+                for(MultiplexDescription multiplex : multiplexes) {
+                    Set<SignalDescription> signals = multiplex.getAllSignalDescriptions();
+                    for(SignalDescription signal : signals) {
+                        if(signal.getName().equals("Info3")) {
+                            assertEquals(signal.getOffset(), 8);
+                            found = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        assertTrue(found);
+    }
+
+    @Test
+    public void testLabels() {
+        Set<BusDescription> busses = document.getBusDescriptions();
+
+        for(BusDescription bus : busses) {
+            if(bus.getName().equals("Motor")) {
+                Set<SignalDescription> signals = bus.getMessages().get(0x0b2).getSignals();
+
+                boolean found = false;
+
+                for(SignalDescription s : signals) {
+                    if(s.getName().equals("OutsideTemp")) {
+                        found = true;
+
+                        Set<Label> labels = s.getAllLabels();
+                        assertNotNull(labels);
+                        assertEquals(2, labels.size());
+                    }
+                }
+
+                assertTrue(found);
+            }
+        }
     }
 
     /**
@@ -81,7 +143,7 @@ public class KCDLoaderTest {
     @Test
     public void testGetSupportedExtensions() {
         System.out.println("getSupportedExtensions");
-        
+
         String[] expResult = new String[]{"kcd", "kcd.gz"};
         String[] result = loader.getSupportedExtensions();
         assertEquals(2, result.length);

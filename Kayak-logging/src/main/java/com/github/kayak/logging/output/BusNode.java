@@ -27,14 +27,14 @@ public class BusNode extends AbstractNode {
         this.bus = bus;
         this.notify = notify;
 
-        setName(bus.getName());
+        setName(bus.toString());
     }
 
     @Override
     public Action[] getActions(boolean context) {
         return new Action[] { new RemoveAction() };
     }
-    
+
     private class RemoveAction extends AbstractAction {
 
         public RemoveAction() {

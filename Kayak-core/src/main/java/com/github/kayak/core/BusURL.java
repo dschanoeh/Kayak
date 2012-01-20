@@ -23,8 +23,12 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Comparator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * URL class that absoulutely defines the connection parameters for a single bus
@@ -33,6 +37,32 @@ import java.net.Socket;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class BusURL implements Transferable {
+
+    public static Comparator<BusURL> nameComparator = new Comparator<BusURL>() {
+
+        @Override
+        public int compare(BusURL o1, BusURL o2) {
+            int i = o1.getHost().compareTo(o2.getHost());
+            if(i!=0) {
+                return i;
+            } else {
+                String d1 = o1.getDescription();
+                String d2 = o2.getDescription();
+
+                if(d1 != null && d2 != null) {
+                    i = o1.getDescription().compareTo(o2.getDescription());
+                }
+                if(i!=0) {
+                    return i;
+                } else {
+                    i = o1.getBus().compareTo(o2.getBus());
+                    return i;
+                }
+            }
+        }
+    };
+
+    private static final Logger logger = Logger.getLogger(BusURL.class.getCanonicalName());
 
     public static final DataFlavor DATA_FLAVOR = new DataFlavor(BusURL.class, "BusURL");
     private String host;
@@ -182,23 +212,50 @@ public class BusURL implements Transferable {
     public Boolean checkConnection() {
         Socket socket = new Socket();
         InetSocketAddress address = new InetSocketAddress(host, port);
-
+        InputStreamReader input = null;
+        OutputStreamWriter output = null;
         try {
-            socket.setSoTimeout(10);
-            socket.connect(address, 50);
+            socket.setSoTimeout(100);
+            socket.connect(address, 100);
 
-            InputStreamReader input = new InputStreamReader(
+            input = new InputStreamReader(
                     socket.getInputStream());
 
-            /*String ret = "";
+            output = new OutputStreamWriter(socket.getOutputStream());
 
-            for(int i=0;i<)
+            String ret = "< hi >";
 
-            if (!ret.equals("< hi >")) {
-                logger.log(Level.SEVERE, "Did not receive greeting from host.");
-            }*/
+            for(int i=0;i<6;i++) {
+                if(input.read() != ret.charAt(i)) {
+                    logger.log(Level.INFO, "Could not connect to host");
+                    return false;
+                }
+            }
+
+            output.write("< open " + bus + " >");
+            output.flush();
+
+            ret = "< ok >";
+            for(int i=0;i<6;i++) {
+                if(input.read() != ret.charAt(i)) {
+                    logger.log(Level.INFO, "Could not open bus");
+                    return false;
+                }
+            }
+
         } catch (IOException ex) {
+            logger.log(Level.INFO, "Could not connect to host", ex);
             return false;
+        }
+        finally {
+            if(input != null) {
+                    try {
+                    input.close();
+                    output.close();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
         }
 
         return true;

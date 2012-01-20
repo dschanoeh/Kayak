@@ -17,7 +17,9 @@
  */
 package com.github.kayak.ui.messageview;
 
+import com.github.kayak.core.Bus;
 import com.github.kayak.core.description.MessageDescription;
+import com.github.kayak.core.description.Node;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.lang.reflect.InvocationTargetException;
@@ -33,20 +35,27 @@ import org.openide.util.lookup.Lookups;
  */
 public class MessageDescriptionNode extends AbstractNode implements Transferable {
 
-    public static final DataFlavor DATA_FLAVOR = new DataFlavor(MessageDescriptionNode.class, "MessageDescriptionNode");
-    
+    public static final DataFlavor MESSAGE_DATA_FLAVOR = new DataFlavor(MessageDescription.class, "MessageDescription");
+    public static final DataFlavor BUS_DATA_FLAVOR = new DataFlavor(Bus.class, "Bus");
+
     private MessageDescription description;
+    private Bus bus;
+
+    public Bus getBus() {
+        return bus;
+    }
 
     public MessageDescription getDescription() {
         return description;
     }
-    
-    public MessageDescriptionNode(MessageDescription messageDescription) {
-	super(Children.create(new SignalNodeFactory(messageDescription), true), Lookups.fixed(messageDescription));
+
+    public MessageDescriptionNode(MessageDescription messageDescription, Bus bus) {
+	super(Children.create(new SignalNodeFactory(messageDescription, bus), true), Lookups.fixed(messageDescription, bus));
 
 	this.description = messageDescription;
+        this.bus = bus;
         setDisplayName(description.getName());
-        setIconBaseWithExtension("org/freedesktop/tango/16x16/apps/internet-mail.png");
+        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/apps/internet-mail.png");
     }
 
     @Override
@@ -56,22 +65,24 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[]{DATA_FLAVOR};
+        return new DataFlavor[]{BUS_DATA_FLAVOR, MESSAGE_DATA_FLAVOR};
     }
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return flavor == DATA_FLAVOR;
+        return flavor == BUS_DATA_FLAVOR || flavor == MESSAGE_DATA_FLAVOR;
     }
 
     @Override
     public Object getTransferData(DataFlavor flavor) {
-        if (flavor == DATA_FLAVOR) {
+        if (flavor == BUS_DATA_FLAVOR) {
+            return bus;
+        } else if(flavor == MESSAGE_DATA_FLAVOR) {
             return description;
         }
         return null;
-    } 
-        
+    }
+
     @Override
     protected Sheet createSheet() {
         Sheet s = super.createSheet();
@@ -86,6 +97,15 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
 
         };
 
+        Property extended = new PropertySupport.ReadOnly<Boolean>("Extended ID", Boolean.class, "Extended ID", "Extended ID of the message") {
+
+            @Override
+            public Boolean getValue() throws IllegalAccessException, InvocationTargetException {
+                return description.isExtended();
+            }
+
+        };
+
         Property interval = new PropertySupport.ReadOnly<Integer>("Interval", Integer.class, "Interval", "Interval of the message") {
 
             @Override
@@ -95,11 +115,24 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
 
         };
 
+        Property producer = new PropertySupport.ReadOnly<String>("Producer", String.class, "Producer", "Node that produces this message") {
+
+            @Override
+            public String getValue() throws IllegalAccessException, InvocationTargetException {
+                Node producer = description.getProducer();
+
+		return producer.getName();
+            }
+
+        };
+
         set.put(id);
+        set.put(extended);
         set.put(interval);
+        set.put(producer);
 
         s.put(set);
 
         return s;
-    } 
+    }
 }

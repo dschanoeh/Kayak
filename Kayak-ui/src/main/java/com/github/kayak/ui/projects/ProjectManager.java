@@ -25,9 +25,10 @@ import com.github.kayak.core.description.DescriptionLoader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -50,20 +51,20 @@ import org.w3c.dom.NodeList;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ProjectManager {
-    
+
     private static final Logger logger = Logger.getLogger(ProjectManager.class.getCanonicalName());
 
     private static ProjectManager projectManagement;
-    private ArrayList<Project> projects;
+    private HashSet<Project> projects = new HashSet<Project>();
     private Project openedProject;
-    private ArrayList<ProjectManagementListener> listeners;
+    private HashSet<ProjectManagementListener> listeners = new HashSet<ProjectManagementListener>();
 
     public Project getOpenedProject() {
         return openedProject;
     }
 
-    public ArrayList<Project> getProjects() {
-        return projects;
+    public Set<Project> getProjects() {
+        return Collections.unmodifiableSet(projects);
     }
 
     public void addProject(Project e) {
@@ -72,6 +73,9 @@ public class ProjectManager {
     }
 
     public void removeProject(Project e) {
+        if(openedProject == e)
+            closeProject(e);
+
         projects.remove(e);
         notifyListeners();
     }
@@ -81,11 +85,11 @@ public class ProjectManager {
             return;
 
         if(openedProject != null)
-            openedProject.close();
+            closeProject(openedProject);
 
-        p.open();
         openedProject = p;
-        
+        p.open();
+
         for(ProjectManagementListener l : listeners) {
             l.openProjectChanged(p);
         }
@@ -97,9 +101,6 @@ public class ProjectManager {
 
         openedProject.close();
         openedProject = null;
-        for(ProjectManagementListener l : listeners) {
-            l.openProjectChanged(null);
-        }
     }
 
     public void addListener(ProjectManagementListener listener) {
@@ -116,9 +117,29 @@ public class ProjectManager {
         }
     }
 
-    public ProjectManager() {
-        projects = new ArrayList<Project>();
-        listeners = new ArrayList<ProjectManagementListener>();
+    /**
+     * Returns the bus with the name busName if the project with the name
+     * projectName is currently opened.
+     * This may be used by persistent components that want to reconnect to
+     * a bus.
+     * @param projectName
+     * @param busName
+     * @return
+     */
+    public Bus findBus(String projectName, String busName) {
+
+        if(openedProject != null && openedProject.getName().equals(projectName)) {
+            Bus newBus = null;
+
+            for (Bus b : openedProject.getBusses()) {
+                if (b != null && b.getName() != null && b.getName().equals(busName)) {
+                    newBus = b;
+                    break;
+                }
+            }
+            return newBus;
+        }
+        return null;
     }
 
     public static ProjectManager getGlobalProjectManager() {
@@ -153,10 +174,12 @@ public class ProjectManager {
 
                         NamedNodeMap busAttributes = busNode.getAttributes();
                         Node busNameNode = busAttributes.getNamedItem("name");
-
                         String busName = busNameNode.getNodeValue();
+                        Node aliasNode = busAttributes.getNamedItem("alias");
+                        String alias = aliasNode.getNodeValue();
                         Bus bus = new Bus();
                         bus.setName(busName);
+                        bus.setAlias(alias);
 
                         NodeList busChildren = busNode.getChildNodes();
 
@@ -184,7 +207,7 @@ public class ProjectManager {
                                         for(String ext : extensions) {
                                             if(ext.equals(fileObject.getExt())) {
                                                 com.github.kayak.core.description.Document parseFile = loader.parseFile(file);
-                                                HashSet<BusDescription> busDescriptions = parseFile.getBusses();
+                                                Set<BusDescription> busDescriptions = parseFile.getBusDescriptions();
 
                                                 for(BusDescription b : busDescriptions)  {
                                                     if(b.getName().equals(descriptionName)) {
@@ -234,6 +257,7 @@ public class ProjectManager {
                 for(Bus bus : project.getBusses()) {
                     Element busElement = doc.createElement("Bus");
                     busElement.setAttribute("name", bus.getName());
+                    busElement.setAttribute("alias", bus.getAlias());
                     projectElement.appendChild(busElement);
 
                     BusURL connection = bus.getConnection();
@@ -245,7 +269,7 @@ public class ProjectManager {
                     }
 
                     BusDescription desc = bus.getDescription();
-                    
+
                     if(desc != null) {
                         Element descriptionElement = doc.createElement("Description");
                         descriptionElement.setAttribute("fileName", desc.getDocument().getFileName());

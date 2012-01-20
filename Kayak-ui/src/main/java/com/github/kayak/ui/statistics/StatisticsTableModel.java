@@ -18,14 +18,14 @@
 
 package com.github.kayak.ui.statistics;
 
-import com.github.kayak.core.StatisticsReceiver;
+import com.github.kayak.core.StatisticsListener;
 import javax.swing.table.AbstractTableModel;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-public class StatisticsTableModel extends AbstractTableModel implements StatisticsReceiver {
+public class StatisticsTableModel extends AbstractTableModel implements StatisticsListener {
 
     private int interval = 1000;
 

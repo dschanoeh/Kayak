@@ -19,7 +19,7 @@ package com.github.kayak.ui.events;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.EventFrame;
-import com.github.kayak.core.EventFrameReceiver;
+import com.github.kayak.core.EventFrameListener;
 import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManagementListener;
@@ -35,7 +35,7 @@ import org.openide.awt.StatusLineElementProvider;
 @org.openide.util.lookup.ServiceProvider(service=StatusLineElementProvider.class)
 public class EventsStatusElementProvider implements StatusLineElementProvider {
     private JLabel label;
-    
+
     private ProjectManagementListener projectListener = new ProjectManagementListener() {
 
         @Override
@@ -45,18 +45,18 @@ public class EventsStatusElementProvider implements StatusLineElementProvider {
         @Override
         public void openProjectChanged(Project p) {
             for(Bus b : p.getBusses()) {
-                b.addEventFrameReceiver(eventFrameReceiver);
+                b.addEventFrameListener(eventFrameReceiver);
             }
-            
+
             p.addProjectChangeListener(projectChangeListener);
         }
     };
-    
+
     private ProjectChangeListener projectChangeListener = new ProjectChangeListener() {
 
         @Override
         public void projectNameChanged(Project p, String name) {
-            
+
         }
 
         @Override
@@ -71,16 +71,16 @@ public class EventsStatusElementProvider implements StatusLineElementProvider {
 
         @Override
         public void projectBusAdded(Project p, Bus bus) {
-            bus.addEventFrameReceiver(eventFrameReceiver);
+            bus.addEventFrameListener(eventFrameReceiver);
         }
 
         @Override
         public void projectBusRemoved(Project p, Bus bus) {
-            bus.removeEventFrameReceiver(eventFrameReceiver);
+            bus.removeEventFrameListener(eventFrameReceiver);
         }
     };
-    
-    private EventFrameReceiver eventFrameReceiver = new EventFrameReceiver() {
+
+    private EventFrameListener eventFrameReceiver = new EventFrameListener() {
 
         @Override
         public void newEventFrame(EventFrame f) {
@@ -92,30 +92,30 @@ public class EventsStatusElementProvider implements StatusLineElementProvider {
             sb.append(timestamp % 1000);
             sb.append(") ");
             sb.append(f.toString());
-            
+
             label.setText(sb.toString());
         }
     };
-    
+
     public EventsStatusElementProvider() {
         label = new JLabel();
 
         ProjectManager.getGlobalProjectManager().addListener(projectListener);
-        
+
         Project p = ProjectManager.getGlobalProjectManager().getOpenedProject();
-        
+
         if(p != null) {
             p.addProjectChangeListener(projectChangeListener);
-            
+
             for(Bus b : p.getBusses()) {
-                b.addEventFrameReceiver(eventFrameReceiver);
+                b.addEventFrameListener(eventFrameReceiver);
             }
         }
     }
-    
+
     @Override
     public Component getStatusLineElement() {
         return label;
     }
-    
+
 }

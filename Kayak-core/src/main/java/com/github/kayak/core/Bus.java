@@ -1,29 +1,30 @@
 /**
  * 	This file is part of Kayak.
- *	
+ *
  *	Kayak is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU Lesser General Public License as published by
  *	the Free Software Foundation, either version 3 of the License, or
  *	(at your option) any later version.
- *	
+ *
  *	Kayak is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
- *	
+ *
  *	You should have received a copy of the GNU Lesser General Public License
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
- *	
+ *
  */
 
 package com.github.kayak.core;
 
 import com.github.kayak.core.description.BusDescription;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * A Bus is the virtual representation of a CAN bus. It connects different
@@ -32,34 +33,41 @@ import java.util.logging.Logger;
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  *
  */
-public class Bus implements SubscriptionChangeReceiver {
+public class Bus implements SubscriptionChangeListener {
 
     private static final Logger logger = Logger.getLogger(Bus.class.getName());
-    private ArrayList<Subscription> subscriptionsRAW;
-    private ArrayList<Subscription> subscriptionsBCM;
+
+    private final Set<Subscription> subscriptionsRAW = Collections.synchronizedSet(new HashSet<Subscription>());
+    private final Set<Subscription> subscriptionsBCM = Collections.synchronizedSet(new HashSet<Subscription>());
     private TimeSource timeSource;
     private RAWConnection rawConnection;
     private BCMConnection bcmConnection;
     private ControlConnection controlConnection;
     private String name;
+    private String alias;
     private BusURL url;
-    private final ArrayList<BusChangeListener> listeners;
-    private final ArrayList<EventFrameReceiver> eventFrameReceivers;
+    private final HashSet<BusChangeListener> listeners;
+    private final HashSet<EventFrameListener> eventFrameListeners;
     private TimeSource.Mode mode = TimeSource.Mode.STOP;
-    private HashSet<Integer> subscribedIDs;
-    private ArrayList<StatisticsReceiver> statisticsReceivers;
-    private BusDescription description;
+    private final Set<Integer> subscribedIDs = Collections.synchronizedSet(new HashSet<Integer>());
+    private final Set<Integer> subscribedExtendedIDs = Collections.synchronizedSet(new HashSet<Integer>());
 
-    private StatisticsReceiver statisticsReceiver = new StatisticsReceiver() {
+    private final HashSet<StatisticsListener> statisticsListeners;
+    private BusDescription description;
+    private long delta=0; /* delta between socketcand system time and local timesource */
+
+    public static final Pattern BUS_NAME_PATTERN = Pattern.compile("[a-z0-9]{1,16}");
+
+    private StatisticsListener statisticsReceiver = new StatisticsListener() {
 
         @Override
         public void statisticsUpdated(long rxBytes, long rxPackets, long tBytes, long tPackets) {
-            for(StatisticsReceiver s : statisticsReceivers) {
+            for(StatisticsListener s : statisticsListeners) {
                 s.statisticsUpdated(rxBytes, rxPackets, tBytes, tPackets);
             }
         }
     };
-    
+
     private TimeEventReceiver timeReceiver = new TimeEventReceiver() {
 
         @Override
@@ -92,32 +100,64 @@ public class Bus implements SubscriptionChangeReceiver {
 
             if(rawConnection != null && rawConnection.isConnected())
                 rawConnection.close();
+
+            delta = 0;
         }
     };
 
     @Override
     public String toString() {
-        if(name == null)
-            return super.toString();
-        else
-            return name;
+        if(name == null) {
+            if(alias == null)
+                return super.toString();
+            else
+                return alias + " ()";
+        } else {
+            if(alias == null)
+                return "(" + name + ")";
+            else
+                return alias + " (" + name + ")";
+        }
     }
 
     public BusURL getConnection() {
         return url;
     }
 
+    /**
+     * Returns the name of the bus. This name is used internally and has to
+     * match a specific pattern. A human readable name can be set with 'alias
+     */
     public String getName() {
         return name;
     }
 
-    public void registerStatisticsReceiver(StatisticsReceiver receiver) {
-        if(!statisticsReceivers.contains(receiver))
-            statisticsReceivers.add(receiver);
+    public void setName(String name) {
+        if(BUS_NAME_PATTERN.matcher(name).matches()) {
+            this.name = name;
+            notifyListenersName();
+        }
     }
 
-    public void removeStatisticsReceiver(StatisticsReceiver receiver) {
-            statisticsReceivers.remove(receiver);
+    /**
+     * Returns the human readable name of the bus.
+     */
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+        notifyListenersAlias();
+    }
+
+    public void registerStatisticsReceiver(StatisticsListener receiver) {
+        if(!statisticsListeners.contains(receiver))
+            statisticsListeners.add(receiver);
+    }
+
+    public void removeStatisticsReceiver(StatisticsListener receiver) {
+            statisticsListeners.remove(receiver);
     }
 
     public void enableStatistics(int interval) {
@@ -138,11 +178,6 @@ public class Bus implements SubscriptionChangeReceiver {
         }
     }
 
-    public void setName(String name) {
-        this.name = name;
-        notifyListenersName();
-    }
-    
     /**
      * Shall be called if the bus is removed. This will inform all components
      * using the bus that it will not be present any more. Also all connections
@@ -158,25 +193,41 @@ public class Bus implements SubscriptionChangeReceiver {
         }
     }
 
-    private FrameReceiver rawReceiver = new FrameReceiver() {
+    private FrameListener rawReceiver = new FrameListener() {
 
         @Override
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
-                f.setTimestamp(timeSource.getTime());
-                f.setBusName(name);
+                long timestamp = f.getTimestamp();
+                if(timestamp != 0) {
+                    if(delta == 0) {
+                        delta = (timestamp/1000) - timeSource.getTime();
+                    }
+                    timestamp -= delta*1000;
+                    f.setTimestamp(timestamp);
+                } else {
+                    f.setTimestamp(timeSource.getTime()*1000);
+                }
                 deliverRAWFrame(f);
             }
         }
     };
 
-    private FrameReceiver bcmReceiver = new FrameReceiver() {
+    private FrameListener bcmReceiver = new FrameListener() {
 
         @Override
         public void newFrame(Frame f) {
             if(mode == TimeSource.Mode.PLAY) {
-                f.setTimestamp(timeSource.getTime());
-                f.setBusName(name);
+                long timestamp = f.getTimestamp();
+                if(timestamp != 0) {
+                    if(delta == 0) {
+                        delta = (timestamp/1000) - timeSource.getTime();
+                    }
+                    timestamp -= delta*1000;
+                    f.setTimestamp(timestamp);
+                } else {
+                    f.setTimestamp(timeSource.getTime()*1000);
+                }
                 deliverBCMFrame(f);
             }
         }
@@ -193,55 +244,73 @@ public class Bus implements SubscriptionChangeReceiver {
     public void setTimeSource(TimeSource timeSource) {
         if(this.timeSource != null)
             this.timeSource.deregister(timeReceiver);
-        
+
         this.timeSource = timeSource;
-        
+
         if(timeSource != null)
             timeSource.register(timeReceiver);
     }
 
     public Bus() {
-        subscriptionsRAW = new ArrayList<Subscription>();
-        subscriptionsBCM = new ArrayList<Subscription>();
-        listeners = new ArrayList<BusChangeListener>();
-        subscribedIDs = new HashSet<Integer>();
-        statisticsReceivers = new ArrayList<StatisticsReceiver>();
-        eventFrameReceivers = new ArrayList<EventFrameReceiver>();
+        listeners = new HashSet<BusChangeListener>();
+        statisticsListeners = new HashSet<StatisticsListener>();
+        eventFrameListeners = new HashSet<EventFrameListener>();
     }
 
 
     @Override
     public void addSubscription(Subscription s) {
         if(s.getSubscribeAll()) {
-            subscriptionsRAW.add(s);
+            synchronized(subscriptionsRAW) {
+                subscriptionsRAW.add(s);
+            }
             if(mode == TimeSource.Mode.PLAY)
                 openRAWConnection();
         } else {
-            subscriptionsBCM.add(s);
+            synchronized(subscriptionsBCM) {
+                subscriptionsBCM.add(s);
+            }
             if(mode == TimeSource.Mode.PLAY)
                 openBCMConnection();
         }
     }
 
     @Override
-    public void subscribed(int id, Subscription s) {
+    public void subscribed(int id, boolean extended, Subscription s) {
         if (subscriptionsBCM.contains(s)) {
             /* Check if the ID was already subscribed in any subscription */
-            if(!subscribedIDs.contains(id)) {
-                subscribedIDs.add(id);
-                if (bcmConnection != null && bcmConnection.isConnected()) {
-                    bcmConnection.subscribeTo(id, 0, 0);
-                } else {
-                    logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+            if(extended) {
+                synchronized(subscribedExtendedIDs) {
+                    if(!subscribedExtendedIDs.contains(id)) {
+                        subscribedExtendedIDs.add(id);
+                        if (bcmConnection != null && bcmConnection.isConnected()) {
+                            bcmConnection.subscribeTo(id, true, 0, 0);
+                        } else {
+                            logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+                        }
+                    }
+                }
+            } else {
+                synchronized(subscribedIDs) {
+                    if(!subscribedIDs.contains(id)) {
+                        subscribedIDs.add(id);
+                        if (bcmConnection != null && bcmConnection.isConnected()) {
+                            bcmConnection.subscribeTo(id, false, 0, 0);
+                        } else {
+                            logger.log(Level.WARNING, "A BCM subscription was made but no BCM connection is present");
+                        }
+                    }
                 }
             }
+        } else {
+            logger.log(Level.WARNING, "Unregistered subscription tried to subscribe!");
         }
     }
 
     @Override
-    public void unsubscribed(int id, Subscription s) {
+    public void unsubscribed(int id, boolean extended, Subscription s) {
         if(subscriptionsBCM.contains(s)) {
-            safeUnsubscribe(id);
+            safeUnsubscribe(id, extended);
         }
     }
 
@@ -253,9 +322,14 @@ public class Bus implements SubscriptionChangeReceiver {
             if(!subscriptionsRAW.contains(s))
                 subscriptionsRAW.add(s);
 
-            Set<Integer> ids = s.getAllIdentifiers();
+            Set<Integer> ids = s.getAllIdentifiers(false);
             for(Integer identifier : ids) {
-                safeUnsubscribe(identifier);
+                safeUnsubscribe(identifier, false);
+            }
+
+            ids = s.getAllIdentifiers(true);
+            for(Integer identifier : ids) {
+                safeUnsubscribe(identifier, true);
             }
 
             if(mode == TimeSource.Mode.PLAY) {
@@ -276,13 +350,23 @@ public class Bus implements SubscriptionChangeReceiver {
             if(mode == TimeSource.Mode.PLAY) {
                 openBCMConnection();
 
-                for(Integer identifier : s.getAllIdentifiers()) {
-                    bcmConnection.subscribeTo(identifier, 0, 0);
+                for(Integer identifier : s.getAllIdentifiers(true)) {
+                    bcmConnection.subscribeTo(identifier, true, 0, 0);
+                }
+
+                for(Integer identifier : s.getAllIdentifiers(false)) {
+                    bcmConnection.subscribeTo(identifier, false, 0, 0);
                 }
             }
-
-            for(Integer identifier : s.getAllIdentifiers()) {
-                subscribedIDs.add(identifier);
+            synchronized(subscribedExtendedIDs) {
+                for(Integer identifier : s.getAllIdentifiers(true)) {
+                    subscribedExtendedIDs.add(identifier);
+                }
+            }
+            synchronized(subscribedIDs) {
+                for(Integer identifier : s.getAllIdentifiers(false)) {
+                    subscribedIDs.add(identifier);
+                }
             }
         }
     }
@@ -291,25 +375,49 @@ public class Bus implements SubscriptionChangeReceiver {
     public void subscriptionTerminated(Subscription s) {
         removeSubscription(s);
     }
-    
+
     /**
      * Try to unsubscribe from the identifier. First all other subscriptions
      * are checked if they subscribe to this identifier. If so nothing will
      * be done.
      * @param identifier
      */
-    private void safeUnsubscribe(Integer identifier) {
-        Boolean found = false;
-        for (Subscription subscription : subscriptionsBCM) {
-            if (subscription.includes(identifier)) {
-                found = true;
-                break;
+    private void safeUnsubscribe(Integer identifier, boolean extended) {
+        Boolean found = Boolean.FALSE;
+
+        if(extended) {
+            synchronized(subscriptionsBCM) {
+                for (Subscription subscription : subscriptionsBCM) {
+                    if (subscription.includes(identifier, true)) {
+                        found = Boolean.TRUE;
+                        break;
+                    }
+                }
             }
-        }
-        if (!found) {
-            subscribedIDs.remove(identifier);
-            if(bcmConnection != null && bcmConnection.isConnected()) {
-                bcmConnection.unsubscribeFrom(identifier);
+            if (!found) {
+                synchronized(subscribedExtendedIDs) {
+                    subscribedExtendedIDs.remove(identifier);
+                }
+                if(bcmConnection != null && bcmConnection.isConnected()) {
+                    bcmConnection.unsubscribeFrom(identifier, true);
+                }
+            }
+        } else {
+            synchronized(subscriptionsBCM) {
+                for (Subscription subscription : subscriptionsBCM) {
+                    if (subscription.includes(identifier, false)) {
+                        found = Boolean.TRUE;
+                        break;
+                    }
+                }
+            }
+            if (!found) {
+                synchronized(subscribedIDs) {
+                    subscribedIDs.remove(identifier);
+                }
+                if(bcmConnection != null && bcmConnection.isConnected()) {
+                    bcmConnection.unsubscribeFrom(identifier, false);
+                }
             }
         }
     }
@@ -332,9 +440,12 @@ public class Bus implements SubscriptionChangeReceiver {
         if(subscriptionsBCM.contains(s)) {
             subscriptionsBCM.remove(s);
 
-            Set<Integer> identifiers = s.getAllIdentifiers();
-            for(Integer identifier : identifiers) {
-                safeUnsubscribe(identifier);
+            for(Integer identifier : s.getAllIdentifiers(false)) {
+                safeUnsubscribe(identifier, false);
+            }
+
+            for(Integer identifier : s.getAllIdentifiers(true)) {
+                safeUnsubscribe(identifier, true);
             }
         }
     }
@@ -362,14 +473,19 @@ public class Bus implements SubscriptionChangeReceiver {
      */
     public void setConnection(BusURL url) {
         disconnect();
-        
+
         this.url = url;
 
-        rawConnection = new RAWConnection(url);
-        bcmConnection = new BCMConnection(url);
+        if(url != null) {
+            rawConnection = new RAWConnection(url);
+            bcmConnection = new BCMConnection(url);
 
-        rawConnection.setReceiver(rawReceiver);
-        bcmConnection.setReceiver(bcmReceiver);
+            rawConnection.setListener(rawReceiver);
+            bcmConnection.setListener(bcmReceiver);
+        } else {
+            rawConnection = null;
+            bcmConnection = null;
+    }
 
         notifyListenersConnection();
     }
@@ -386,8 +502,6 @@ public class Bus implements SubscriptionChangeReceiver {
             bcmConnection.close();
         }
 
-        url = null;
-
         notifyListenersConnection();
     }
 
@@ -399,30 +513,48 @@ public class Bus implements SubscriptionChangeReceiver {
         /* Try to open BCM connection if not present */
         if(url != null) {
             openBCMConnection();
-            
+
             if (bcmConnection != null) {
                 bcmConnection.sendFrame(frame);
-            }  
+            }
         /* If no BCM connection is present we have to do loopback locally */
         } else {
-            frame.setTimestamp(timeSource.getTime());
+            frame.setTimestamp(timeSource.getTime() * 1000);
             deliverBCMFrame(frame);
             deliverRAWFrame(frame);
         }
     }
 
+    public void addSendJob(int id, boolean extended, byte[] data, long usec) {
+        if(url != null) {
+            openBCMConnection();
+
+            if (bcmConnection != null && bcmConnection.isConnected()) {
+                bcmConnection.addSendJob(id, extended, data,(int) (usec / 1000000), (int) (usec % 1000000));
+            }
+        }
+    }
+
+    public void removeSendJob(int id, boolean extended) {
+        if (bcmConnection != null && bcmConnection.isConnected()) {
+            bcmConnection.removeSendJob(id, extended);
+        }
+    }
+
     private void deliverBCMFrame(Frame frame) {
+        frame.setBus(this);
         for (Subscription s : subscriptionsBCM) {
             if (!s.isMuted()) {
-                s.deliverFrame(frame);
+                s.deliverFrame(frame, this);
             }
         }
     }
 
     private void deliverRAWFrame(Frame frame) {
+        frame.setBus(this);
         for (Subscription s : subscriptionsRAW) {
             if (!s.isMuted()) {
-                s.deliverFrame(frame);
+                s.deliverFrame(frame, this);
             }
         }
     }
@@ -440,11 +572,20 @@ public class Bus implements SubscriptionChangeReceiver {
         synchronized(listeners) {
             for(BusChangeListener listener : listeners) {
                 if(listener != null)
-                    listener.nameChanged();
+                    listener.nameChanged(name);
             }
         }
     }
-    
+
+    private void notifyListenersAlias() {
+        synchronized(listeners) {
+            for(BusChangeListener listener : listeners) {
+                if(listener != null)
+                    listener.aliasChanged(alias);
+            }
+        }
+    }
+
     private void notifyListenersDescriptionChanged() {
         synchronized(listeners) {
             for(BusChangeListener listener : listeners) {
@@ -465,13 +606,13 @@ public class Bus implements SubscriptionChangeReceiver {
             if(url != null) {
                 logger.log(Level.INFO, "Creating new BCM connection");
                 bcmConnection = new BCMConnection(url);
-                bcmConnection.setReceiver(bcmReceiver);
+                bcmConnection.setListener(bcmReceiver);
             } else {
                 logger.log(Level.WARNING, "Could not open BCM connection because no url was set");
                 return;
             }
-        } 
-       
+        }
+
         if (bcmConnection.isConnected()) {
             return;
         } else {
@@ -481,8 +622,15 @@ public class Bus implements SubscriptionChangeReceiver {
             /* Check for all present BCM subscriptions and bring the connection
              * up to date.
              */
-            for (Integer identifier : subscribedIDs) {
-                bcmConnection.subscribeTo(identifier, 0, 0);
+            synchronized(subscribedIDs) {
+                for (Integer identifier : subscribedIDs) {
+                    bcmConnection.subscribeTo(identifier, false, 0, 0);
+                }
+            }
+            synchronized(subscribedExtendedIDs) {
+                for (Integer identifier : subscribedExtendedIDs) {
+                    bcmConnection.subscribeTo(identifier, true, 0, 0);
+                }
             }
         }
 
@@ -498,7 +646,7 @@ public class Bus implements SubscriptionChangeReceiver {
             if(url != null) {
                 logger.log(Level.INFO, "Creating new RAW connection");
                 rawConnection = new RAWConnection(url);
-                rawConnection.setReceiver(rawReceiver);
+                rawConnection.setListener(rawReceiver);
             } else {
                 logger.log(Level.WARNING, "Could not open RAW connection because no url was set");
                 return;
@@ -513,24 +661,24 @@ public class Bus implements SubscriptionChangeReceiver {
             rawConnection.open();
         }
     }
-    
-    public void addEventFrameReceiver(EventFrameReceiver receiver) {
-        eventFrameReceivers.add(receiver);
+
+    public void addEventFrameListener(EventFrameListener listener) {
+        eventFrameListeners.add(listener);
     }
-    
-    public void removeEventFrameReceiver(EventFrameReceiver receiver) {
-        eventFrameReceivers.remove(receiver);
+
+    public void removeEventFrameListener(EventFrameListener listener) {
+        eventFrameListeners.remove(listener);
     }
-    
+
     public void sendEventFrame(EventFrame f) {
         f.setTimestamp(timeSource.getTime());
-        f.setBusName(name);
-        
-        for(EventFrameReceiver receiver : eventFrameReceivers) {
+        f.setBus(this);
+
+        for(EventFrameListener receiver : eventFrameListeners) {
             if(receiver != null)
                 receiver.newEventFrame(f);
         }
-        
+
         logger.log(Level.INFO, "received event frame{0}", f.getMessage());
     }
 
@@ -538,9 +686,9 @@ public class Bus implements SubscriptionChangeReceiver {
         this.description = desc;
         notifyListenersDescriptionChanged();
     }
-    
+
     public BusDescription getDescription() {
         return description;
     }
-    
+
 }

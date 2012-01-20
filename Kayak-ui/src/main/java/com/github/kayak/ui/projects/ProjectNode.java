@@ -29,6 +29,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
+import org.openide.util.Utilities;
 import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.Lookups;
 
@@ -48,36 +49,36 @@ public class ProjectNode extends AbstractNode {
         @Override
         public void projectClosed(Project p) {
             setChildren(Children.LEAF);
-            setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
+            setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/folder.png");
         }
 
         @Override
         public void projectOpened(Project p) {
-            setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
+            setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/status/folder-open.png");
             setChildren(Children.create(new ProjectChildFactory(project), true));
         }
 
         @Override
         public void projectBusAdded(Project p, Bus bus) {
-            
+
         }
 
         @Override
         public void projectBusRemoved(Project p, Bus bus) {
-            
+
         }
     };
 
     public ProjectNode(Project project) {
         super(Children.LEAF, Lookups.fixed(project));
-        setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
+        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/folder.png");
 
         this.project = project;
         project.addProjectChangeListener(changeListener);
 
         if (project.isOpened()) {
             setChildren(Children.create(new ProjectChildFactory(project), true));
-            setIconBaseWithExtension("org/freedesktop/tango/16x16/status/folder-open.png");
+            setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/status/folder-open.png");
         }
         super.setDisplayName(project.getName());
 
@@ -92,15 +93,25 @@ public class ProjectNode extends AbstractNode {
                 @Override
                 public Transferable paste() throws IOException {
                     if (url.checkConnection()) {
-                        String name = JOptionPane.showInputDialog("Please give a name for the Bus", url.getBus());
-
-                        if (name != null) {
-                            Bus b = new Bus();
-                            b.setName(name);
-                            project.addBus(b);
-                            b.setConnection(url);
-                            ConnectionManager.getGlobalConnectionManager().addRecent(url);
+                        Bus b = new Bus();
+                        b.setConnection(url);
+                        String newName = url.getBus();
+                        if(project.isBusNameValid(newName)) {
+                            b.setName(url.getBus());
+                        } else {
+                            b.setName(project.getNextValidBusName());
                         }
+
+                        String alias = JOptionPane.showInputDialog("Please input a alias for the Bus", url.getBus());
+
+                        if (alias != null) {
+
+                            b.setAlias(alias);
+
+                        }
+
+                        project.addBus(b);
+                        ConnectionManager.getGlobalConnectionManager().addRecent(url);
                     }
                     return null;
                 }
@@ -120,27 +131,12 @@ public class ProjectNode extends AbstractNode {
     @Override
     public Action[] getActions(boolean popup) {
         if (project.isOpened()) {
-            return new Action[]{new NewBusAction(project), new RenameAction(), new DeleteAction(), new CloseAction()};
+            return new Action[]{new NewBusAction(project), new RenameAction(), new DeleteProjectAction(project), new CloseAction()};
         } else {
-            return new Action[]{new OpenAction(), new RenameAction(), new DeleteAction(), };
+            return new Action[]{new OpenAction(), new RenameAction(), new DeleteProjectAction(project)};
         }
     }
 
-    private class DeleteAction extends AbstractAction {
-
-        public DeleteAction() {
-            putValue(NAME, "Delete");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (project.isOpened()) {
-                project.close();
-            }
-
-            ProjectManager.getGlobalProjectManager().removeProject(project);
-        }
-    };
 
     private class RenameAction extends AbstractAction {
 

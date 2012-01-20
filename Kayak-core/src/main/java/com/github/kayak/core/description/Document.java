@@ -18,16 +18,18 @@
 
 package com.github.kayak.core.description;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
- * @author dschanoeh
+ * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
 public class Document {
 
-    private HashSet<String> nodes;
-    private HashSet<BusDescription> busses;
+    private Set<Node> nodes;
+    private Set<BusDescription> busses;
     private String name;
     private String version;
     private String author;
@@ -35,12 +37,22 @@ public class Document {
     private String date;
     private String fileName;
 
-    public HashSet<String> getNodes() {
-        return nodes;
+    public Set<Node> getNodes() {
+        return Collections.unmodifiableSet(nodes);
     }
 
-    public void setNodes(HashSet<String> nodes) {
-        this.nodes = nodes;
+    public Node createNode(String id, String name) {
+        Node n = new Node(id, name);
+        nodes.add(n);
+        return n;
+    }
+
+    public Node getNodeWithID(String id) {
+        for(Node n : nodes) {
+            if(n.getId().equals(id))
+                return n;
+        }
+        return null;
     }
 
     public String getAuthor() {
@@ -67,17 +79,17 @@ public class Document {
         this.date = date;
     }
 
-    public HashSet<BusDescription> getBusses() {
-        return busses;
+    public Set<BusDescription> getBusDescriptions() {
+        return Collections.unmodifiableSet(busses);
     }
 
     public BusDescription createBusDescription() {
         BusDescription b = new BusDescription(this);
-        
+        busses.add(b);
         return b;
     }
-    
-    
+
+
     public String getName() {
         return name;
     }
@@ -95,7 +107,7 @@ public class Document {
     }
 
     public Document() {
-        nodes = new HashSet<String>();
+        nodes = new HashSet<Node>();
         busses = new HashSet<BusDescription>();
     }
 

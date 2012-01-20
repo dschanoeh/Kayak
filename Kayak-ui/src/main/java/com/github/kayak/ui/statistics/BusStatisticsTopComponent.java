@@ -20,11 +20,11 @@ package com.github.kayak.ui.statistics;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.BusChangeListener;
+import com.github.kayak.ui.projects.ProjectManager;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
@@ -33,12 +33,14 @@ import org.netbeans.api.settings.ConvertAsProperties;
  */
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.statistics//BusStatistics//EN",
 autostore = false)
+@TopComponent.Description(preferredID = "BusStatisticsTopComponent",
+iconBase="org/tango-project/tango-icon-theme/16x16/apps/utilities-system-monitor.png",
+persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
+@TopComponent.Registration(mode = "statistics", openAtStartup = false)
 public final class BusStatisticsTopComponent extends TopComponent {
 
+    private static final Logger logger = Logger.getLogger(BusStatisticsTopComponent.class.getName());
     private static BusStatisticsTopComponent instance;
-    /** path to the icon used by the component and its open action */
-//    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
-    private static final String PREFERRED_ID = "BusStatisticsTopComponent";
 
     private StatisticsTableModel model = new StatisticsTableModel();
     private Bus bus;
@@ -51,8 +53,8 @@ public final class BusStatisticsTopComponent extends TopComponent {
         }
 
         @Override
-        public void nameChanged() {
-            setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.getName());
+        public void nameChanged(String name) {
+            setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.toString());
         }
 
         @Override
@@ -62,7 +64,12 @@ public final class BusStatisticsTopComponent extends TopComponent {
 
         @Override
         public void descriptionChanged() {
-            
+
+        }
+
+        @Override
+        public void aliasChanged(String string) {
+            setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.toString());
         }
     };
 
@@ -70,9 +77,6 @@ public final class BusStatisticsTopComponent extends TopComponent {
         initComponents();
         setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent"));
         setToolTipText(NbBundle.getMessage(BusStatisticsTopComponent.class, "HINT_BusStatisticsTopComponent"));
-//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
-
     }
 
     /** This method is called from within the constructor to
@@ -111,24 +115,6 @@ public final class BusStatisticsTopComponent extends TopComponent {
         return instance;
     }
 
-    /**
-     * Obtain the BusStatisticsTopComponent instance. Never call {@link #getDefault} directly!
-     */
-    public static synchronized BusStatisticsTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(BusStatisticsTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-            return getDefault();
-        }
-        if (win instanceof BusStatisticsTopComponent) {
-            return (BusStatisticsTopComponent) win;
-        }
-        Logger.getLogger(BusStatisticsTopComponent.class.getName()).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
-        return getDefault();
-    }
 
     public void setBus(Bus bus) {
         this.bus = bus;
@@ -137,46 +123,32 @@ public final class BusStatisticsTopComponent extends TopComponent {
         bus.registerStatisticsReceiver(model);
         bus.enableStatistics(model.getInterval());
 
-        setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.getName());
-    }
-
-    @Override
-    public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_NEVER;
-    }
-
-    @Override
-    public void componentOpened() {
-        // TODO add custom code on component opening
-    }
-
-    @Override
-    public void componentClosed() {
-        
+        setName(NbBundle.getMessage(BusStatisticsTopComponent.class, "CTL_BusStatisticsTopComponent") + " - " + bus.toString());
     }
 
     void writeProperties(java.util.Properties p) {
-        // better to version settings since initial version as advocated at
-        // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
+
+        p.setProperty("busName", bus.getName());
+        ProjectManager manager = ProjectManager.getGlobalProjectManager();
+        p.setProperty("projectName", manager.getOpenedProject().getName());
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
-    }
 
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
+        String busName = p.getProperty("busName");
+        String projectName = p.getProperty("projectName");
+
+        logger.log(Level.INFO, "Trying to restore statistics view with project {0} and bus {1}", new String[]{projectName, busName});
+
+        Bus newBus = ProjectManager.getGlobalProjectManager().findBus(projectName, busName);
+
+        if (newBus == null) {
+            this.close();
+            return;
+        }
+
+        setBus(newBus);
     }
 }

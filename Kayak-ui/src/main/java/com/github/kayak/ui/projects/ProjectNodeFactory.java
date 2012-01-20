@@ -44,10 +44,8 @@ public class ProjectNodeFactory extends ChildFactory<Project> {
 
     @Override
     protected boolean createKeys(List<Project> toPopulate) {
-        for(Project p : manager.getProjects()) {
-            toPopulate.add(p);
-        }
-
+        toPopulate.addAll(manager.getProjects());
+        
         return true;
     }
 

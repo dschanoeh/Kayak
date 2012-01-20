@@ -19,7 +19,10 @@
 package com.github.kayak.core.description;
 
 import com.github.kayak.core.Frame;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -27,27 +30,36 @@ import java.util.HashSet;
  */
 public class MessageDescription {
 
+    public static final Comparator<MessageDescription> nameComparator = new Comparator<MessageDescription>() {
+
+        @Override
+        public int compare(MessageDescription o1, MessageDescription o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    };
+
     private int id;
+    private boolean extended;
     private int interval;
     private String name;
-    private String producer;
-    private HashSet<SignalDescription> signals;
-    private BusDescription bus;
+    private Node producer;
+    private final Set<SignalDescription> signals = Collections.synchronizedSet(new HashSet<SignalDescription>());
+    private final Set<MultiplexDescription> multiplexes = Collections.synchronizedSet(new HashSet<MultiplexDescription>());
 
-    public BusDescription getBus() {
-        return bus;
-    }
-
-    public String getProducer() {
+    public Node getProducer() {
         return producer;
     }
 
-    public void setProducer(String producer) {
+    public void setProducer(Node producer) {
         this.producer = producer;
     }
 
     public int getId() {
         return id;
+    }
+
+    public boolean isExtended() {
+        return extended;
     }
 
     public int getInterval() {
@@ -66,42 +78,71 @@ public class MessageDescription {
         this.name = name;
     }
 
-    public HashSet<SignalDescription> getSignals() {
-        return signals;
+    public Set<SignalDescription> getSignals() {
+        return Collections.unmodifiableSet(signals);
     }
 
-    public void setSignals(HashSet<SignalDescription> signals) {
-        this.signals = signals;
+    public Set<MultiplexDescription> getMultiplexes() {
+        return Collections.unmodifiableSet(multiplexes);
     }
 
-    protected MessageDescription(BusDescription bus, int id) {
-        signals = new HashSet<SignalDescription>();
-        this.bus = bus;
+    public void addMultiplex(MultiplexDescription m) {
+        synchronized(multiplexes) {
+            multiplexes.add(m);
+        }
+    }
+
+    public void addSignal(SignalDescription s) {
+        synchronized(signals) {
+            signals.add(s);
+        }
+    }
+
+    public MessageDescription(int id, boolean extended) {
         this.id = id;
+        this.extended = extended;
     }
 
-    public Message decodeFrame(Frame f) {
+    public Message decodeFrame(Frame f) throws DescriptionException {
+
+        if(f.isExtended() != extended || f.getIdentifier() != id)
+            return null;
 
         Message m = new Message();
         m.setId(id);
         m.setInterval(interval);
         m.setName(name);
-        m.setProducer(producer);
-        HashSet<Signal> ret = m.getSignals();
+        if(producer!=null)
+            m.setProducer(producer.getName());
+
+        byte[] data = f.getData();
+        HashSet<Signal> sig = new HashSet<Signal>();
 
         for(SignalDescription s : signals) {
-            Signal signal = s.decodeData(f.getData());
+            Signal signal = s.decodeData(data);
             if(s != null)
-                ret.add(signal);
+                sig.add(signal);
         }
-        
+
+        for(MultiplexDescription mul : multiplexes) {
+            sig.addAll(mul.decodeData(data));
+        }
+
+        m.setSignals(sig);
+
         return m;
     }
 
-    public SignalDescription createSignal() {
+    public SignalDescription createSignalDescription() {
         SignalDescription s = new SignalDescription(this);
         signals.add(s);
         return s;
+    }
+
+    public MultiplexDescription createMultiplexDescription() {
+        MultiplexDescription m = new MultiplexDescription(this);
+        multiplexes.add(m);
+        return m;
     }
 
 }

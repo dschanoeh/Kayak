@@ -11,8 +11,8 @@ import com.github.kayak.ui.projects.Project;
 import com.github.kayak.ui.projects.ProjectChangeListener;
 import com.github.kayak.ui.projects.ProjectManagementListener;
 import com.github.kayak.ui.projects.ProjectManager;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Children;
@@ -40,6 +40,7 @@ public class BusFactory extends ChildFactory<BusDescription> {
             for(Bus b : p.getBusses()) {
                 b.addBusChangeListener(busListener);
             }
+            refresh(true);
         }
     };
 
@@ -55,6 +56,8 @@ public class BusFactory extends ChildFactory<BusDescription> {
             for(Bus b : p.getBusses()) {
                 b.removeBusChangeListener(busListener);
             }
+            project = null;
+            refresh(true);
         }
 
         @Override
@@ -81,7 +84,7 @@ public class BusFactory extends ChildFactory<BusDescription> {
         }
 
         @Override
-        public void nameChanged() {
+        public void nameChanged(String name) {
         }
 
         @Override
@@ -91,6 +94,11 @@ public class BusFactory extends ChildFactory<BusDescription> {
         @Override
         public void descriptionChanged() {
             refresh(true);
+        }
+
+        @Override
+        public void aliasChanged(String string) {
+
         }
     };
 
@@ -109,7 +117,7 @@ public class BusFactory extends ChildFactory<BusDescription> {
     @Override
     protected boolean createKeys(List<BusDescription> list) {
         if(project != null) {
-            ArrayList<Bus> busses = project.getBusses();
+            Set<Bus> busses = project.getBusses();
 
             for(Bus b : busses) {
                 BusDescription desc = b.getDescription();
@@ -124,16 +132,13 @@ public class BusFactory extends ChildFactory<BusDescription> {
 
     @Override
     protected Node[] createNodesForKey(BusDescription key) {
-        AbstractNode node = new AbstractNode(Children.create(new MessageNodeFactory(key), true), Lookups.fixed(key));
-        node.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/network-workgroup.png");
-
-        String busName = null;
+        Bus bus = null;
         for(Bus b : project.getBusses()) {
             if(b.getDescription() == key)
-                busName = b.getName();
+                bus = b;
         }
-        node.setDisplayName(busName + " (" + key.getName() + ")");
-        return new Node[] { node };
+        
+        return new Node[] { new BusNode(key, bus) };
     }
-    
+
 }

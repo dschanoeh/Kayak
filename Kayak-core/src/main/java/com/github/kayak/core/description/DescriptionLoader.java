@@ -24,7 +24,7 @@ import java.io.File;
  * Interface that must be implemented by a factory that loads descriptions from
  * files. This is used to load descriptions from different file types in a
  * standard way.
- * @author dschanoeh
+ * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
 public interface DescriptionLoader {
 

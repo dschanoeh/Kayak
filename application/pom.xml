@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.netbeans.cluster</groupId>
             <artifactId>platform</artifactId>
-            <version>${netbeans.version}</version>
+            <version>RELEASE71</version>
             <type>pom</type>
         </dependency>
 
@@ -40,6 +40,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>Kayak-kcd</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>Kayak-mapview</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -83,6 +88,7 @@
                                 </configuration>
                             </execution>
                         </executions>
+                        <version>3.6</version>
                     </plugin>
                 </plugins>
             </build>

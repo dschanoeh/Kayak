@@ -28,9 +28,28 @@ public class FrameData {
 
     private int identifier;
     private byte[] data;
+    private boolean dataChanged;
     private int[] frequency;
     private long timestamp;
     private long interval;
+    private boolean inTable;
+    private boolean extended;
+
+    public boolean isDataChanged() {
+        return dataChanged;
+    }
+
+    public void setDataChanged(boolean dataChanged) {
+        this.dataChanged = dataChanged;
+    }
+
+    public boolean isInTable() {
+        return inTable;
+    }
+
+    public void setInTable(boolean inTable) {
+        this.inTable = inTable;
+    }
 
     public byte[] getData() {
         return data;
@@ -52,12 +71,19 @@ public class FrameData {
         return frequency;
     }
 
+    public boolean isExtended() {
+        return extended;
+    }
+
     public FrameData(Frame f) {
-        this.identifier = f.getIdentifier();
-        this.timestamp = f.getTimestamp();
-        this.data = f.getData();
-        this.frequency = new int[data.length];
-        this.interval = 0;
+        identifier = f.getIdentifier();
+        timestamp = f.getTimestamp();
+        data = f.getData();
+        frequency = new int[data.length];
+        for(int i=0;i<frequency.length;i++)
+            frequency[i] = 127;
+        interval = 0;
+        extended = f.isExtended();
     }
 
     public void updateWith(Frame frame) {
@@ -66,8 +92,8 @@ public class FrameData {
         byte[] newData = frame.getData();
         if(newData.length == data.length) {
             for(int i=0;i<data.length;i++) {
-                if(data[i] != newData[i] && frequency[i] < 255)
-                    frequency[i] += 2;
+                if(data[i] != newData[i] && frequency[i] < 253)
+                    frequency[i] += 4;
                 if(frequency[i]>=1)
                     frequency[i]--;
             }
@@ -81,6 +107,8 @@ public class FrameData {
 
         this.data = newData;
         this.timestamp = frame.getTimestamp();
+        this.dataChanged = true;
+        this.extended = frame.isExtended();
     }
 
 }

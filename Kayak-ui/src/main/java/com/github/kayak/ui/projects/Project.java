@@ -18,19 +18,21 @@
 
 package com.github.kayak.ui.projects;
 
-import com.github.kayak.core.*;
 import com.github.kayak.ui.time.TimeSourceManager;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import com.github.kayak.core.Bus;
 
 /**
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class Project {
-    
-    private ArrayList<Bus> busses;
+
+    private final Set<Bus> busses = Collections.synchronizedSet(new HashSet<Bus>());
     private String name;
-    private ArrayList<ProjectChangeListener> listeners;
+    private HashSet<ProjectChangeListener> listeners = new HashSet<ProjectChangeListener>();
     private boolean opened = false;
 
     public boolean isOpened() {
@@ -39,38 +41,69 @@ public class Project {
 
     public void open() {
         this.opened = true;
-        
+
         for(Bus b : busses) {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
         }
         notifyListenersOpened();
     }
-    
+
     public void close() {
         this.opened = false;
-        
+
         for(Bus b : busses) {
             b.setTimeSource(null);
             b.destroy();
         }
-        
+
         notifyListenersClosed();
+    }
+
+    public boolean isBusNameValid(String name) {
+        if(!Bus.BUS_NAME_PATTERN.matcher(name).matches())
+            return false;
+
+        synchronized (busses) {
+            for (Bus bus : busses) {
+                if (name.equals(bus.getName())) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public String getNextValidBusName() {
+        String n = "";
+        for(int i=0;;i++) {
+            n = "can" + String.valueOf(i);
+            if(isBusNameValid(n)) {
+                break;
+            }
+        }
+
+        return n;
     }
 
     public void addProjectChangeListener(ProjectChangeListener listener) {
         listeners.add(listener);
     }
-    
+
     public void removeProjectChangeListener(ProjectChangeListener listener) {
         listeners.remove(listener);
     }
 
-    public ArrayList<Bus> getBusses() {
-        return busses;
+    public Set<Bus> getBusses() {
+        return Collections.unmodifiableSet(busses);
     }
 
     public void addBus(Bus b) {
+        if(b == null)
+            return;
+
         busses.add(b);
+
         if(isOpened()) {
             b.setTimeSource(TimeSourceManager.getGlobalTimeSource());
         }
@@ -120,9 +153,6 @@ public class Project {
 
     public Project(String name) {
         this.name = name;
-        busses = new ArrayList<Bus>();
-        listeners = new ArrayList<ProjectChangeListener>();
     }
-
 
 }

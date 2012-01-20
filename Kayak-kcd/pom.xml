@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>RELEASE70</version>
+            <version>RELEASE701</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -71,7 +71,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.5</version>
+                <version>3.6</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publicPackages>
@@ -82,7 +82,6 @@
             </plugin>
 
             <plugin>
-                <!-- netbeans modules in 6.9+ are 1.6 compatible -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
@@ -95,7 +94,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.3.2</version>
                 <configuration>
                     <!-- to have the jar plugin pickup the nbm generated manifest -->
                     <useDefaultManifestFile>true</useDefaultManifestFile>
@@ -106,7 +105,7 @@
            <!-- Usage: mvn org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:generate -->
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.7.4</version>
+                <version>0.8.0</version>
                 <configuration>
                     <schemaDirectory>src/main/resources/com/github/kayak/canio/kcd/schema</schemaDirectory>
                     <schemaIncludes>

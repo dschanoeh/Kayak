@@ -19,6 +19,7 @@
 package com.github.kayak.ui;
 
 import com.github.kayak.ui.connections.ConnectionManager;
+import com.github.kayak.ui.descriptions.DescriptionManagement;
 import com.github.kayak.ui.projects.ProjectManager;
 import java.io.File;
 import java.io.IOException;
@@ -38,17 +39,17 @@ import org.openide.util.NbPreferences;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class ModuleLifecycleManager extends ModuleInstall {
-    
+
     private static final Logger logger = Logger.getLogger(ModuleLifecycleManager.class.getCanonicalName());
 
     @Override
     public void restored() {
         readConnections();
         readProjects();
-        
+
         /* make sure that the required folders exist */
         String homeFolder = System.getProperty("user.home");
-        
+
         String logDir = NbPreferences.forModule(ModuleLifecycleManager.class).get("Log file directory", homeFolder + "/kayak/log/");
         File logDirFile = new File(logDir);
         if(!logDirFile.exists()) {
@@ -57,7 +58,7 @@ public class ModuleLifecycleManager extends ModuleInstall {
                 logger.log(Level.SEVERE, "Could not create directory!");
             }
         }
-        
+
         String descriptionDir = NbPreferences.forModule(ModuleLifecycleManager.class).get("Bus description directory", homeFolder + "/kayak/descriptions/");
         File descriptionDirFile = new File(descriptionDir);
         if(!descriptionDirFile.exists()) {

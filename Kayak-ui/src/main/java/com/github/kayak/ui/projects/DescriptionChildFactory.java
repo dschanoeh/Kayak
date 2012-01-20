@@ -32,35 +32,40 @@ import org.openide.nodes.Node;
 public class DescriptionChildFactory extends ChildFactory<BusDescription> {
 
     private Bus bus;
-    
+
     private BusChangeListener listener = new BusChangeListener() {
 
         @Override
         public void connectionChanged() {
-            
+
         }
 
         @Override
-        public void nameChanged() {
-            
+        public void nameChanged(String name) {
+
         }
 
         @Override
         public void destroyed() {
-            
+
         }
 
         @Override
         public void descriptionChanged() {
             refresh(true);
         }
+
+        @Override
+        public void aliasChanged(String string) {
+            
+        }
     };
-    
+
     public DescriptionChildFactory(Bus bus) {
         this.bus = bus;
         bus.addBusChangeListener(listener);
     }
-    
+
     @Override
     protected boolean createKeys(List<BusDescription> list) {
         BusDescription desc = bus.getDescription();

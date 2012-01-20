@@ -18,8 +18,10 @@
 package com.github.kayak.core.description;
 
 import java.nio.ByteOrder;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A SignalDescription contains the parameters and methods to extract
@@ -27,6 +29,14 @@ import java.util.HashSet;
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
 public class SignalDescription {
+
+    public static final Comparator<SignalDescription> nameComparator = new Comparator<SignalDescription>() {
+
+        @Override
+        public int compare(SignalDescription o1, SignalDescription o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    };
 
     public static enum Type {
         SIGNED, UNSIGNED, SINGLE, DOUBLE
@@ -40,21 +50,53 @@ public class SignalDescription {
     private String notes;
     private String name;
     private Type type;
-    private HashMap<Integer, String> labels;
-    private HashSet<String> consumer;
+    private Set<Label> labels = new HashSet<Label>();
+    private Set<Node> consumers = new HashSet<Node>();
     private ByteOrder byteOrder;
-    private MessageDescription message;
+    private Object parent;
+    private boolean multiplexed = false;
+    private MultiplexDescription multiplexDescription;
+    private MessageDescription description;
+    private long multiplexCount;
 
-    public MessageDescription getMessage() {
-        return message;
+    public void addLabel(Label l) {
+        labels.add(l);
     }
 
-    public HashSet<String> getConsumer() {
-        return consumer;
+    public Set<Label> getAllLabels() {
+        return Collections.unmodifiableSet(labels);
     }
 
-    public void setConsumer(HashSet<String> consumer) {
-        this.consumer = consumer;
+    public MessageDescription getDescription() {
+        return description;
+    }
+
+    public long getMultiplexCount() {
+        return multiplexCount;
+    }
+
+    public MessageDescription getMessageDescription() {
+        return description;
+    }
+
+    public MultiplexDescription getMultiplexDescription() {
+        return multiplexDescription;
+    }
+
+    public boolean isMultiplexed() {
+        return multiplexed;
+    }
+
+    public Object getParent() {
+        return parent;
+    }
+
+    public Set<Node> getConsumers() {
+        return Collections.unmodifiableSet(consumers);
+    }
+
+    public void addConsumer(Node consumer) {
+        consumers.add(consumer);
     }
 
     public ByteOrder getByteOrder() {
@@ -129,7 +171,7 @@ public class SignalDescription {
         this.unit = unit;
     }
 
-    protected SignalDescription(MessageDescription message) {
+    protected SignalDescription(MessageDescription description) {
         byteOrder = ByteOrder.LITTLE_ENDIAN;
         length = 1;
         offset = 0;
@@ -138,38 +180,79 @@ public class SignalDescription {
         intercept = 0;
         slope = 1;
         type = Type.UNSIGNED;
-        this.message = message;
+        this.description = description;
     }
 
-    public Signal decodeData(byte[] data) {
+    protected SignalDescription(MultiplexDescription multiplexDescription, MessageDescription description, long multiplexCount) {
+        byteOrder = ByteOrder.LITTLE_ENDIAN;
+        length = 1;
+        offset = 0;
+        unit = "";
+        notes = "";
+        intercept = 0;
+        slope = 1;
+        type = Type.UNSIGNED;
+        this.multiplexDescription = multiplexDescription;
+        multiplexed = true;
+        this.description = description;
+        this.multiplexCount = multiplexCount;
+    }
+
+    /**
+     * Decode the binary data according to the signal information in this
+     * description. may return null if this is a multiplexed signal and the
+     * multiplex count does not match.
+     * @param data
+     * @return
+     */
+    public Signal decodeData(byte[] data) throws DescriptionException {
+
+        if(multiplexed) {
+            long rawValue = SignalDescription.extractBits(data, multiplexDescription.getOffset(), multiplexDescription.getLength(), multiplexDescription.getByteOrder());
+
+            if(rawValue != multiplexCount)
+                return null;
+        }
+
         Signal signal = new Signal();
         signal.setUnit(unit);
         signal.setNotes(notes);
+        signal.setDescription(this);
 
         /* read raw value */
         long rawValue = extractBits(data, offset, length, byteOrder);
 
         signal.setRawValue(rawValue);
 
-        switch(type) {  
+        switch(type) {
             case SIGNED:
                 long signBit = (long) (1L << ((long) length - 1L));
                 long signedRawValue = rawValue - ((rawValue & signBit) << 1);
-                long signedValue = signedRawValue * (long) slope + (long) intercept;
-                signal.setValue(Long.toString(signedValue));
+                double signedValue = (double) signedRawValue * slope + intercept;
+                signal.setValue(signedValue);
                 break;
             case UNSIGNED:
-                long unsignedValue = rawValue * (long) slope + (long) intercept;
-                signal.setValue(Long.toString(unsignedValue));
+                double unsignedValue = (double) rawValue * slope +  intercept;
+                signal.setValue(unsignedValue);
                 break;
             case SINGLE:
                 float floatValue = (float) rawValue * (float) slope + (float) intercept;
-                signal.setValue(Float.toString(floatValue));
+                signal.setValue((double) floatValue);
                 break;
             case DOUBLE:
                 double doubleValue = (double) rawValue * slope + intercept;
-                signal.setValue(Double.toString(doubleValue));
+                signal.setValue(doubleValue);
                 break;
+        }
+
+        /* find all labels that match for the current raw value */
+        if(!labels.isEmpty()) {
+            Set<String> matchingLabels = new HashSet<String>();
+            for(Label l : labels) {
+                if(l.isInRange(rawValue))
+                    matchingLabels.add(l.getLabel());
+            }
+            signal.setLabels(matchingLabels);
         }
 
         return signal;
@@ -188,15 +271,20 @@ public class SignalDescription {
      * @param order The {@link ByteOrder} for the extraction
      * @return Long representation of the extracted bits
      */
-    private long extractBits(byte[] data, int offset, int length, ByteOrder order) {
+    protected static long extractBits(byte[] data, int offset, int length, ByteOrder order) throws DescriptionException {
         long val = 0;
+
+        /* Check if the data array is too short for this signal */
+        if(data.length < ((offset+length+7) / 8)) {
+            throw new DescriptionException(DescriptionException.Cause.FRAME_LENGTH);
+        }
 
         if(order == ByteOrder.LITTLE_ENDIAN) {
             for (int i = 0; i < length; i++) {
                 int bitNr = i + offset;
                 val |= ((data[bitNr >> 3] >> (bitNr & 0x07)) & 1) << i;
             }
-        } else {            
+        } else {
             for (int i = 0; i < length; i++) {
                 int bitNr = offset + length - i -1;
                 val |= ((data[bitNr >> 3] >> (7-(bitNr & 0x07))) & 1) << i;

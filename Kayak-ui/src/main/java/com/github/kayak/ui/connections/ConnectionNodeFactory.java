@@ -18,18 +18,12 @@
 
 package com.github.kayak.ui.connections;
 
-import com.github.kayak.core.BusURL;
 import java.util.List;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Node;
 
-/**
- *
- * @author dsi9mjn
- */
 public class ConnectionNodeFactory extends ChildFactory {
-    private ConnectionManager manager = ConnectionManager.getGlobalConnectionManager();
 
     private static enum Folder {
         DISCOVERY, FAVOURITES, RECENT;
@@ -55,23 +49,23 @@ public class ConnectionNodeFactory extends ChildFactory {
                 case DISCOVERY:
                     AbstractNode discoveryNode = new AbstractNode(new ConnectionChildrenFactory(BusURLNode.Type.DISCOVERY));
                     discoveryNode.setDisplayName("Auto discovery");
-                    discoveryNode.setIconBaseWithExtension("org/freedesktop/tango/16x16/devices/network-wireless.png");
+                    discoveryNode.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/devices/network-wireless.png");
                     return new Node[] { discoveryNode };
                 case FAVOURITES:
                     AbstractNode favouritesFolderNode = new AbstractNode(new ConnectionChildrenFactory(BusURLNode.Type.FAVOURITE));
                     favouritesFolderNode.setDisplayName("Favourites");
-                    favouritesFolderNode.setIconBaseWithExtension("org/freedesktop/tango/16x16/actions/bookmark-new.png");
+                    favouritesFolderNode.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/actions/bookmark-new.png");
                     return new Node[] { favouritesFolderNode };
                 case RECENT:
                     AbstractNode recentFolderNode = new AbstractNode(new ConnectionChildrenFactory(BusURLNode.Type.RECENT));
                     recentFolderNode.setDisplayName("Recent");
-                    recentFolderNode.setIconBaseWithExtension("org/freedesktop/tango/16x16/places/folder.png");
+                    recentFolderNode.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/folder.png");
                     return new Node[] { recentFolderNode };
                 default:
                     return null;
             }
         }
-        
+
         return null;
     }
 

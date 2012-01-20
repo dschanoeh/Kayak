@@ -18,16 +18,16 @@
 package com.github.kayak.core;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
@@ -42,7 +42,7 @@ import java.util.zip.GZIPOutputStream;
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
 public class LogFile {
-    
+
     private static final Logger logger = Logger.getLogger(LogFile.class.getCanonicalName());
 
     private Boolean compressed;
@@ -51,16 +51,31 @@ public class LogFile {
     private String description;
     private String platform;
     private HashMap<String, String> deviceAlias;
-    private long length;
-    
+    private long startTime;
+    private long stopTime;
+    private long startPosition;
+
     public static final Pattern platformPattern = Pattern.compile("[A-Z0-9_]+");
     public static final Pattern descriptionPattern = Pattern.compile("[a-zA-Z0-9\\s]+");
-    public static final Pattern descriptionLinePattern = Pattern.compile("DESCRIPTION \"[a-zA-Z0-9\\s]+\"");
+    public static final Pattern descriptionLinePattern = Pattern.compile("DESCRIPTION \"[^\"]+\"");
     public static final Pattern platformLinePattern = Pattern.compile("PLATFORM [A-Z0-9_]+");
     public static final Pattern deviceAliasLinePattern = Pattern.compile("DEVICE_ALIAS [A-Za-z0-9]+ [a-z0-9]{1,16}");
 
+    public long getStartPosition() {
+        return startPosition;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public long getStopTime() {
+        return stopTime;
+    }
+
+
     public long getLength() {
-        return length;
+        return stopTime - startTime;
     }
 
     public long getSize() {
@@ -75,16 +90,9 @@ public class LogFile {
         return deviceAlias.get(s);
     }
 
-    public ArrayList<String> getBusses() {
-        ArrayList<String> busNames = new ArrayList<String>();
+    public Set<String> getBusses() {
         Set<String> keys = deviceAlias.keySet();
-
-        for (String bus : keys) {
-            busNames.add(deviceAlias.get(bus));
-        }
-
-        return busNames;
-
+        return keys;
     }
 
     public String getDescription() {
@@ -102,111 +110,21 @@ public class LogFile {
     public String getFileName() {
         return file.getName();
     }
-    
+
     public void setPlatform(String platform) throws FileNotFoundException, IOException {
         if(!platformPattern.matcher(platform).matches())
             throw new IllegalArgumentException("Platform must match " + platformPattern.pattern());
 
-        File tempFile = new File(file.getAbsolutePath() + ".tmp");
-        BufferedReader br;
-        PrintWriter pw;
-        
-        if(compressed) {
-            GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
-            br = new BufferedReader(new InputStreamReader(zipStream));
-            GZIPOutputStream outStream = new GZIPOutputStream(new FileOutputStream(tempFile));
-            pw = new PrintWriter(outStream);
-        } else {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            pw = new PrintWriter(new FileWriter(tempFile));
-        }
-
-        String line = null;
-        boolean written = false;
-
-        while ((line = br.readLine()) != null) {
-            /* If line is found overwrite it */
-            if (!written && line.startsWith(("PLATFORM"))) {
-                pw.println("PLATFORM " + platform);
-                written = true;
-            /* If header has no such field add it */
-            } else if(!written && line.startsWith("(")) {
-                pw.println("PLATFORM " + platform);
-                pw.println(line);
-                written = true;
-            /* Write all other header lines */
-            } else {
-                pw.println(line);
-                pw.flush();
-            }
-        }
-        
-        pw.close();
-        br.close();
-
-        if (!file.delete()) {
-            logger.log(Level.WARNING, "Could not delete old file");
-            return;
-        }
-
-        if (!tempFile.renameTo(file)) {
-            logger.log(Level.WARNING, "Could not rename new file to old filename");
-        }
-        
         this.platform = platform;
+        rewriteHeader();
     }
-    
+
     public void setDescription(String description) throws FileNotFoundException, IOException {
         if(!descriptionPattern.matcher(description).matches())
             throw new IllegalArgumentException("Description must match " + descriptionPattern.pattern());
 
-        File tempFile = new File(file.getAbsolutePath() + ".tmp");
-        BufferedReader br;
-        PrintWriter pw;
-        
-        if(compressed) {
-            GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
-            br = new BufferedReader(new InputStreamReader(zipStream));
-            GZIPOutputStream outStream = new GZIPOutputStream(new FileOutputStream(tempFile));
-            pw = new PrintWriter(outStream);
-        } else {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            pw = new PrintWriter(new FileWriter(tempFile));
-        }
-
-        String line = null;
-        boolean written = false;
-
-        while ((line = br.readLine()) != null) {
-            /* If line is found overwrite it */
-            if (!written && line.startsWith(("DESCRIPTION"))) {
-                pw.println("DESCRIPTION \"" + description + "\"");
-                written = true;
-            /* If header has no such field add it */
-            } else if(!written && line.startsWith("(")) {
-                pw.println("DESCRIPTION \"" + description + "\"");
-                pw.println(line);
-                written = true;
-            /* Write all other header lines */
-            } else {
-                pw.println(line);
-                pw.flush();
-            }
-        }
-        
-        pw.close();
-        br.close();
-
-        if (!file.delete()) {
-            logger.log(Level.WARNING, "Could not delete old file");
-            return;
-        }
-
-        if (!tempFile.renameTo(file)) {
-            logger.log(Level.WARNING, "Could not rename new file to old filename");
-        }
-        
         this.description = description;
+        rewriteHeader();
     }
 
     public LogFile(File file) throws FileNotFoundException, IOException {
@@ -225,60 +143,194 @@ public class LogFile {
         }
 
         parseHeader();
+        findPositions();
+    }
+
+    private void rewriteHeader() throws FileNotFoundException, IOException {
+        BufferedWriter wr = null;
+        BufferedReader br = null;
+        File tempFile = new File(file.getAbsolutePath() + ".tmp");
+        if(compressed) {
+            GZIPInputStream zipStream = new GZIPInputStream(new FileInputStream(file));
+            br = new BufferedReader(new InputStreamReader(zipStream));
+            GZIPOutputStream outStream = new GZIPOutputStream(new FileOutputStream(tempFile));
+            wr = new BufferedWriter(new OutputStreamWriter(outStream));
+        } else {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile)));
+        }
+
+        String line = null;
+        boolean descriptionWritten = false;
+        boolean platformWritten = false;
+
+        /* update header */
+        while ((line = br.readLine()) != null) {
+            if (descriptionLinePattern.matcher(line).matches()) {
+                wr.write("DESCRIPTION \"");
+                wr.write(description);
+                wr.write("\"\n");
+                descriptionWritten = true;
+            } else if(platformLinePattern.matcher(line).matches()) {
+                wr.write("PLATFORM ");
+                wr.write(platform);
+                wr.write("\n");
+                platformWritten = true;
+            } else if(line.startsWith("(")) {
+                if(!descriptionWritten) {
+                    wr.write("DESCRIPTION \"");
+                    wr.write(description);
+                    wr.write("\"\n");
+                }
+
+                if(!platformWritten) {
+                    wr.write("PLATFORM ");
+                    wr.write(platform);
+                    wr.write("\n");
+                }
+
+                wr.write(line);
+                wr.append('\n');
+                break;
+            /* Write all other lines */
+            } else {
+                wr.write(line);
+                wr.append('\n');
+            }
+        }
+
+        /* write rest of file without checking */
+        char[] buff = new char[4096];
+        int len;
+        while ((len = br.read(buff, 0, 4096)) > 0) {
+            wr.write(buff, 0, len);
+        }
+
+        wr.close();
+        br.close();
+
+        if (!file.delete()) {
+            logger.log(Level.WARNING, "Could not delete old file");
+            return;
+        }
+
+        if (!tempFile.renameTo(file)) {
+            logger.log(Level.WARNING, "Could not rename new file to old filename");
+        }
     }
 
     private void parseHeader() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        long startTime = 0;
         try {
             while (true) {
-
                 String line = reader.readLine();
 
-                if (line.startsWith("DESCRIPTION")) {
-                    if (descriptionLinePattern.matcher(line).matches()) {
-                        int start = line.indexOf('\"') + 1;
-                        int stop = line.lastIndexOf("\"");
-                        description = line.substring(start, stop);
+                if(line == null)
+                    break;
+
+                if(descriptionLinePattern.matcher(line).matches()) {
+                    int start = line.indexOf('\"') + 1;
+                    int stop = line.lastIndexOf("\"");
+                    description = line.substring(start, stop);
+                } else if(platformLinePattern.matcher(line).matches()) {
+                    int start = line.indexOf(' ') + 1;
+                    platform = line.substring(start);
+                } else if (deviceAliasLinePattern.matcher(line).matches()) {
+                    int start = line.indexOf(' ') + 1;
+                    int stop = line.lastIndexOf(' ');
+                    String alias = line.substring(start, stop);
+                    String bus = line.substring(stop + 1);
+                    deviceAlias.put(bus, alias);
+                /*
+                 * All lines that are not recognized and not pure whitespace cause
+                 * the header parsing to abort.
+                 */
+                } else if (line.startsWith("(")) {
+                    if (description.equals("")) {
+                        description = file.getName();
                     }
-                } else if (line.startsWith("PLATFORM")) {
-                    if(platformLinePattern.matcher(line).matches()) {
-                        int start = line.indexOf(' ') + 1;
-                        platform = line.substring(start);
+                    if (platform.equals("")) {
+                        platform = "No platform";
                     }
-                } else if (line.startsWith("DEVICE_ALIAS")) {
-                    if (deviceAliasLinePattern.matcher(line).matches()) {
-                        int start = line.indexOf(' ') + 1;
-                        int stop = line.lastIndexOf(' ');
-                        String alias = line.substring(start, stop);
-                        String bus = line.substring(stop + 1);
-                        deviceAlias.put(bus, alias);
-                    }
-                    /*
-                     * All lines that are not recognized and not pure whitespace cause
-                     * the header parsing to abort.
-                     */
-                } else {
-                    if (!line.matches("\\s")) {
-                        if (description.equals("")) {
-                            description = file.getName();
-                        }
-                        if (platform.equals("")) {
-                            platform = "No platform";
-                        }
-                        break;
-                    }
+
+                    Frame f = Frame.fromLogFileNotation(line).getFrame();
+                    startTime = f.getTimestamp();
+                    break;
                 }
             }
+
         } catch (IOException ex) {
-            return;
+            logger.log(Level.WARNING, "IOException while loading log file.", ex);
         } finally {
             try {
                 reader.close();
             } catch (Exception ex) {
+                logger.log(Level.WARNING, "Could not close reader.", ex);
             }
-            ;
         }
-
-        /* TODO: get length of file */
     }
+
+    private void findPositions() {
+        RandomAccessFile newFile = null;
+        try {
+            newFile = new RandomAccessFile(file, "r");
+
+            while(true) {
+                long posBefore = newFile.getFilePointer();
+                String line = newFile.readLine();
+                if(line.startsWith("(")) {
+                    Frame f = Frame.fromLogFileNotation(line).getFrame();
+                    startTime = f.getTimestamp();
+                    startPosition = posBefore;
+                    break;
+                }
+            }
+
+            for(long checkPos = newFile.length() - 10;checkPos>0;checkPos--) {
+                newFile.seek(checkPos);
+
+                String line = newFile.readLine();
+
+                if(line != null) {
+                    Frame.FrameBusNamePair pair = Frame.fromLogFileNotation(line);
+
+                    if(pair != null) {
+                        newFile.seek(checkPos);
+                        stopTime = pair.getFrame().getTimestamp();
+                        break;
+                    }
+                }
+            }
+        } catch(IOException ex) {
+            logger.log(Level.INFO, "Exception while finding positions.", ex);
+        } finally {
+            try {
+                newFile.close();
+            } catch (Exception ex) {
+                Logger.getLogger(SeekableLogFileReplay.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LogFile other = (LogFile) obj;
+        if(other.getFileName().equals(getFileName()))
+            return true;
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getFileName().hashCode();
+    }
+
 }

@@ -1,19 +1,19 @@
 /**
  * 	This file is part of Kayak.
- *	
+ *
  *	Kayak is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU Lesser General Public License as published by
  *	the Free Software Foundation, either version 3 of the License, or
  *	(at your option) any later version.
- *	
+ *
  *	Kayak is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
- *	
+ *
  *	You should have received a copy of the GNU Lesser General Public License
  *	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
- *	
+ *
  */
 package com.github.kayak.logging.options;
 
@@ -28,7 +28,6 @@ final class LoggingPanel extends javax.swing.JPanel {
     LoggingPanel(LoggingOptionsPanelController controller) {
         this.controller = controller;
         initComponents();
-        // TODO listen to changes in form fields and call controller.changed()
     }
 
     /** This method is called from within the constructor to
@@ -49,6 +48,7 @@ final class LoggingPanel extends javax.swing.JPanel {
         jTextField2 = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jTextField3 = new javax.swing.JTextField();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -73,10 +73,12 @@ final class LoggingPanel extends javax.swing.JPanel {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        jPanel1.add(jButton1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         add(jPanel1, gridBagConstraints);
 
@@ -111,10 +113,18 @@ final class LoggingPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanel2.add(jTextField3, gridBagConstraints);
 
+        jCheckBox1.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(LoggingPanel.class, "LoggingPanel.jCheckBox1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        jPanel2.add(jCheckBox1, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(jPanel2, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -130,37 +140,40 @@ final class LoggingPanel extends javax.swing.JPanel {
         jTextField1.setText(Options.getLogFilesFolder());
         jTextField2.setText(String.valueOf(Options.getSnapshotBufferDepth()));
         jTextField3.setText(String.valueOf(Options.getSnapshotBufferFinish()));
+        jCheckBox1.setSelected(Options.getSnapshotsEnabled());
     }
 
     void store() {
         NbPreferences.forModule(LoggingPanel.class).put("Log file directory", jTextField1.getText());
         NbPreferences.forModule(LoggingPanel.class).put("Snapshot buffer depth", jTextField2.getText());
         NbPreferences.forModule(LoggingPanel.class).put("Snapshot buffer finish", jTextField3.getText());
+        NbPreferences.forModule(LoggingPanel.class).putBoolean("Snapshots enabled", jCheckBox1.isSelected());
     }
 
     boolean valid() {
         File logDir = new File(jTextField1.getText());
 
-        
+
         if(!logDir.isDirectory() ||
                 !logDir.canRead() ||
                 !logDir.canWrite())
             return false;
-                    
+
         try {
             int a = Integer.parseInt(jTextField2.getText());
             int b = Integer.parseInt(jTextField3.getText());
-            
+
             if(a < 0 || b < 0)
                 return false;
         } catch (Exception ex) {
             return false;
         }
-        
+
         return true;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
