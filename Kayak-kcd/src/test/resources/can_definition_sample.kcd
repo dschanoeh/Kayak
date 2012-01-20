@@ -17,7 +17,7 @@
 --> 
 <NetworkDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="Definition.xsd"
- version="0.3">
+ version="0.6">
 	<Document name="The Homer" version="1.23" author="Herbert Powell" company="Powell Motors" date="1991-02-16">
 	A car designed by Homer J. Simpson that the average american consumer would want to buy.
 	The Homer has two bubble domes: one in the front and one for quarreling kids. 
@@ -84,15 +84,15 @@
 	     			<Signal name="Info7" offset="8" length="8"/>
 	     		</MuxGroup>
 	     	</Multiplex>   	
-	     	<Signal name="OutsideTemp" offset="18" length="12" endianess="little" >
+	     	<Signal name="OutsideTemp" offset="18" length="12" endianess="little">
 	     	  <Notes>Outside temperature.</Notes>
 	     	  <Consumer>
 	     	  	<NodeRef id="12"/>
 	     	  </Consumer>
-	     	  <Value type="unsigned" slope="0.5" intercept="-40" unit="Cel"/>
+	     		<Value type="unsigned" slope="0.05" intercept="-40" unit="Cel" min="0" max="100"/>
 	       	  <LabelSet>
 	     	    <Label name="init" value="0"/>
-	     	    <LabelGroup type="error" name="Sensor error" from="1021" to="1023"/>
+	     	    <LabelGroup type="error" name="Sensor error" from="4090" to="4095"/>
 			  </LabelSet>	     			
 		   </Signal>
 	       <Signal name="SpeedKm" offset="30" length="24">
@@ -359,13 +359,26 @@
 			<Producer>
 				<NodeRef id="8"/>
 			</Producer>
-			<Signal name="Day" offset="0" length="8"/>
-			<Signal name="Month" offset="8" length="8"/>
-			<Signal name="Year" offset="16" length="8"/>
+			<Signal name="Day" offset="0" length="8">
+				<Value unit="d" min="1" max="31"/>
+			</Signal>
+			<Signal name="Month" offset="8" length="8">
+				<Value unit="mo" min="1" max="12"/>
+			</Signal>
+			<Signal name="Year" offset="16" length="8">
+				<Notes>Year starts with offset 2000. 2012 would be value 12.</Notes>
+				<Value unit="a" min="0" max="100"/>
+			</Signal>
 			<Signal name="Weekday" offset="24" length="8"/>
-			<Signal name="Hour" offset="32" length="8"/>
-			<Signal name="Minute" offset="40" length="8"/>
-			<Signal name="Second" offset="48" length="8"/>
+			<Signal name="Hour" offset="32" length="8">
+				<Value unit="h" min="0" max="23"/>
+			</Signal>
+			<Signal name="Minute" offset="40" length="8">
+				<Value unit="min" min="0" max="59"/>
+			</Signal>
+			<Signal name="Second" offset="48" length="8">
+				<Value unit="s" min="0" max="59"/>
+			</Signal>
 		</Message>
 	</Bus>
 </NetworkDefinition>
