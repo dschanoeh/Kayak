@@ -107,7 +107,7 @@
                 <artifactId>maven-jaxb2-plugin</artifactId>
                 <version>0.8.0</version>
                 <configuration>
-                    <schemaDirectory>src/main/resources/com/github/kayak/canio/kcd/schema</schemaDirectory>
+                    <schemaDirectory>src/main/resources/com/github/kayak/canio/kcd/loader</schemaDirectory>
                     <schemaIncludes>
                         <include>Definition.xsd</include>
                     </schemaIncludes>
