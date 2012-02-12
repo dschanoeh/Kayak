@@ -16,7 +16,7 @@
   along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
   
 --> 
-<xs:schema version="0.6" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema version="0.7" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="NetworkDefinition">
     <xs:annotation>
       <xs:documentation>Definition of one or more CAN bus networks in one file.</xs:documentation>
@@ -24,7 +24,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="1" ref="Document"/>
-        <xs:element maxOccurs="unbounded" ref="Node"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Node"/>
         <xs:element maxOccurs="unbounded" ref="Bus"/>
       </xs:sequence>
       <xs:attribute name="version" type="xs:string" use="required">
@@ -212,9 +212,8 @@
           <xs:documentation>Count value of the Multiplex when the signals of this group become valid.</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:restriction base="xs:nonNegativeInteger">
+          <xs:restriction base="xs:long">
             <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="1000000"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
