@@ -40,7 +40,7 @@ iconBase="org/tango-project/tango-icon-theme/16x16/apps/accessories-text-editor.
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "management", openAtStartup = true)
 @ActionID(category = "Window", id = "com.github.kayak.logging.LogFilesTopComponent")
-@ActionReference(path = "Window", position = 10)
+@ActionReference(path = "Menu/Window", position = 10)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_LogFilesAction",
 preferredID = "LogFilesTopComponent")
 public final class LogFilesTopComponent extends TopComponent implements ExplorerManager.Provider {
