@@ -16,7 +16,11 @@
   along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
   
 --> 
-<xs:schema version="0.7" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+					 targetNamespace="http://kayak.2codeornot2code.org/1.0"
+					 xmlns:kcd="http://kayak.2codeornot2code.org/1.0"
+					 xmlns="http://kayak.2codeornot2code.org/1.0">
+
   <xs:element name="NetworkDefinition">
     <xs:annotation>
       <xs:documentation>Definition of one or more CAN bus networks in one file.</xs:documentation>
@@ -27,17 +31,12 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Node"/>
         <xs:element maxOccurs="unbounded" ref="Bus"/>
       </xs:sequence>
-      <xs:attribute name="version" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>The version number of the schema that defines the structure of a CAN bus definition file. A naming scheme of the version may be {major.minor} where major and minor are integers. </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
     </xs:complexType>
     <xs:key name="nodeIdKey">
       <xs:annotation>
         <xs:documentation>Assurance that the identifier (id) of a network node is unique.</xs:documentation>
       </xs:annotation>
-      <xs:selector xpath="Node"/>
+      <xs:selector xpath="kcd:Node"/>
       <xs:field xpath="@id"/>
     </xs:key>
     <xs:unique name="busNameUniqueness">
@@ -51,7 +50,7 @@
       <xs:annotation>
         <xs:documentation>Assurance that the references node, to identify the producer of a network message, was already created.</xs:documentation>
       </xs:annotation>
-      <xs:selector xpath="Bus/Message/Producer/NodeRef"/>
+      <xs:selector xpath="kcd:Bus/kcd:Message/kcd:Producer/kcd:NodeRef"/>
       <xs:field xpath="@id"/>
     </xs:keyref>
   </xs:element>
@@ -85,7 +84,7 @@
       <xs:annotation>
         <xs:documentation>Assurance that the identifier of a network message is unique.</xs:documentation>
       </xs:annotation>
-      <xs:selector xpath="Message"/>
+      <xs:selector xpath="kcd:Message"/>
       <xs:field xpath="@id"/>
     </xs:unique>
   </xs:element>
