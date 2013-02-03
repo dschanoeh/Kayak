@@ -223,33 +223,6 @@ public class NetworkDefinitionTest {
 			}
 		}
 	}
-
-	/**
-	 * Test method for
-	 * {@link com.github.kayak.canio.kcd.NetworkDefinition#getVersion()}.
-	 */
-	@Test
-	public void testGetVersion() {
-		assertEquals("Version uniqueness", "0.6", netdef.getVersion());
-	}
-
-	/**
-	 * Test method for
-	 * {@link com.github.kayak.canio.kcd.NetworkDefinition#setVersion(java.lang.String)}
-	 * .
-	 */
-	@Test
-	public void testSetVersion() {
-		netdef.setVersion("7e57");
-		assertEquals("Unexpected network definition version", "7e57", netdef
-				.getVersion());
-		try {
-			marshall.marshal(object, System.out);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
-	}
-
 }
 
 
