@@ -15,9 +15,7 @@
 	along with Kayak.  If not, see <http://www.gnu.org/licenses/>.
 	
 --> 
-<NetworkDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="Definition.xsd"
- xmlns="http://kayak.2codeornot2code.org/1.0">
+<NetworkDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://kayak.2codeornot2code.org/1.0" xsi:noNamespaceSchemaLocation="Definition.xsd">
 	<Document name="The Homer" version="1.23" author="Herbert Powell" company="Powell Motors" date="1991-02-16">
 	A car designed by Homer J. Simpson that the average american consumer would want to buy.
 	The Homer has two bubble domes: one in the front and one for quarreling kids. 
@@ -25,7 +23,15 @@
 	are three horns, playing the song "La Cucaracha." The car also features 
 	gigantic cupholders.
 	</Document> 
-	<Node id="1" name="Motor ACME"/>
+	<Node id="1" name="Motor ACME">
+		<Var name="MotorTempHouse">
+			<Notes>Engine housing temperature</Notes>
+			<Value type="unsigned" slope="0.05" intercept="-40" unit="Cel" min="-40" max="85"/>
+		</Var>
+		<Var name="BottomTemp">
+			<Value type="unsigned" slope="1" intercept="-40" unit="Cel" min="-40" max="85"/>
+		</Var>
+	</Node>
 	<Node id="17" name="Motor alternative supplier"/>
 	<Node id="2" name="Brake ACME"/>
 	<Node id="18" name="Brake alternative supplier"/>
@@ -89,7 +95,7 @@
 	     	  <Consumer>
 	     	  	<NodeRef id="12"/>
 	     	  </Consumer>
-	     		<Value type="unsigned" slope="0.05" intercept="-40" unit="Cel" min="0" max="100"/>
+	     	  <Value type="unsigned" slope="0.05" intercept="-40" unit="Cel" min="0" max="100"/>
 	       	  <LabelSet>
 	     	    <Label name="init" value="0"/>
 	     	    <LabelGroup type="error" name="Sensor error" from="4090" to="4095"/>
@@ -202,11 +208,11 @@
 		<Message id="0x385" name="BCC" count="10" triggered="true" interval="200">
 	     	<Producer>
 	     		<NodeRef id="12"/>
-	     	</Producer>	     	
+	     	</Producer>	
 	     	<Signal name="Milage1" offset="0" length="24">
 	     		<Value slope="0.1" unit="km"/>
 	     	</Signal>
-            <Signal name="Milage2" offset="24" length="48">
+            <Signal name="Milage2" offset="24" length="24">
             	<Value slope="0.1" unit="km"/>
             </Signal>
 		</Message>
@@ -248,10 +254,10 @@
 				<NodeRef id="15"/>
 			</Producer>
 			<Signal name="InsideTempC" offset="0" length="12">
-				<Value type="signed" unit="Cel"/>
+				<Value type="unsigned" unit="Cel" slope="0.05" intercept="-70"/>
 			</Signal>
 			<Signal name="OutsideTempC" offset="12" length="12">
-				<Value type="signed" unit="Cel"/>
+				<Value type="unsigned" unit="Cel" slope="0.05" intercept="-70"/>
 			</Signal>
 		</Message>
 		
@@ -382,5 +388,6 @@
 		</Message>
 	</Bus>
 </NetworkDefinition>
+
 
 

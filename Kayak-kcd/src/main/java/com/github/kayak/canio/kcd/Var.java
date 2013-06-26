@@ -10,6 +10,7 @@ package com.github.kayak.canio.kcd;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -23,14 +24,13 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://kayak.2codeornot2code.org/1.0}BasicSignalType">
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element ref="{http://kayak.2codeornot2code.org/1.0}Notes" minOccurs="0"/>
- *         &lt;element ref="{http://kayak.2codeornot2code.org/1.0}Consumer" minOccurs="0"/>
- *         &lt;element ref="{http://kayak.2codeornot2code.org/1.0}Value" minOccurs="0"/>
- *         &lt;element ref="{http://kayak.2codeornot2code.org/1.0}LabelSet" minOccurs="0"/>
+ *         &lt;element ref="{http://kayak.2codeornot2code.org/1.0}Value"/>
  *       &lt;/sequence>
- *     &lt;/extension>
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
@@ -40,23 +40,17 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "notes",
-    "consumer",
-    "value",
-    "labelSet"
+    "value"
 })
-@XmlRootElement(name = "Signal")
-public class Signal
-    extends BasicSignalType
-{
+@XmlRootElement(name = "Var")
+public class Var {
 
     @XmlElement(name = "Notes")
     protected String notes;
-    @XmlElement(name = "Consumer")
-    protected Consumer consumer;
-    @XmlElement(name = "Value")
+    @XmlElement(name = "Value", required = true)
     protected Value value;
-    @XmlElement(name = "LabelSet")
-    protected LabelSet labelSet;
+    @XmlAttribute(name = "name", required = true)
+    protected String name;
 
     /**
      * Gets the value of the notes property.
@@ -80,30 +74,6 @@ public class Signal
      */
     public void setNotes(String value) {
         this.notes = value;
-    }
-
-    /**
-     * Gets the value of the consumer property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Consumer }
-     *     
-     */
-    public Consumer getConsumer() {
-        return consumer;
-    }
-
-    /**
-     * Sets the value of the consumer property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Consumer }
-     *     
-     */
-    public void setConsumer(Consumer value) {
-        this.consumer = value;
     }
 
     /**
@@ -131,27 +101,27 @@ public class Signal
     }
 
     /**
-     * Gets the value of the labelSet property.
+     * Gets the value of the name property.
      * 
      * @return
      *     possible object is
-     *     {@link LabelSet }
+     *     {@link String }
      *     
      */
-    public LabelSet getLabelSet() {
-        return labelSet;
+    public String getName() {
+        return name;
     }
 
     /**
-     * Sets the value of the labelSet property.
+     * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
-     *     {@link LabelSet }
+     *     {@link String }
      *     
      */
-    public void setLabelSet(LabelSet value) {
-        this.labelSet = value;
+    public void setName(String value) {
+        this.name = value;
     }
 
 }
