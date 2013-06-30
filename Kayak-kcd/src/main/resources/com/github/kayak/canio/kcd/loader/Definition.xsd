@@ -192,7 +192,7 @@
             <xs:element ref="Notes" minOccurs="0"/>
             <xs:element ref="Consumer" minOccurs="0"/>
             <xs:element ref="Value" minOccurs="0"/>
-            <xs:element ref="LabelSet" minOccurs="0"/>            
+            <xs:element ref="LabelSet" minOccurs="0"/>
           </xs:sequence>
         </xs:extension>
       </xs:complexContent>
@@ -251,7 +251,7 @@
 
   <xs:element name="Notes" type="xs:string">
     <xs:annotation>
-      <xs:documentation>Describes the purpose of the signal and/or comments on its usage.</xs:documentation>
+      <xs:documentation>Describes the purpose of the signal/variable and/or comments on its usage.</xs:documentation>
     </xs:annotation>
   </xs:element>
 
@@ -279,7 +279,7 @@
 
   <xs:element name="Value">
     <xs:annotation>
-      <xs:documentation>Details of how the raw value of signal shall be interpreted.</xs:documentation>
+      <xs:documentation>Details of how the raw value of the signal/variable shall be interpreted.</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:attribute name="type" use="optional" default="unsigned">
@@ -307,10 +307,10 @@
       </xs:attribute>
       <xs:attribute default="1" name="unit" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>Physical unit of the value written as unit term as described in "The Unified Code for Units of Measure" (http://aurora.regenstrief.org/~ucum/ucum.html)</xs:documentation>
+          <xs:documentation>Physical unit of the value written as unit term as described in "The Unified Code for Units of Measure" (http://unitsofmeasure.org/ucum.html)</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute default="0" name="min" use="optional" type="xs:double"> 
+      <xs:attribute default="0" name="min" use="optional" type="xs:double">
         <xs:annotation>
           <xs:documentation>Lower validity limit of the interpreted value after using the slope/intercept equation.</xs:documentation>
         </xs:annotation>
@@ -367,6 +367,9 @@
       <xs:documentation>An endpoint connected to the network (e.g. an electronic control unit) that is able to send messages to or receive messages from other endpoints.</xs:documentation>
     </xs:annotation>
     <xs:complexType>
+      <xs:sequence maxOccurs="unbounded" minOccurs="0">
+        <xs:element ref="Var"/>
+      </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:string">
         <xs:annotation>
           <xs:documentation>Unique identifier of the network node.</xs:documentation>
@@ -421,6 +424,23 @@
       <xs:attribute name="date">
         <xs:annotation>
           <xs:documentation>The release date of this version of the network definition document.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Var">
+    <xs:annotation>
+      <xs:documentation>A variable, a symbolic name associated to a chunk of information (e.g. a string or a value).</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Notes" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Value" minOccurs="1" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Unique name of the variable.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>

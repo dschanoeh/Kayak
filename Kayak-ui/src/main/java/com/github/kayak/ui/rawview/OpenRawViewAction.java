@@ -30,7 +30,8 @@ import org.openide.awt.ActionRegistration;
 @ActionID(category="BusViews", id="com.github.kayak.ui.rawview.OpenRawViewAction")
 @ActionReferences( value= {
     @ActionReference(path = "Menu/Bus views", position = 10),
-    @ActionReference(path = "Toolbars/Bus views", position = 10)
+    @ActionReference(path = "Toolbars/Bus views", position = 10),
+    @ActionReference(path = "Shortcuts", name = "D-R"),
 })
 public final class OpenRawViewAction extends AbstractAction {
 
