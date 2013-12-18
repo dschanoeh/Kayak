@@ -128,7 +128,7 @@ public class NetworkDefinitionTest {
 		String date = "1993-01-14";
 		String name = "Springfield Monorail";
 		String version = "2.0";
-
+		doc = netdef.getDocument();
 		doc.setAuthor(author);
 		doc.setCompany(company);
 		doc.setContent(content);
