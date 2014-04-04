@@ -178,6 +178,19 @@ public class KCDLoader implements DescriptionLoader {
                     multiplexDescription.setLength(multiplex.getLength());
                     multiplexDescription.setOffset(multiplex.getOffset());
                     multiplexDescription.setName(multiplex.getName());
+                    
+                    if(multiplex.getValue() != null) {
+                        String typeString = multiplex.getValue().getType();
+                        if (typeString.equals("signed")) {
+                            multiplexDescription.setType(SignalDescription.Type.SIGNED);
+                        } else if (typeString.equals("double")) {
+                            multiplexDescription.setType(SignalDescription.Type.DOUBLE);
+                        } else if (typeString.equals("float")) {
+                            multiplexDescription.setType(SignalDescription.Type.SINGLE);
+                        } else {
+                            multiplexDescription.setType(SignalDescription.Type.UNSIGNED);
+                        }
+                    }
 
                     /* Transform MuxGroups to Signal lists */
                     for(MuxGroup group : multiplex.getMuxGroup()) {

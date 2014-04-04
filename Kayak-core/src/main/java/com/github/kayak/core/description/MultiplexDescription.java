@@ -38,6 +38,7 @@ public class MultiplexDescription  {
     private ByteOrder byteOrder;
     private String name;
     private MessageDescription description;
+    private SignalDescription.Type type;
 
     public String getName() {
         return name;
@@ -69,6 +70,14 @@ public class MultiplexDescription  {
 
     public void setOffset(int offset) {
         this.offset = offset;
+    }
+    
+     public SignalDescription.Type getType() {
+        return type;
+    }
+
+    public void setType(SignalDescription.Type type) {
+        this.type = type;
     }
 
     /**
@@ -139,7 +148,7 @@ public class MultiplexDescription  {
         s.setName(name);
         s.setNotes("Multiplex");
         s.setSlope(1);
-        s.setType(SignalDescription.Type.UNSIGNED); /* FIXME */
+        s.setType(type);
         s.setUnit("1");
         
         return s;

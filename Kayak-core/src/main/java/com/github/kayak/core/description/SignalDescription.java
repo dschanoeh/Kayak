@@ -210,6 +210,11 @@ public class SignalDescription {
         if(multiplexed) {
             long rawValue = SignalDescription.extractBits(data, multiplexDescription.getOffset(), multiplexDescription.getLength(), multiplexDescription.getByteOrder());
 
+            if(multiplexDescription.getType() == Type.SIGNED) {
+                long signBit = (long) (1L << ((long) length - 1L));
+                rawValue = rawValue - ((rawValue & signBit) << 1);
+            }
+            
             if(rawValue != multiplexCount)
                 return null;
         }
