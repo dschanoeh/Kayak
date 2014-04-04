@@ -57,7 +57,7 @@
                         <cluster>kayak</cluster>
                         <etcConfFile>${basedir}/kayak.conf</etcConfFile>
                     </configuration>
-                    <version>3.11</version>
+                    <version>3.13</version>
                 </plugin>
 
                 <plugin>
@@ -66,8 +66,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.0</version>
                     <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -102,7 +102,7 @@
   </modules>
 
     <properties>
-        <netbeans.version>RELEASE71</netbeans.version>
+        <netbeans.version>RELEASE80</netbeans.version>
         <brandingToken>kayak</brandingToken>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
