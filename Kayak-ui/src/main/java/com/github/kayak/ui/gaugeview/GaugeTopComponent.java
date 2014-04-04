@@ -23,6 +23,7 @@ import com.github.kayak.core.FrameListener;
 import com.github.kayak.core.Subscription;
 import com.github.kayak.core.description.DescriptionException;
 import com.github.kayak.core.description.MessageDescription;
+import com.github.kayak.core.description.MultiplexDescription;
 import com.github.kayak.core.description.Signal;
 import com.github.kayak.core.description.SignalDescription;
 import com.github.kayak.ui.messageview.MessageSignalDropAdapter;
@@ -85,6 +86,30 @@ public final class GaugeTopComponent extends TopComponent {
         @Override
         public void dropped(MessageDescription message, Bus bus) {
 
+        }
+        
+        @Override
+        public void dropped(MultiplexDescription multiplex, Bus b) {
+            if(subscription != null) {
+                subscription.Terminate();
+            }
+            
+            SignalDescription signal = multiplex.getMultiplexAsSignal();
+
+            int id = signal.getMessageDescription().getId();
+            subscription = new Subscription(listener, b);
+            subscription.subscribe(id, signal.getMessageDescription().isExtended());
+            signalDescription = signal;
+            gauge.setUnitString(signalDescription.getUnit());
+            gauge.setTitle(signalDescription.getName());
+            setName(NbBundle.getMessage(GaugeTopComponent.class, "CTL_GaugeTopComponent") + " - " + signal.getName());
+            bus = b;
+
+            if(project != null)
+                project.removeProjectChangeListener(projectChangeListener);
+
+            project = ProjectManager.getGlobalProjectManager().getOpenedProject();
+            project.addProjectChangeListener(projectChangeListener);
         }
     };
 
@@ -152,7 +177,6 @@ public final class GaugeTopComponent extends TopComponent {
 
         /* only repaint if there is at least 0.5% change in the value */
         double change = Math.abs(this.value - value)/(maximum - minimum);
-        assert change > 0f;
 
 
         if(change > 0.005f) {

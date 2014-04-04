@@ -129,5 +129,20 @@ public class MultiplexDescription  {
         descriptions.add(s);
         return s;
     }
+    
+    public SignalDescription getMultiplexAsSignal() {
+        SignalDescription s = new SignalDescription(description);
+        
+        s.setByteOrder(byteOrder);
+        s.setIntercept(0);
+        s.setLength(length);
+        s.setName(name);
+        s.setNotes("Multiplex");
+        s.setSlope(1);
+        s.setType(SignalDescription.Type.UNSIGNED); /* FIXME */
+        s.setUnit("1");
+        
+        return s;
+    }
 
 }

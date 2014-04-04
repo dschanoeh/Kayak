@@ -54,7 +54,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.11</version>
+                <version>3.13</version>
             </plugin>
         </plugins>
     </build>
@@ -95,8 +95,5 @@
             </build>
         </profile>
     </profiles>
-    <properties>
-        <netbeans.run.params.ide/>
-        <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
-    </properties>
+    <properties></properties>
 </project>

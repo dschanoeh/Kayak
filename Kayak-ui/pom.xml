@@ -119,7 +119,7 @@
                         <publicPackage>com.github.kayak.ui.useroutput</publicPackage>
                     </publicPackages>
                 </configuration>
-                <version>3.11</version>
+                <version>3.13</version>
             </plugin>
 
             <plugin>

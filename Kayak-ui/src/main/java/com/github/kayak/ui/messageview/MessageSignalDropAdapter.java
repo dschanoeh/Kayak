@@ -19,6 +19,7 @@ package com.github.kayak.ui.messageview;
 
 import com.github.kayak.core.Bus;
 import com.github.kayak.core.description.MessageDescription;
+import com.github.kayak.core.description.MultiplexDescription;
 import com.github.kayak.core.description.SignalDescription;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -39,6 +40,8 @@ public class MessageSignalDropAdapter extends DropTargetAdapter{
         public void dropped(SignalDescription signal, Bus bus);
 
         public void dropped(MessageDescription message, Bus bus);
+        
+        public void dropped(MultiplexDescription mux, Bus bus);
         
     };
 
@@ -75,6 +78,17 @@ public class MessageSignalDropAdapter extends DropTargetAdapter{
             try {
                 SignalDescription desc = (SignalDescription) transferable.getTransferData(SignalDescriptionNode.SIGNAL_DATA_FLAVOR);
                 Bus bus = (Bus) transferable.getTransferData(SignalDescriptionNode.BUS_DATA_FLAVOR);
+                    receiver.dropped(desc, bus);
+                    return;
+            } catch (UnsupportedFlavorException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } else if(transferable.isDataFlavorSupported(MultiplexDescriptionNode.MULTIPLEX_DATA_FLAVOR)) {
+            try {
+                MultiplexDescription desc = (MultiplexDescription) transferable.getTransferData(MultiplexDescriptionNode.MULTIPLEX_DATA_FLAVOR);
+                Bus bus = (Bus) transferable.getTransferData(MultiplexDescriptionNode.BUS_DATA_FLAVOR);
                     receiver.dropped(desc, bus);
                     return;
             } catch (UnsupportedFlavorException ex) {

@@ -24,6 +24,7 @@ import com.github.kayak.core.Subscription;
 import com.github.kayak.core.description.DescriptionException;
 import com.github.kayak.core.description.Message;
 import com.github.kayak.core.description.MessageDescription;
+import com.github.kayak.core.description.MultiplexDescription;
 import com.github.kayak.core.description.Signal;
 import com.github.kayak.core.description.SignalDescription;
 import com.github.kayak.ui.useroutput.UserOutput;
@@ -94,18 +95,16 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
         public void newFrame(Frame frame) {
             Bus bus = frame.getBus();
 
-            try {
-                Message m = bus.getDescription().decodeFrame(frame);
-
-                if(m != null) {
-                    Set<Signal> frameSignals = m.getSignals();
-                    synchronized(entries) {
-                        for(Signal s : frameSignals) {
-                            for(SignalTableEntry entry : entries) {
-                                if(s.getDescription().equals(entry.getDescription())) {
-                                    entry.setSignal(s);
-                                    entry.setRefresh(true);
-                                }
+            try {                
+                for(SignalTableEntry entry : entries) {
+                    /* Correct bus? */
+                    if(entry.getBus() == frame.getBus()) {
+                        /* Correct identifier? */
+                        if(entry.getDescription().getMessageDescription().getId() == frame.getIdentifier()) {
+                            Signal s = entry.getDescription().decodeData(frame.getData());
+                            if(s != null) {
+                                entry.setSignal(s);
+                                entry.setRefresh(true);
                             }
                         }
                     }
@@ -263,5 +262,9 @@ public class SignalTableModel extends AbstractTableModel implements MessageSigna
         for(SignalDescription s : message.getSignals())
             addSignal(s, bus);
     }
-
+    
+    @Override
+    public void dropped(MultiplexDescription mux, Bus bus) {
+        addSignal(mux.getMultiplexAsSignal(), bus);
+    }
 }

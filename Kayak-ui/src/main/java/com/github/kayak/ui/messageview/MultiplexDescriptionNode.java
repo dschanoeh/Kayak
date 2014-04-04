@@ -35,7 +35,7 @@ import org.openide.util.lookup.Lookups;
  */
 public class MultiplexDescriptionNode extends AbstractNode implements Transferable {
 
-    public static final DataFlavor SIGNAL_DATA_FLAVOR = new DataFlavor(MultiplexDescription.class, "MultiplexDescription");
+    public static final DataFlavor MULTIPLEX_DATA_FLAVOR = new DataFlavor(MultiplexDescription.class, "MultiplexDescription");
     public static final DataFlavor BUS_DATA_FLAVOR = new DataFlavor(Bus.class, "Bus");
 
     private MultiplexDescription description;
@@ -66,19 +66,19 @@ public class MultiplexDescriptionNode extends AbstractNode implements Transferab
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[]{BUS_DATA_FLAVOR, SIGNAL_DATA_FLAVOR};
+        return new DataFlavor[]{BUS_DATA_FLAVOR, MULTIPLEX_DATA_FLAVOR};
     }
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return flavor == BUS_DATA_FLAVOR || flavor == SIGNAL_DATA_FLAVOR;
+        return flavor == BUS_DATA_FLAVOR || flavor == MULTIPLEX_DATA_FLAVOR;
     }
 
     @Override
     public Object getTransferData(DataFlavor flavor) {
         if (flavor == BUS_DATA_FLAVOR) {
             return bus;
-        } else if(flavor == SIGNAL_DATA_FLAVOR) {
+        } else if(flavor == MULTIPLEX_DATA_FLAVOR) {
             return description;
         }
         return null;
