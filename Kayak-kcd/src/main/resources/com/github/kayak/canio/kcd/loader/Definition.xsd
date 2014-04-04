@@ -43,7 +43,7 @@
       <xs:annotation>
         <xs:documentation>Assurance that there are no duplicate bus names (assures bus name uniqueness).</xs:documentation>
       </xs:annotation>
-      <xs:selector xpath="Bus"/>
+      <xs:selector xpath="kcd:Bus"/>
       <xs:field xpath="@name"/>
     </xs:unique>
     <xs:keyref name="nodeIdKeyRef" refer="nodeIdKey">
