@@ -117,7 +117,7 @@
       </xs:attribute>
       <xs:attribute name="length" use="optional" default="auto">
         <xs:annotation>
-          <xs:documentation>Number of bytes available in the data field of the message (data length code). "auto" (default) calculate minimum length for the contained signals in the message.</xs:documentation>
+          <xs:documentation>Number of bytes available in the data field of the message (data length code). "auto" (default) calculate minimum length for the contained signals in the message. Length greater than 8 is only allowed in messages with flexible data rate (fd).</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -131,6 +131,13 @@
             <xs:enumeration value="6"/>
             <xs:enumeration value="7"/>
             <xs:enumeration value="8"/>
+            <xs:enumeration value="12"/>
+            <xs:enumeration value="16"/>
+            <xs:enumeration value="20"/>
+            <xs:enumeration value="24"/>
+            <xs:enumeration value="32"/>
+            <xs:enumeration value="48"/>
+            <xs:enumeration value="64"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
@@ -152,7 +159,7 @@
       </xs:attribute>
       <xs:attribute default="0" name="count">
         <xs:annotation>
-          <xs:documentation>Number of repetitions of a triggered network message. 0 (default) for infine repetitions.</xs:documentation>
+          <xs:documentation>Number of repetitions of a triggered network message. 0 (default) for infinite repetitions.</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:nonNegativeInteger">
@@ -172,9 +179,19 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute name="fd" use="optional" type="xs:boolean" default="false">
+        <xs:annotation>
+          <xs:documentation>True, if frame formats of the network message supports flexible data rate (dual bit rate).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+       <xs:attribute name="switchbitrate" use="optional" type="xs:boolean" default="false">
+        <xs:annotation>
+          <xs:documentation>True, if the alternative bitrate shall be applied in the data phase of transmission i.e. a higher bitrate should be used to send the payload of message. Only allowed for CAN-FD messages. It is an error, if switchbitrate=true and fd=false</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="remote" use="optional" type="xs:boolean" default="false">
         <xs:annotation>
-          <xs:documentation>True, if message is a remote frame.</xs:documentation>
+          <xs:documentation>True, if message is a remote frame. Not possible in messages with flexible data rate (fd).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
