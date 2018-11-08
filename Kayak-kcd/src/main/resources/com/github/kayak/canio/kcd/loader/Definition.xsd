@@ -184,9 +184,9 @@
           <xs:documentation>True, if frame formats of the network message supports flexible data rate (dual bit rate).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-       <xs:attribute name="switchbitrate" use="optional" type="xs:boolean" default="false">
+      <xs:attribute name="bitrateswitch" use="optional" type="xs:boolean" default="false">
         <xs:annotation>
-          <xs:documentation>True, if the alternative bitrate shall be applied in the data phase of transmission i.e. a higher bitrate should be used to send the payload of message. Only allowed for CAN-FD messages. It is an error, if switchbitrate=true and fd=false</xs:documentation>
+			<xs:documentation>True, if this CAN-FD message is sent with the BRS (bit-rate switch) bit set, i.e. a higher bitrate should be used to send the payload of the message. Setting this to bitrateswitch="true", if canfd="false" or canfd unset (default), is an error.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="remote" use="optional" type="xs:boolean" default="false">
@@ -502,7 +502,7 @@
       <xs:simpleType>
         <xs:restriction base="xs:positiveInteger">
           <xs:minInclusive value="1"/>
-          <xs:maxInclusive value="64"/>
+          <xs:maxInclusive value="512"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
@@ -518,7 +518,7 @@
       <xs:simpleType>
         <xs:restriction base="xs:nonNegativeInteger">
           <xs:minInclusive value="0"/>
-          <xs:maxInclusive value="63"/>
+          <xs:maxInclusive value="511"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
