@@ -32,7 +32,7 @@ import org.openide.nodes.Children;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.messageview//Messages//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "MessagesTopComponent",
-iconBase="org/tango-project/tango-icon-theme/16x16/status/dialog-information.png",
+iconBase="com/github/kayak/ui/icons/dialog-information.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @ActionID(category = "Window", id = "com.github.kayak.ui.messageview.MessagesTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)

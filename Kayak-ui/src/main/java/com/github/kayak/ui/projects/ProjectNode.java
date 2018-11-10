@@ -49,12 +49,12 @@ public class ProjectNode extends AbstractNode {
         @Override
         public void projectClosed(Project p) {
             setChildren(Children.LEAF);
-            setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/folder.png");
+            setIconBaseWithExtension("com/github/kayak/ui/icons/folder.png");
         }
 
         @Override
         public void projectOpened(Project p) {
-            setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/status/folder-open.png");
+            setIconBaseWithExtension("com/github/kayak/ui/icons/folder-open.png");
             setChildren(Children.create(new ProjectChildFactory(project), true));
         }
 
@@ -71,14 +71,14 @@ public class ProjectNode extends AbstractNode {
 
     public ProjectNode(Project project) {
         super(Children.LEAF, Lookups.fixed(project));
-        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/folder.png");
+        setIconBaseWithExtension("com/github/kayak/ui/icons/folder.png");
 
         this.project = project;
         project.addProjectChangeListener(changeListener);
 
         if (project.isOpened()) {
             setChildren(Children.create(new ProjectChildFactory(project), true));
-            setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/status/folder-open.png");
+            setIconBaseWithExtension("com/github/kayak/ui/icons/folder-open.png");
         }
         super.setDisplayName(project.getName());
 

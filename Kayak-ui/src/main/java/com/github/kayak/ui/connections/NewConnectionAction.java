@@ -28,7 +28,7 @@ import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
 @ActionID(id = "com.github.kayak.ui.connections.NewConnectionAction", category = "Connections")
-@ActionRegistration(iconInMenu = true, displayName = "#CTL_NewConnectionAction", iconBase = "org/tango-project/tango-icon-theme/16x16/actions/document-new.png")
+@ActionRegistration(iconInMenu = true, displayName = "#CTL_NewConnectionAction", iconBase = "com/github/kayak/ui/icons/document-new.png")
 @ActionReferences(value = {
     @ActionReference(path = "Menu/Connections", position = 20)})
 public final class NewConnectionAction implements ActionListener {

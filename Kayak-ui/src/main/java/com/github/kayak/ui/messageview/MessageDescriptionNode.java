@@ -55,7 +55,7 @@ public class MessageDescriptionNode extends AbstractNode implements Transferable
 	this.description = messageDescription;
         this.bus = bus;
         setDisplayName(description.getName());
-        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/apps/internet-mail.png");
+        setIconBaseWithExtension("com/github/kayak/ui/icons/internet-mail.png");
     }
 
     @Override

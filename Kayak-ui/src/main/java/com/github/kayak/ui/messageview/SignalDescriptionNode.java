@@ -60,7 +60,7 @@ public class SignalDescriptionNode extends AbstractNode implements Transferable 
         this.bus = bus;
 
 	setDisplayName(signalDescription.getName());
-        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/status/dialog-information.png");
+        setIconBaseWithExtension("com/github/kayak/ui/icons/dialog-information.png");
     }
 
     @Override

@@ -50,7 +50,7 @@ import com.github.kayak.ui.useroutput.UserOutput;
 @ConvertAsProperties(dtd = "-//com.github.kayak.mapview//MapView//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "MapViewTopComponent",
-iconBase="org/tango-project/tango-icon-theme/16x16/apps/internet-web-browser.png",
+iconBase="com/github/kayak/mapview/icons/internet-web-browser.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 public final class MapViewTopComponent extends TopComponent {

@@ -26,7 +26,7 @@ import org.openide.windows.TopComponent;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.rawview//RawView//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "RawViewTopComponent",
-iconBase="org/tango-project/tango-icon-theme/16x16/mimetypes/text-x-generic.png",
+iconBase="com/github/kayak/ui/icons/text-x-generic.png",
 persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 public final class RawViewTopComponent extends TopComponent {

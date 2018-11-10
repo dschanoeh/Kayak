@@ -29,7 +29,7 @@ import org.openide.awt.ActionRegistration;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-@ActionRegistration(displayName="Bookmark Log file...", iconBase="org/tango-project/tango-icon-theme/16x16/actions/bookmark-new.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="Bookmark Log file...", iconBase="com/github/kayak/logging/icons/bookmark-new.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="Log files", id="com.github.kayak.logging.BookmarkLogFileAction")
 @ActionReferences(value = {
     @ActionReference(path="Menu/Log files", position=30)})

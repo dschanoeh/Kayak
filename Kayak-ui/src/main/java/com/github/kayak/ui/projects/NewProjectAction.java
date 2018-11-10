@@ -13,7 +13,7 @@ import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
 @ActionID(id = "com.github.kayak.ui.projects.NewProjectAction", category = "File")
-@ActionRegistration(iconInMenu = true, displayName = "#CTL_NewProject", iconBase = "org/tango-project/tango-icon-theme/16x16/actions/document-new.png")
+@ActionRegistration(iconInMenu = true, displayName = "#CTL_NewProject", iconBase = "com/github/kayak/ui/icons/document-new.png")
 @ActionReferences(value = {
     @ActionReference(path = "Shortcuts", name = "D-N"),
     @ActionReference(path = "Actions/Projects", position = 10 ),

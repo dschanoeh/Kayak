@@ -97,7 +97,7 @@ public class ConnectedBusURLNode extends AbstractNode {
         } else {
             setDisplayName("Connection: " + url.toString());
         }
-        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/devices/network-wired.png");
+        setIconBaseWithExtension("com/github/kayak/ui/icons/network-wired.png");
     }
 
     @Override

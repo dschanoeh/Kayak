@@ -12,7 +12,7 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
-@ActionRegistration(displayName="Bookmark connection...", iconBase="org/tango-project/tango-icon-theme/16x16/actions/bookmark-new.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="Bookmark connection...", iconBase="com/github/kayak/ui/icons/bookmark-new.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="Connections", id="com.github.kayak.ui.connections.BookmarkConnectionAction")
 @ActionReferences(value = {
     @ActionReference(path="Menu/Connections", position=30)})

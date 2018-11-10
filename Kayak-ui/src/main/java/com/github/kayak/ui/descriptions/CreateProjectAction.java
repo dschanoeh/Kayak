@@ -33,7 +33,7 @@ import org.openide.awt.ActionRegistration;
  *
  * @author Jan-Niklas Meier < dschanoeh@googlemail.com >
  */
-@ActionRegistration(displayName="Create project...", iconBase="org/tango-project/tango-icon-theme/16x16/mimetypes/package-x-generic.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="Create project...", iconBase="com/github/kayak/ui/icons/package-x-generic.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="Descriptions", id="com.github.kayak.ui.descriptions.CreateProjectAction")
 @ActionReferences(value = {
     @ActionReference(path="Menu/Descriptions", position=30)})

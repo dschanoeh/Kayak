@@ -44,7 +44,7 @@ public class DocumentNode extends AbstractNode {
         super(Children.create(new DocumentChildrenFactory(document), true), Lookups.fixed(document));
         this.document = document;
         setName(document.getName());
-        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/mimetypes/text-x-generic.png");
+        setIconBaseWithExtension("com/github/kayak/ui/icons/text-x-generic.png");
     }
 
     @Override

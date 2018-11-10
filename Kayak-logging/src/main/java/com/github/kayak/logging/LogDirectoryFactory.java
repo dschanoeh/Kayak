@@ -63,7 +63,7 @@ public class LogDirectoryFactory extends ChildFactory<String> {
     @Override
     protected Node[] createNodesForKey(String key) {
         AbstractNode node = new AbstractNode(Children.create(new PlatformChildFactory(key), false));
-        node.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/folder.png");
+        node.setIconBaseWithExtension("com/github/kayak/logging/icons/folder.svg");
         node.setDisplayName(key);
 
         return new Node[] {node};

@@ -31,7 +31,7 @@ import org.openide.util.ImageUtilities;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.messageview//MessageView//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "MessageViewTopComponent",
-iconBase="org/tango-project/tango-icon-theme/16x16/status/dialog-information.png",
+iconBase="com/github/kayak/ui/icons/dialog-information.png",
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 public final class MessageViewTopComponent extends TopComponent {
@@ -74,7 +74,7 @@ public final class MessageViewTopComponent extends TopComponent {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        jButton1.setIcon(new ImageIcon(ImageUtilities.loadImage("org/tango-project/tango-icon-theme/16x16/actions/edit-delete.png")));
+        jButton1.setIcon(new ImageIcon(ImageUtilities.loadImage("com/github/kayak/ui/icons/edit-delete.png")));
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(MessageViewTopComponent.class, "MessageViewTopComponent.jButton1.text")); // NOI18N
         jButton1.setFocusable(false);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -116,7 +116,7 @@ public final class MessageViewTopComponent extends TopComponent {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE))
+                .addComponent(jScrollPane1))
         );
     }// </editor-fold>//GEN-END:initComponents
 

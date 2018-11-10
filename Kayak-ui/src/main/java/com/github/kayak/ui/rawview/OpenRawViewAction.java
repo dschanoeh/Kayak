@@ -26,7 +26,7 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
-@ActionRegistration(displayName="Open RAW view", iconBase="org/tango-project/tango-icon-theme/16x16/mimetypes/text-x-generic.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="Open RAW view", iconBase="com/github/kayak/ui/icons/text-x-generic.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="BusViews", id="com.github.kayak.ui.rawview.OpenRawViewAction")
 @ActionReferences( value= {
     @ActionReference(path = "Menu/Bus views", position = 10),

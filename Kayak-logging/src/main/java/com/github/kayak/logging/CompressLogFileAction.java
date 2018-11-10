@@ -36,7 +36,7 @@ import org.openide.awt.ActionRegistration;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-@ActionRegistration(displayName="Compress Log file...", iconBase="org/tango-project/tango-icon-theme/16x16/mimetypes/package-x-generic.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="Compress Log file...", iconBase="com/github/kayak/logging/icons/package-x-generic.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="Log files", id="com.github.kayak.logging.CompressLogFileAction")
 @ActionReferences(value = {
     @ActionReference(path="Menu/Log files", position=20)})

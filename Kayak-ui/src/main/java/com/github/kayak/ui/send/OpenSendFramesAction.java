@@ -28,7 +28,7 @@ import org.openide.awt.ActionRegistration;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-@ActionRegistration(displayName="Open send view", iconBase="org/tango-project/tango-icon-theme/16x16/actions/mail-forward.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="Open send view", iconBase="com/github/kayak/ui/icons/mail-forward.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="Bus views", id="com.github.kayak.ui.send.SendFramesTopComponent")
 @ActionReferences( value= {
     @ActionReference(path = "Menu/Bus views"),

@@ -72,7 +72,7 @@ public class DescriptionNode extends AbstractNode implements Transferable {
 
         this.description = d;
         setDisplayName(description.getName());
-        this.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/network-workgroup.png");
+        this.setIconBaseWithExtension("com/github/kayak/ui/icons/network-workgroup.png");
     }
 
     @Override

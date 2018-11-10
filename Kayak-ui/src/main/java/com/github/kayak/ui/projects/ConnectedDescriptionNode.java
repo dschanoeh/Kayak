@@ -85,7 +85,7 @@ public class ConnectedDescriptionNode extends AbstractNode {
         else
             setDisplayName("Description: " + description.getName());
 
-        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/mimetypes/text-x-generic.png");
+        setIconBaseWithExtension("com/github/kayak/ui/icons/text-x-generic.png");
     }
 
     @Override

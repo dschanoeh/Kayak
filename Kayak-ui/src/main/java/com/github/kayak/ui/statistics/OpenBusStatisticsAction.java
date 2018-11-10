@@ -30,7 +30,7 @@ import org.openide.awt.ActionRegistration;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-@ActionRegistration(displayName="Open bus statistics", iconBase="org/tango-project/tango-icon-theme/16x16/apps/utilities-system-monitor.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="Open bus statistics", iconBase="com/github/kayak/ui/icons/utilities-system-monitor.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="BusViews", id="com.github.kayak.ui.statistics.OpenBusStatisticsAction")
 @ActionReferences( value= {
     @ActionReference(path = "Menu/Bus views", position = 20 ),

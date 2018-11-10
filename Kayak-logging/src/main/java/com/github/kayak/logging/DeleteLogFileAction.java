@@ -18,7 +18,7 @@ import org.openide.awt.ActionRegistration;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-@ActionRegistration(displayName="Delete Log file...", iconBase="org/tango-project/tango-icon-theme/16x16/actions/edit-delete.png", iconInMenu=true, surviveFocusChange=true)
+@ActionRegistration(displayName="Delete Log file...", iconBase="com/github/kayak/logging/icons/edit-delete.png", iconInMenu=true, surviveFocusChange=true)
 @ActionID(category="Log files", id="com.github.kayak.logging.DeleteLogFileAction")
 @ActionReferences(value = {
     @ActionReference(path="Menu/Log files", position=40)})

@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.netbeans.cluster</groupId>
             <artifactId>platform</artifactId>
-            <version>RELEASE80</version>
+            <version>RELEASE82</version>
             <type>pom</type>
         </dependency>
 
@@ -54,7 +54,11 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.13</version>
+                <version>3.13.3</version>
+                <configuration>
+                    <installerOsSolaris>false</installerOsSolaris>
+                    <installerLicenseFile>license.txt</installerLicenseFile>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -89,7 +93,7 @@
                                 </configuration>
                             </execution>
                         </executions>
-                        <version>3.6</version>
+                        <version>4.1</version>
                     </plugin>
                 </plugins>
             </build>

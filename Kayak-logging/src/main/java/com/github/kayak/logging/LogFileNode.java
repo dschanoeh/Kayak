@@ -53,7 +53,7 @@ public class LogFileNode extends AbstractNode {
         this.setDisplayName(logFile.getDescription());
         this.setShortDescription(logFile.getFileName());
 
-        this.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/apps/accessories-text-editor.png");
+        this.setIconBaseWithExtension("com/github/kayak/logging/icons/accessories-text-editor.png");
     }
 
     @Override

@@ -33,7 +33,7 @@ import org.openide.awt.ActionRegistration;
  *
  * @author Jan-Niklas Meier <dschanoeh@googlemail.com>
  */
-@ActionRegistration(displayName = "Create snapshot", iconBase = "org/tango-project/tango-icon-theme/16x16/devices/camera-photo.png", iconInMenu = true, surviveFocusChange = true, asynchronous=true)
+@ActionRegistration(displayName = "Create snapshot", iconBase = "com/github/kayak/logging/icons/camera-photo.png", iconInMenu = true, surviveFocusChange = true, asynchronous=true)
 @ActionID(category = "Log files", id = "com.github.kayak.logging.snapshots.CreateSnapshotAction")
 @ActionReferences(value = {
     @ActionReference(path = "Menu/Log files", position = 70),

@@ -40,7 +40,7 @@ import org.netbeans.api.settings.ConvertAsProperties;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.send//SendFrames//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "SendFramesTopComponent",
-iconBase="org/tango-project/tango-icon-theme/16x16/actions/mail-forward.png",
+iconBase="com/github/kayak/ui/icons/mail-forward.png",
 persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_SendFramesAction",

@@ -49,17 +49,17 @@ public class ConnectionNodeFactory extends ChildFactory {
                 case DISCOVERY:
                     AbstractNode discoveryNode = new AbstractNode(new ConnectionChildrenFactory(BusURLNode.Type.DISCOVERY));
                     discoveryNode.setDisplayName("Auto discovery");
-                    discoveryNode.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/devices/network-wireless.png");
+                    discoveryNode.setIconBaseWithExtension("com/github/kayak/ui/icons/network-wireless.png");
                     return new Node[] { discoveryNode };
                 case FAVOURITES:
                     AbstractNode favouritesFolderNode = new AbstractNode(new ConnectionChildrenFactory(BusURLNode.Type.FAVOURITE));
                     favouritesFolderNode.setDisplayName("Favourites");
-                    favouritesFolderNode.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/actions/bookmark-new.png");
+                    favouritesFolderNode.setIconBaseWithExtension("com/github/kayak/ui/icons/bookmark-new.png");
                     return new Node[] { favouritesFolderNode };
                 case RECENT:
                     AbstractNode recentFolderNode = new AbstractNode(new ConnectionChildrenFactory(BusURLNode.Type.RECENT));
                     recentFolderNode.setDisplayName("Recent");
-                    recentFolderNode.setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/folder.png");
+                    recentFolderNode.setIconBaseWithExtension("com/github/kayak/ui/icons/folder.png");
                     return new Node[] { recentFolderNode };
                 default:
                     return null;

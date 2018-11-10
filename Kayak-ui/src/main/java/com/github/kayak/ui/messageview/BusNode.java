@@ -32,7 +32,7 @@ public class BusNode extends AbstractNode {
     public BusNode(BusDescription desc, Bus bus) {
         super(Children.create(new MessageNodeFactory(desc, bus), true));
 
-        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/places/network-workgroup.png");
+        setIconBaseWithExtension("com/github/kayak/ui/icons/network-workgroup.png");
         setDisplayName(bus.getName() + " (" + desc.getName() + ")");
     }
 

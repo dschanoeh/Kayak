@@ -66,9 +66,9 @@ public class BusURLNode extends AbstractNode {
         public void actionPerformed(ActionEvent e) {
             Boolean result = url.checkConnection();
             if(!result)
-                setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/emblems/emblem-unreadable.png");
+                setIconBaseWithExtension("com/github/kayak/ui/icons/emblem-unreadable.png");
             else
-                setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/devices/network-wired.png");
+                setIconBaseWithExtension("com/github/kayak/ui/icons/network-wired.png");
         }
     }
 
@@ -77,7 +77,7 @@ public class BusURLNode extends AbstractNode {
         this.url = url;
         setDisplayName(url.toString());
         this.type = type;
-        setIconBaseWithExtension("org/tango-project/tango-icon-theme/16x16/devices/network-wired.png");
+        setIconBaseWithExtension("com/github/kayak/ui/icons/network-wired.png");
     }
 
     @Override

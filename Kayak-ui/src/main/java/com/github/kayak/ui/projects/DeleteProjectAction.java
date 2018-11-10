@@ -25,7 +25,7 @@ import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 
 @ActionID(id = "com.github.kayak.ui.projects.DeleteProjectAction", category = "File")
-@ActionRegistration(iconInMenu = true, displayName = "#CTL_DeleteProject", iconBase = "org/tango-project/tango-icon-theme/16x16/actions/edit-delete.png")
+@ActionRegistration(iconInMenu = true, displayName = "#CTL_DeleteProject", iconBase = "com/github/kayak/ui/icons/edit-delete.png")
 @ActionReferences(value = {
     @ActionReference(path = "Actions/Projects", position = 30 ),
     @ActionReference(path = "Menu/File", name = "com-github-kayak-ui-projects-NewProject", position = 30)})

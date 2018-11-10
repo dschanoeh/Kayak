@@ -43,7 +43,7 @@ import java.awt.Dimension;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.gaugeview//Gauge//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "GaugeTopComponent",
-iconBase="org/tango-project/tango-icon-theme/16x16/actions/appointment-new.png",
+iconBase="com/github/kayak/ui/icons/appointment-new.png",
 persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 public final class GaugeTopComponent extends TopComponent {

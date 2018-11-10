@@ -34,7 +34,7 @@ import org.netbeans.api.settings.ConvertAsProperties;
 @ConvertAsProperties(dtd = "-//com.github.kayak.ui.statistics//BusStatistics//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "BusStatisticsTopComponent",
-iconBase="org/tango-project/tango-icon-theme/16x16/apps/utilities-system-monitor.png",
+iconBase="com/github/kayak/ui/icons/utilities-system-monitor.png",
 persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED)
 @TopComponent.Registration(mode = "statistics", openAtStartup = false)
 public final class BusStatisticsTopComponent extends TopComponent {

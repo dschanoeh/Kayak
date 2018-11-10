@@ -13,7 +13,7 @@ import org.openide.awt.ActionRegistration;
 
 @ActionID(category = "Time",
 id = "com.github.kayak.ui.time.PauseAction")
-@ActionRegistration(iconBase = "org/tango-project/tango-icon-theme/16x16/actions/media-playback-pause.png",
+@ActionRegistration(iconBase = "com/github/kayak/ui/icons/media-playback-pause.png",
 displayName = "com.github.kayak.ui.time.Bundle#CTL_PauseAction")
 @ActionReferences({
     @ActionReference(path = "Toolbars/Time", position = 200),
