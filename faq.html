@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <meta charset='utf-8'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,400italic' rel='stylesheet' type='text/css'>
+        <title>Kayak - FAQ</title>
+        <link rel="stylesheet" type="text/css" href="style.css"/>
+    </head>
+
+    <body>
+    <a href="http://github.com/dschanoeh/Kayak"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+    <div id="container">
+
+        <h1><a href="index.html">Kayak</a> - FAQ</h1>
+
+        <div class="description">
+            Frequently asked questions about Kayak. Have a question you found no answer for? Send mail to kayak (at) 2codeornot2code.org 
+        </div>
+
+        <h2>Does Kayak have .dbc support?</h2>
+        <p>
+            No it does not and probably will never have. The .dbc file format is a proprietary format of the
+            <i>Vector Informatik GmbH</i> and they want to make money with it. I don't want to be sued for 
+            reverse engineering the format. Kayak is open source so if you need support for .dbc develop a
+            plugin on your own.
+        </p>
+        
+        <h2>How do I write my own network definitions?</h2>
+        <p>
+        Kayak uses the .kcd file format for network definitions. There is not yet an editor in Kayak
+        but they can be written by hand using the 
+        <a href="https://github.com/dschanoeh/Kayak/blob/master/Kayak-kcd/src/main/resources/com/github/kayak/canio/kcd/schema/Definition.xsd">schema</a>
+        and the 
+        <a href="https://github.com/dschanoeh/Kayak/blob/master/Kayak-kcd/src/test/resources/can_definition_sample.kcd">example</a> 
+        as a reference.
+        </p>
+
+        <h2>Which CAN hardware is supported?</h2>
+        <p>
+            Kayak supports all hardware that is supported by SocketCAN. The list is quite large and
+            constantly changing. You can find some information in 
+            <a href="http://jansblog.org/?p=1025">my blog post</a> or
+            <a href="http://git.kernel.org/?p=linux/kernel/git/torvalds/linux.git;a=blob_plain;f=drivers/net/can/Kconfig;hb=HEAD">in the Linux kernel source</a>.
+        </p>
+
+        <h2>Why didn't you use Java JNI?</h2>
+        <p>
+            I think JNI is something that should be avoided if possible. Your code tends to get ugly and you can
+            easily run into various problems.<br/>
+            The new attempt in Kayak was choosen because it has some advantages and creates new possibilities
+            how you can set up your infrastructure.
+        </p>
+
+        <h2>Can the socketcand be extended with high level protocols like ISO-TP?</h2>
+        <p>
+            Yes this is possible. Currently there are no attempts in this direction but it should be quite simple to implement.
+        </p>
+        <h2>Does the .kcd network definition format handle multiplex messages?</h2>
+        <p>Yes!</p>
+
+        <h2>Is it possible to use Kayak and the socketcand on a Windows only machine with a VM?</h2>
+        <p>It is possible to run the socketcand and the SocketCAN backend in a virtual machine and connect to this machine with Kayak. The performance may not be the best but you can do this...</p>
+
+
+        <h2>Is Kayak able to send messages on the CAN-bus</h2>
+        <p>Yes sending is possible via the <i>Send view</i></p>
+
+        <h2>Does Kayak support filtering (or event triggering) by frame content (e.g. vehicle speed > 100km/h)</h2>
+        <p>No this is not yet possible but it should be fairly simple to implement in a plugin.</p>
+
+        </div>
+
+<div class="footer">
+            Kayak is free software by Jan-Niklas Meier - <a href="http://jansblog.org/page/impressum">Imprint</a> - <a href="http://jansblog.org/page/datenschutz">Disclaimer</a>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,177 @@
+<html>
+    <head>
+    <meta charset='utf-8'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,400italic' rel='stylesheet' type='text/css'>
+    <title>Kayak - tutorial</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    </head>
+
+    <body>
+    <a href="http://github.com/dschanoeh/Kayak"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+        <div id="container">
+            <h1><a href="index.html">Kayak</a>- tutorial</h1>
+            <div class="description">
+                This tutorial will show you how to set up a working Kayak setup.
+                If you already have a device with a socketcand you wish to connect to
+                you can skip the steps (1) and (2).
+            </div>
+            <div>
+                <h2>(1) Find out about SocketCAN</h2>
+                Kayak is based on SocketCAN and uses some of the features it provides.
+                To connect Kayak to a real CAN bus you first have to understand the SocketCAN principles
+                and set up a Linux machine with SocketCAN support. Then you have to connect a compatible
+                CAN adapter or controller and create a new bus.<br/>
+                For further instructions check the 
+                <a href="http://developer.berlios.de/project/socketcan/">SocketCAN project</a>
+                or read the SocketCAN tutorials I wrote (German):
+                <a href="http://2codeornot2code.org/?p=129">Part 0</a>
+                <a href="http://2codeornot2code.org/?p=167">Part 1</a>
+                <a href="http://2codeornot2code.org/?p=400">Part 2</a>
+            </div>
+
+            <div>
+                <h2>(2) Set up socketcand</h2>
+                To use Kayak you need a socketcand on the Linux machine where the SocketCAN busses
+                were created.<br/>
+                socketcand will probably not be distributed in binary form but can be compiled
+                from source using the following steps 
+                (assuming you have the essential build tools and git installed):
+
+                <pre>$ git clone http://github.com/dschanoeh/socketcand.git
+$ cd socketcand
+$ autoconf
+$ ./configure
+$ make clean
+$ make
+$ sudo make install</pre>
+
+                For more details check the
+                <a href="http://github.com/dschanoeh/socketcand">socketcand project page</a>.
+                socketcand comes with init and rc scripts that allow you to start the daemon
+                at boot time.<br/>
+                To change the settings edit /etc/socketcand.conf and read the manpage.
+            </div>
+
+            <div>
+                <h2>(3) Install and configure Kayak</h2>
+                The easiest way to install Kayak is in binary form. Download the current version
+                at <a href="http://kayak.2codeornot2code.org">this page</a>.
+                Run the installer for your platform and Kayak is set up.<br/>
+            </div>
+
+            <div>
+                <h2>(4) Create a new Project</h2>
+                Open Kayak and select the <i>Projects</i> window on the left. Add a new Project
+                to the list by selecting <i>File->New Project</i>. Give the project a meaningful name.
+                After selecting the project you can add new busses to it. Right click on the Project
+                and select <i>New bus...</i>. Then choose a name for the bus like <i>Powertrain</i>.
+                You can add and remove projects and switch between them by right clicking on a project
+                and selecting <i>Open project</i>.
+            </div>
+            <div>
+                <h2>(5) Connect to a socketcand</h2>
+                Select the <i>Connections</i> window on the right side. If
+                auto discovery is working in your network you should see some entries in the
+                tree under <i>Auto discovery</i>.<br/>
+                You can also add manual connections via the menu or the toolbar. These connections
+                are characterized by URLs of the schema <i>socket://busname@host:port</i>.
+                They will show up in the <i>Recent</i> folder.<br/>
+                If you want to connect an existing bus in your project, drag the connection onto
+                the <i>Connection: None</i> element of the bus.<br/>
+                You can also drag a connection to a project and create a new bus in the project
+                with the connection already set.
+            </div>
+            <div>
+                <h2>(6) View raw data on the bus</h2>
+                <img align="right" src="images/raw_view.png"/>
+                When you have set up your project and all busses you need hit the play icon in the
+                toolbar. Kayak will then start to open connections and in the bottom right corner
+                of the application you can see the current simulation time.<br/>
+                At first you will see no data. Right click on a bus you want to monitor and select
+                <i>Open RAW view</i>. A new window will open showing you the frames that are on
+                the bus.
+                You can do this for all busses you want to watch and change the window layout to your
+                needs.<br/>
+                In a raw view you can:
+                <ul>
+                    <li>resort the frames by clicking on a table header</li>
+                    <li>enable a colorized presentation where bytes that change often are
+                    highlighted in read</li>
+                    <li>clear the list of all frames</li>
+                    <li>filter for specific IDs either by typing in the filter text field or selecting
+                    rows in the table and clicking <i>Filter for selection</i>. Filters can be toggled
+                    by the <i>filter</i> checkbox. Note that filtering not only helps you stay on
+                    top of things but also reduces the network load because less frames are transmitted.</li>
+                </ul>
+                After closing all views for a bus the connection will be terminated.
+            </div>
+
+            <div>
+                <h2>Record a log file</h2>
+            </div>
+            <div>
+                <h2>Play a log file</h2>
+                <img align="right" src="images/log_input.png"/>
+                Kayak handles all 
+                <a href="https://github.com/dschanoeh/Kayak/blob/master/doc/files/logfiles.md">log files</a>
+                you place in the Kayak log file folder. After installation
+                this folder is <i>[USER_DIR]/kayak/log/</i> but you can change it in the settings 
+                Every file in the folder named <i>*.log | *.log.gz</i> is displayed in Kayak.
+                You can open the <i>Log files</i> window and browse them sorted by platform.<br/>
+                If you want to play a log file you first have to create a project and add busses.
+                You don't need to connect them to a socketcand becaus local loopback replay is possible.
+                Select the log file and open it.<br/>
+                In the new window you see a list of all busses in the log file. To connect a project bus
+                to a bus in the log file drag it into the log input window. This way you can easily
+                change bus configurations or only connect the busses you are interested in.<br/>
+                After that you are ready to start the replay. Hit play in Kayak, open the bus views you want
+                to watch and hit play in the Log input view to start replay.
+                The bar will move as the log file is playing to indicate the current position.
+                Below you can see the current start and stop time. They may be changed using the <i>Set in</i>
+                and <i>Set out</i> buttons as known from video cut software.
+                If you want the replay to start over at the end check the <i>Infinite replay</i> checkbox.
+                You can pause, stop and play the replay at any time.
+            </div>
+            <div>
+                <h2>View interpreted data</h2>
+                <img align="right" src="images/signals.png"/>
+                Bus descriptions are handled the way log files are handled. The default folder is
+                <i>[USER_DIR]/kayak/descriptions/</i> and all <i>.kcd</i> files placed there are displayed
+                in the <i>Descriptions</i> window.<br/>
+                When you expand a file in this window you see all the bus descriptions a file contains.
+                To load a description drag the bus from the description window to the <i>Description: None</i>
+                node of a bus in you project. After doing this configuration open the <i>Messages</i> window.
+                It contains all messages and signals of busses for which descriptions were loaded.
+                This list can get quite huge so use the <i>Search</i> box if you are looking for a specific
+                item. If you select a message or signal the <i>Properties</i> window shows all the information
+                about this element.<br/>
+                Currently there are two views that can display interpreted data. The first is the 
+                <i>Message View</i>. After opening it you can drag signals and messages there and you will see
+                their current value in a tabular.<br/>
+                The second is the <i>Gauge view</i>. Open a gauge view and drag a single signal into it.
+                This view is useful for fast changing values like vehicle speed or engine speed.<br/>
+                <center><img src="images/gauge.png"/></center>
+            </div>
+            <div>
+                <h2>Map view</h2>
+                <img align="right" src="images/map_view.png"/>
+                To watch GPS signals from a log file on an <i>Open Streetmap</i> map you first need a network definition
+                that contains latitude and longitude signals.
+                Create a new project and connect this description to the bus on which the GPS signal is transmitted.
+                After opening a map view you can drag those
+                signals from the <i>Message View</i> into the corresponding fields of the <i>Map view</i>
+                and the position will be show live on the map.
+                You can move the map around and zoom in or out. Also you can clear the waypoint trail and deactivate
+                following of the current position.<br/>
+                If you are behind a proxy you first need to configure the proxy settings in Kayak to enable
+                automatic tile loading from the Open Streetmap servers.
+            </div>
+        </div>
+
+<div class="footer">
+            Kayak is free software by Jan-Niklas Meier - <a href="http://jansblog.org/page/impressum">Imprint</a> - <a href="http://jansblog.org/page/datenschutz">Disclaimer</a>
+        </div>
+    </body>
+</html>
+
+

@@ -1,33 +1,9 @@
-<!DOCTYPE html>
 <html>
 <head>
   <meta charset='utf-8'>
-
-  <title>dschanoeh/Kayak @ GitHub</title>
-
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #ffffff;
-      font-family: "Helvetica,Arial,FreeSans";
-      color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #000000; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #000000; }
-    h3 { text-align: center; color: #000000; }
-    a { color: #000000; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+  <title>Kayak</title>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,400italic' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
 
 <body>
@@ -35,44 +11,78 @@
 
   <div id="container">
 
-    <div class="download">
-      <a href="http://github.com/dschanoeh/Kayak/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/dschanoeh/Kayak/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
-
-    <h1><a href="http://github.com/dschanoeh/Kayak">Kayak</a></h1>
+    <h1>Kayak</h1>
 
     <div class="description">
-      Kayak aims to be a Java framework and Application for CAN data monitoring and . It includes an abstract data model for different CAN hard- and software solutions. SocketCAN and IP will be used as an abstraction layer above the hardware. 
-      Platform independence is a goal and therefore it if fully implemented in Java. To provide a rich user interface Kayak is a Netbeans RCP application.</div>
-
-    <h2>Authors</h2>
-<p>Jan-Niklas Meier (dschanoeh@googlemail.com)<br/>
-julietkilo<br/><br/>      </p>
-
-    <h2>Download</h2>
-    <p>
-      You can download the project sourcecode in either
-      <a href="http://github.com/dschanoeh/Kayak/zipball/master">zip</a> or
-      <a href="http://github.com/dschanoeh/Kayak/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/dschanoeh/Kayak</pre>
-    </p>
-
-    <h2>Build</h2>
-    To build Kayak you only need a working maven2 installation. To initiate the packaging go into the Kayak source folder and run
-      <pre>$ mvn clean package</pre>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/dschanoeh/Kayak">dschanoeh/Kayak</a>
+        Kayak is an application for CAN bus diagnosis and monitoring. Its main goals are a simple interface and platform independence.
+        It is implemented in pure Java and has no platform specific dependencies.
+        Kayak is based on SocketCAN and the connection to a SocketCAN bus takes place using TCP/IP and a socketcand server.
+        Therefore the bus access is network transparent and can be shared with multiple users.<br/>
+        Kayak uses the <a href="https://github.com/julietkilo/kcd">open CAN definition format kcd</a>. Existing .dbc CAN definitions can be converted to kcd using <a href="https://github.com/julietkilo/CANBabel">CANBabel</a>.<br/>
+    <center><a href="images/overview.png"><img width="700" src="images/overview.png"/></a></center>
     </div>
 
-  </div>
+    <div>
+        <h2>Features</h2>
+        <ul>
+            <li>view raw CAN data on a bus</li>
+            <li>view CAN frames interpreted as signals and messages</li>
+            <li>XML-based bus definitions</li>
+            <li>connect to to multiple CAN busses on different machines at once</li>
+            <li>multiple users can connect to the same CAN bus using a single CAN controller</li>
+            <li>no platform dependend code</li>
+            <li><a href="library.html">core library</a> without dependencies for use in other applications that need to handle CAN frames</li>
+            <li>rich client application (Netbeans RCP)</li>
+            <li>easily write your own plugins using the Netbeans plugin system</li>
+        </ul>
+    </div>
 
-  
+    <div>
+    <h2>Get Kayak</h2>
+    <h3>Binary</h3>
+    <p>
+        You can download the current <i>DEVELOPMENT</i> version of Kayak
+        <a href="https://github.com/dschanoeh/Kayak/releases">here</a>. Please note that Kayak
+        has not been released yet and it will possibly be quite unstable.
+    </p>
+
+    <h3>From source</h3>
+
+    <h4>1. Clone using Git</h4>
+    <p>You can clone the project using <a href="http://git-scm.com">git</a>:
+      <pre>$ git clone git://github.com/dschanoeh/Kayak</pre>
+      The main releases of Kayak are on branch master. If you would like to test the unstable development
+      version please checkout the develop branch.
+    </p>
+
+    <h4>2. Build</h4>
+    <p>
+        To build Kayak you only need a working maven installation.
+        All dependencies are downloaded during the build process
+        To initiate the build move into the Kayak source folder and run
+        <pre>$ mvn clean package</pre>
+    </p>
+    </div>
+
+    <div>
+        <h2>Get started</h2>
+        Read <a href="./tutorial.html">this short tutorial</a> for a quick start with Kayak or check
+        the <a href="faq.html">FAQ</a> if your questions were not covered.
+    </div>
+
+    <div>
+    <h2>Found a bug; want a feature?</h2>
+    <p>
+    Please use the <a href="https://github.com/dschanoeh/Kayak/issues">bugtracker</a> at github
+    or even fix the bug / implement the feature yourself and send a
+    <a href="https://github.com/dschanoeh/Kayak/pulls">pull request</a> ;).
+    </p>
+</div>
+
+</div>
+<div class="footer">
+            Kayak is free software by Jan-Niklas Meier - <a href="http://jansblog.org/page/impressum">Imprint</a> - <a href="http://jansblog.org/page/datenschutz">Disclaimer</a>
+        </div>
+
 </body>
 </html>
