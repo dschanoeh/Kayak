@@ -8,6 +8,9 @@ The [socketcand](https://github.com/dschanoeh/socketcand) provides the bridge be
 Existing .dbc files with CAN message specifications can be converted into the Kayak .kcd format using [CANBabel](https://github.com/julietkilo/CANBabel). Afterwards Kayak is able to decode CAN frames and to display and interpret the messages and signals.
 To build Kayak follow the instructions in BUILD.md
 
+### Documentation
+You can find some basic documentation [here](https://dschanoeh.github.io/Kayak/).
+
 ### What is implemented yet:
 * abstract bus, receiver, sender - model
 * .kcd bus description format, see [CANBabel](https://github.com/julietkilo/CANBabel)
@@ -15,6 +18,6 @@ To build Kayak follow the instructions in BUILD.md
 * simple raw view of CAN frames
 * sending of single and repetitive CAN frames
 * creation and replay of log files
- 
+
 ### Why the name Kayak?
-Because a kayak is a small, lightweight and versatile boat compared to a canoe. 
+Because a kayak is a small, lightweight and versatile boat compared to a canoe.
