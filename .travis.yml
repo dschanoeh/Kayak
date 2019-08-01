@@ -5,16 +5,14 @@ jdk:
 cache:
   directories:
   - "$HOME/.m2"
-
 before_deploy:
-  - "mvn package"
-  - "mv application/target/application-1.0-SNAPSHOT.zip application/target/Kayak-1.0-SNAPSHOT.zip"
-
+- mvn package
+- mv application/target/application-1.0-SNAPSHOT.zip application/target/Kayak-1.0-SNAPSHOT.zip
 deploy:
   provider: releases
   skip_cleanup: true
   api_key:
-    secure: AqkXYNgmPKpWKrVdEWLeilIwc8bQriJtQGPWRQ7dsReJwxdkuu3kmcOX6SSi2RHep5C+Ojv4op7p8G6yE6CHHJimleNgw/tQ1BZivr/04NejQsW/ZOcsMz7+ZKL35MOg8hnXyVlgILgQLW5ae9zGRdUTKCbVJN1DtwsExxmQVIdz87fOsVX6VJ4L+7bBfKHEz5QNl5xiWKyV+5yZkwjD50fqeP1SxMZCYnRx/UrBSplxys6eZo5QBUBjqWlOjh2MMBdOfVbGk1/JMhzB/wJU3KfqBuedn1CNDK5gZn7hih1iZS55TQeweQUcjLvXtc+3zV8cTTA67RyPj4lguFmbsS9QgSc/H3eHwHUnhT2a7J+xH1kG+vL0/WVLnjNQ7/9Wwv0xskoCslGXyb9OY/xgyHka7lQLT3kzxqtfwyrlyxuzA3xnuj+7MjgpnRQix9v887Wlf7Gqvl+Kn9yYYq3bt22Ut802+65T2Vj4rrLLTawwbbdCYXydts+Tj+y2QXGf5Y+5FtF2X5DguTFHMqfuIEyzxIHJ+rDvZAhJkt0huqttEaheSpqntMjSKFyD54zOZwEfCwL/q8b28DnUnccnmI1ANq+qVN/nHD9Yx41wu+JjzMzwNrtMTuI6MnMknzqKdtuOYEcjaPmRcCwHge5vlj3s/4CnGYcFuWIgOB1XoTA=
+    secure: dbLgoGnapUVXv9XzCuq1mhcSUxpWLKL82WCitDRhI+XKlmdroMif1Zrg7kGAsPKJ8LZtN1yjuZVp8lZizFDa6gTsQEaql15t8TlYGYQ6lkzUKvsKSBSydSjVa+H1fbgso+5s400k9mZWd3U2PFx/R0gtoRjtJ8nw9E3cj2+M9enwblAwlssx1AebkMNnbPNiS/rueQa2FKazpOGFp89pjbJLeevW8nFh99DvMfm74uguNp+oljpFTpK6cEdlT+lcs9Sw4sp1ElO5IU1phUOoOveljBRdfRRqrn3FIn/N0MZxEfPiB/yIQKEBU8ah2ZqtYpv1ZPj1LH1n/2Zerz6e4B2mASeTaijO146Jk6+78DospU8rMoWN5uzTw2rvZ7DaOdza2jH2IR9I9cV3/vl1rAg+Z+kP+x2lGCF0ZItvjiYUYfU0azz2bucbVKLZojioLorPAMwzCdQ+WMG3CMz+BhFfjNhD4pt4FqCWNj0UgGmzl1mfb5caUzFg0RP+6CjuaLFIEceRNo0MtT/I/xWuJKywZUc9um6/iCRFQYkRsGOHJGg3oPQwOEgbdtTiK4I5JUlWpbjlQRfz0JUGlRrObpnHUp/3d/5w7vOlLl14ZYsiLYGi2Nw0IB2wsBwXb1rNu3a/mxZxWLTiPYaaxzXaOh9bDAtfytfSxZAeqA3S45c=
   file: application/target/Kayak-1.0-SNAPSHOT.zip
   on:
     repo: dschanoeh/Kayak
