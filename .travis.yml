@@ -1,9 +1,20 @@
 dist: bionic
 language: java
-
 jdk:
-  - openjdk11
-
+- openjdk11
 cache:
   directories:
-  - $HOME/.m2
+  - "$HOME/.m2"
+
+before_deploy:
+  - "mvn package"
+  - "mv application/target/application-1.0-SNAPSHOT.zip application/target/Kayak-1.0-SNAPSHOT.zip"
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: AqkXYNgmPKpWKrVdEWLeilIwc8bQriJtQGPWRQ7dsReJwxdkuu3kmcOX6SSi2RHep5C+Ojv4op7p8G6yE6CHHJimleNgw/tQ1BZivr/04NejQsW/ZOcsMz7+ZKL35MOg8hnXyVlgILgQLW5ae9zGRdUTKCbVJN1DtwsExxmQVIdz87fOsVX6VJ4L+7bBfKHEz5QNl5xiWKyV+5yZkwjD50fqeP1SxMZCYnRx/UrBSplxys6eZo5QBUBjqWlOjh2MMBdOfVbGk1/JMhzB/wJU3KfqBuedn1CNDK5gZn7hih1iZS55TQeweQUcjLvXtc+3zV8cTTA67RyPj4lguFmbsS9QgSc/H3eHwHUnhT2a7J+xH1kG+vL0/WVLnjNQ7/9Wwv0xskoCslGXyb9OY/xgyHka7lQLT3kzxqtfwyrlyxuzA3xnuj+7MjgpnRQix9v887Wlf7Gqvl+Kn9yYYq3bt22Ut802+65T2Vj4rrLLTawwbbdCYXydts+Tj+y2QXGf5Y+5FtF2X5DguTFHMqfuIEyzxIHJ+rDvZAhJkt0huqttEaheSpqntMjSKFyD54zOZwEfCwL/q8b28DnUnccnmI1ANq+qVN/nHD9Yx41wu+JjzMzwNrtMTuI6MnMknzqKdtuOYEcjaPmRcCwHge5vlj3s/4CnGYcFuWIgOB1XoTA=
+  file: application/target/Kayak-1.0-SNAPSHOT.zip
+  on:
+    repo: dschanoeh/Kayak
