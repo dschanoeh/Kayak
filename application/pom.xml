@@ -14,11 +14,25 @@
 
     <name>Kayak - NetBeans Platform based application</name>
 
+    <repositories>
+        <repository>
+            <id>netbeans</id>
+            <name>repository hosting netbeans.org api artifacts</name>
+            <url>http://bits.netbeans.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.netbeans.cluster</groupId>
             <artifactId>platform</artifactId>
-            <version>RELEASE82</version>
+            <version>RELEASE110</version>
             <type>pom</type>
         </dependency>
 
@@ -52,12 +66,37 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.13.3</version>
+                <version>4.2</version>
                 <configuration>
                     <installerOsSolaris>false</installerOsSolaris>
                     <installerLicenseFile>license.txt</installerLicenseFile>
+                    <userSettings>
+                        <property name="default.javac.source" value="1.8"/>
+                        <property name="default.javac.target" value="1.8"/>
+                    </userSettings>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <!-- to have the jar plugin pickup the nbm generated manifest -->
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- netbeans modules in 6.9+ are 1.6 compatible -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -69,7 +108,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
+                        <groupId>org.apache.netbeans.utilities</groupId>
                         <artifactId>nbm-maven-plugin</artifactId>
                         <executions>
                             <execution>
@@ -93,11 +132,10 @@
                                 </configuration>
                             </execution>
                         </executions>
-                        <version>4.1</version>
+                        <version>4.2</version>
                     </plugin>
                 </plugins>
             </build>
         </profile>
     </profiles>
-    <properties></properties>
 </project>

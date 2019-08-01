@@ -49,7 +49,7 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
+                    <groupId>org.apache.netbeans.utilities</groupId>
                     <artifactId>nbm-maven-plugin</artifactId>
                     <extensions>true</extensions>
                     <configuration>
@@ -57,17 +57,17 @@
                         <cluster>kayak</cluster>
                         <etcConfFile>${basedir}/kayak.conf</etcConfFile>
                     </configuration>
-                    <version>3.13.3</version>
+                    <version>4.2</version>
                 </plugin>
 
                 <plugin>
                     <!-- netbeans modules in 6.9+ are 1.6 compatible -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>3.8.1</version>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>1.8</source>
+                        <target>1.8</target>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -82,9 +82,11 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.1.2</version>
                     <configuration>
-                        <useDefaultManifestFile>true</useDefaultManifestFile>
+                        <archive>
+                            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        </archive>
                     </configuration>
                 </plugin>
             </plugins>
@@ -98,11 +100,11 @@
         <module>Kayak-kcd</module>
         <module>Kayak-core</module>
         <module>Kayak-logging</module>
-    <module>Kayak-mapview</module>
-  </modules>
+        <module>Kayak-mapview</module>
+    </modules>
 
     <properties>
-        <netbeans.version>RELEASE82</netbeans.version>
+        <netbeans.version>RELEASE110</netbeans.version>
         <brandingToken>kayak</brandingToken>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
