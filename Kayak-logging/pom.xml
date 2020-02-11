@@ -22,7 +22,7 @@
         <repository>
             <id>netbeans</id>
             <name>repository hosting netbeans.org api artifacts</name>
-            <url>http://bits.netbeans.org/maven2</url>
+            <url>https://bits.netbeans.org/maven2</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
